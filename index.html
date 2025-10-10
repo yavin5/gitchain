@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gitchain v0.8.0 - Blockchain Processor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://unpkg.com/ethereum-cryptography@2.2.1/dist/browser/index.js"></script>
+</head>
+<body>
+    <h1>Gitchain v0.8.0</h1>
+    <p>View blockchain or process issue txns. One user runs this page with a write-enabled GitHub access token to process; others view with read-only access.</p>
+    
+    <div>
+        <label for="githubAccessToken">Your GitHub Access Token:</label>
+        <input type="text" id="githubAccessToken" placeholder="ghp_..." size="40">
+        <button onclick="saveGithubAccessToken()">Save Token</button>
+        <p>Processor token needs repo contents read/write and issues read/write.</p>
+    </div>
+    
+    <button onclick="viewChain()">View Chain & Balances</button>
+    <button onclick="processTxns()">Process Transactions Now</button>
+    
+    <div id="output" style="margin-top: 20px; white-space: pre-wrap;"></div>
+    
+    <script src="js/blockchain.js"></script>
+</body>
+</html>
+

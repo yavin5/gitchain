@@ -1,3 +1,6 @@
+admin.key
+src/admin-address.ts
+
 # Logs
 logs
 *.log

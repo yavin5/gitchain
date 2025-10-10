@@ -1,0 +1,15 @@
+{
+  "name": "gitchain",
+  "version": "0.8.0",
+  "scripts": {
+    "build": "tsc",
+    "generate-admin": "ts-node src/generate-admin-key.ts"
+  },
+  "dependencies": {
+    "ethereum-cryptography": "^2.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.2"
+  }
+}
