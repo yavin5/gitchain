@@ -8,11 +8,21 @@
     // Update block height display
     async function updateBlockHeight() {
         const blockHeightDiv = document.getElementById('blockHeight');
-        const state = await fetchState();
-        if (state && state.content.chain) {
-            blockHeightDiv.textContent = `Current Block Height: ${state.content.chain.length}`;
-        } else {
-            blockHeightDiv.textContent = 'Current Block Height: 0 (Chain not initialized)';
+        if (!fetchState) {
+            blockHeightDiv.textContent = 'Current Block Height: Error (fetchState not available)';
+            console.error('fetchState is not available');
+            return;
+        }
+        try {
+            const state = await fetchState();
+            if (state && state.content.chain) {
+                blockHeightDiv.textContent = `Current Block Height: ${state.content.chain.length}`;
+            } else {
+                blockHeightDiv.textContent = 'Current Block Height: 0 (Chain not initialized)';
+            }
+        } catch (error) {
+            blockHeightDiv.textContent = 'Current Block Height: Error fetching state';
+            console.error('Error fetching state:', error);
         }
     }
 
@@ -21,15 +31,23 @@
         const tokenInput = document.getElementById('githubAccessToken');
         const tokenMessageDiv = document.getElementById('tokenMessage');
         if (tokenInput.value) {
-            saveGithubAccessToken();
-            tokenMessageDiv.textContent = 'Github personal access token saved successfully';
-            tokenMessageDiv.style.color = 'green';
-            // Clear message after 5 seconds
-            setTimeout(() => {
-                tokenMessageDiv.textContent = '';
-            }, 5000);
+            try {
+                saveGithubAccessToken();
+                tokenMessageDiv.textContent = 'Token saved successfully';
+                tokenMessageDiv.style.color = 'green';
+                // Clear message after 5 seconds
+                setTimeout(() => {
+                    tokenMessageDiv.textContent = '';
+                }, 5000);
+            } catch (error) {
+                tokenMessageDiv.textContent = 'Failed to save token';
+                tokenMessageDiv.style.color = 'red';
+                setTimeout(() => {
+                    tokenMessageDiv.textContent = '';
+                }, 5000);
+            }
         } else {
-            tokenMessageDiv.textContent = 'Please enter a valid Github personal access token';
+            tokenMessageDiv.textContent = 'Please enter a valid token';
             tokenMessageDiv.style.color = 'red';
             setTimeout(() => {
                 tokenMessageDiv.textContent = '';
@@ -39,12 +57,15 @@
 
     // Attach event listeners
     document.getElementById('saveTokenButton').addEventListener('click', handleSaveToken);
-    document.getElementById('viewChainButton').addEventListener('click', viewChain);
-    document.getElementById('processTxnsButton').addEventListener('click', processTxns);
+    document.getElementById('viewChainButton').addEventListener('click', () => {
+        if (viewChain) viewChain();
+        else console.error('viewChain is not available');
+    });
+    document.getElementById('processTxnsButton').addEventListener('click', () => {
+        if (processTxns) processTxns().then(updateBlockHeight);
+        else console.error('processTxns is not available');
+    });
 
     // Update block height on load and after processing transactions
     window.addEventListener('load', updateBlockHeight);
-    document.getElementById('processTxnsButton').addEventListener('click', () => {
-        processTxns().then(updateBlockHeight);
-    });
 })();

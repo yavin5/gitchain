@@ -135,14 +135,13 @@ export function saveGithubAccessToken() {
     const githubAccessToken = document.getElementById('githubAccessToken')?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
-        alert('GitHub access token saved.');
     }
     else {
-        alert('Enter a GitHub access token first.');
+        throw new Error('Enter a GitHub access token first.');
     }
 }
 // Fetch state
-async function fetchState() {
+export async function fetchState() {
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken)
         return null;
@@ -236,6 +235,8 @@ async function closeIssueWithComment(issueNumber, blockIndex, valid) {
 // Process txns via open issues
 export async function processTxns() {
     const output = document.getElementById('output');
+    const processingMessage = document.getElementById('processingMessage');
+    processingMessage.style.display = 'block';
     let stateData = await fetchState();
     let state = stateData?.content;
     if (!state) {
@@ -249,6 +250,7 @@ export async function processTxns() {
         const success = await updateState(state, null, 'Initialize state');
         if (!success) {
             output.textContent += '\nFailed to initialize.';
+            processingMessage.style.display = 'none';
             return;
         }
         stateData = await fetchState();
@@ -283,9 +285,11 @@ export async function processTxns() {
             continue;
         }
         const { valid, txid } = await processTxn(txn, state);
+        console.log(`Attempting to settle transaction ID: ${txid} from issue #${issue.number}`);
         const blockIndex = valid ? await mineBlock(state) : null;
         await closeIssueWithComment(issue.number, blockIndex, valid);
-        if (valid) {
+        if (valid && blockIndex !== null) {
+            console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
             output.textContent += `\nProcessed txn ${txid} from issue #${issue.number} in block ${blockIndex}`;
         }
         else {
@@ -294,6 +298,7 @@ export async function processTxns() {
         const success = await updateState(state, stateData.sha, `Process issue #${issue.number}`);
         if (!success) {
             output.textContent += `\nFailed to update state after issue #${issue.number}`;
+            processingMessage.style.display = 'none';
             return;
         }
         stateData = await fetchState();
@@ -307,14 +312,14 @@ export async function processTxns() {
         state.lastProcessedDate = newLastDate;
         await updateState(state, stateData.sha, 'Update last processed date');
     }
-    output.textContent += '\nProcessing complete';
+    processingMessage.style.display = 'none';
 }
 // View chain
 export async function viewChain() {
     const output = document.getElementById('output');
     const state = await fetchState();
-    if (!state) {
-        output.textContent = 'Chain not initialized.';
+    if (!state || !state.content.chain || state.content.chain.length === 0) {
+        output.textContent = 'No transactions in the chain yet.';
         return;
     }
     const chain = state.content.chain;
@@ -347,3 +352,4 @@ window.addEventListener('load', () => {
 window.saveGithubAccessToken = saveGithubAccessToken;
 window.viewChain = viewChain;
 window.processTxns = processTxns;
+window.fetchState = fetchState;
