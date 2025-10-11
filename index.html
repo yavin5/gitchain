@@ -4,30 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitchain</title>
-    <!-- Content Security Policy to allow CDN scripts -->
+    <!-- Content Security Policy: Allow scripts from self, CDNs, and API calls -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://cdnjs.cloudflare.com; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
 </head>
 <body>
     <h1>Gitchain</h1>
     <p>Enter your GitHub Personal Access Token (with repo contents read/write and issues read/write permissions):</p>
     <input type="text" id="githubAccessToken" placeholder="Enter GitHub PAT">
-    <button onclick="saveGithubAccessToken()">Save Token</button>
-    <button onclick="viewChain()">View Chain</button>
-    <button onclick="processTxns()">Process Transactions</button>
+    <button id="saveTokenButton">Save Token</button>
+    <button id="viewChainButton">View Chain</button>
+    <button id="processTxnsButton">Process Transactions</button>
     <div id="output"></div>
 
     <!-- Load crypto-js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Load ethereum-cryptography from CDN -->
     <script src="https://unpkg.com/ethereum-cryptography@2.2.1/index.js"></script>
-    <!-- Load blockchain.js as ESM -->
+    <!-- Load blockchain.js as ESM and attach event listeners -->
     <script type="module">
         import { saveGithubAccessToken, viewChain, processTxns } from './js/blockchain.js';
 
-        // Expose functions to global scope for onclick handlers
+        // Expose functions to global scope (optional, for debugging)
         window.saveGithubAccessToken = saveGithubAccessToken;
         window.viewChain = viewChain;
         window.processTxns = processTxns;
+
+        // Attach event listeners to buttons
+        document.getElementById('saveTokenButton').addEventListener('click', saveGithubAccessToken);
+        document.getElementById('viewChainButton').addEventListener('click', viewChain);
+        document.getElementById('processTxnsButton').addEventListener('click', processTxns);
+
+        // Debug: Confirm functions are loaded
+        console.log('Functions exposed:', { saveGithubAccessToken, viewChain, processTxns });
     </script>
 </body>
 </html>
