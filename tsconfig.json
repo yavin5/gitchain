@@ -1,16 +1,22 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "outDir": "./js",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true
-  },
-  "include": ["src/generate-admin-key.ts"],
-  "exclude": ["node_modules"]
+    "compilerOptions": {
+        "target": "es2020",
+        "module": "commonjs",
+        "outDir": "./js",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["es2020", "dom"],
+        "types": ["node"],
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/global.d.ts"
+    ]
 }

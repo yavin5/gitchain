@@ -22,22 +22,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
     <!-- Load js-sha3 for keccak256 (UMD browser bundle) -->
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/build/sha3.min.js"></script>
-    <!-- Load blockchain.js as ESM and attach event listeners -->
-    <script type="module">
-        import { saveGithubAccessToken, viewChain, processTxns } from './js/blockchain.js';
-
-        // Expose functions to global scope
-        window.saveGithubAccessToken = saveGithubAccessToken;
-        window.viewChain = viewChain;
-        window.processTxns = processTxns;
-
-        // Attach event listeners to buttons
-        document.getElementById('saveTokenButton').addEventListener('click', saveGithubAccessToken);
-        document.getElementById('viewChainButton').addEventListener('click', viewChain);
-        document.getElementById('processTxnsButton').addEventListener('click', processTxns);
-
-        // Debug: Confirm functions are loaded
-        console.log('Functions exposed:', { saveGithubAccessToken, viewChain, processTxns });
-    </script>
+    <!-- Load blockchain.js -->
+    <script src="./js/blockchain.js"></script>
+    <!-- Load main.js for event listeners -->
+    <script src="./js/main.js"></script>
 </body>
 </html>

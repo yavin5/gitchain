@@ -343,3 +343,7 @@ window.addEventListener('load', () => {
         processTxns();
     }, 15000);
 });
+// Export functions to global scope for main.js
+window.saveGithubAccessToken = saveGithubAccessToken;
+window.viewChain = viewChain;
+window.processTxns = processTxns;
