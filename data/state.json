@@ -1,0 +1,17 @@
+{
+  "chain": [
+    {
+      "index": 0,
+      "previousHash": "0",
+      "timestamp": "2025-10-11T05:04:19.106Z",
+      "transactions": [],
+      "hash": "4647344d8bbf31a565d13c6fe5855f0eca0257034211c44f9033496bfec4e681"
+    }
+  ],
+  "pending": [],
+  "balances": {
+    "0x097efb2a92bc5205e1615db52338a118f1619f3f": 1000000
+  },
+  "nonces": {},
+  "lastProcessedDate": "1970-01-01T00:00:00.000Z"
+}
