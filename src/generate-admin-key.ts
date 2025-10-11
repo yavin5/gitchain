@@ -3,7 +3,7 @@
  *
  * Usage:
  * 1. Install dependencies: npm install
- * 2. Run the script: npm run generate-admin
+ * 2. Run the script: npm run generate-admin-key
  *    - Generates a random private key using secp256k1.
  *    - Derives the Ethereum-style address (keccak256 of public key, last 20 bytes).
  *    - Saves the private key to 'admin.key' (git-ignored, keep secure!).
@@ -29,17 +29,17 @@
  * - The processor will handle it if valid, close the issue with confirmation.
  */
 
-import { secp256k1 } from 'ethereum-cryptography/secp256k1.js';
-import { keccak256 } from 'ethereum-cryptography/keccak.js';
-import { bytesToHex } from 'ethereum-cryptography/utils.js';
-import fs from 'fs';
+import { secp256k1 } from 'ethereum-cryptography/secp256k1';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+import { bytesToHex } from 'ethereum-cryptography/utils';
+import { writeFileSync } from 'fs';
 
 const privKey = secp256k1.utils.randomPrivateKey();
 const pubKey = secp256k1.getPublicKey(privKey);
 const address = `0x${bytesToHex(keccak256(pubKey.slice(1)).slice(-20))}`;
 
-fs.writeFileSync('admin.key', bytesToHex(privKey));
-fs.writeFileSync('src/admin-address.ts', `export const ADMIN_ADDRESS = '${address}';`);
+writeFileSync('admin.key', bytesToHex(privKey));
+writeFileSync('src/admin-address.ts', `export const ADMIN_ADDRESS = '${address}';`);
 
 console.log(`Generated Admin Private Key saved to 'admin.key' (keep secure!)`);
 console.log(`Admin Address: ${address}`);

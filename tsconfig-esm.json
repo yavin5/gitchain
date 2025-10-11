@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./js",
     "rootDir": "./src",
     "strict": true,
@@ -11,6 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true
   },
-  "include": ["src/generate-admin-key.ts"],
+  "include": ["src/blockchain.ts", "src/admin-address.ts"],
   "exclude": ["node_modules"]
 }

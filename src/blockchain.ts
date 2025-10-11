@@ -1,4 +1,9 @@
-import { ADMIN_ADDRESS } from './admin-address';
+import { ADMIN_ADDRESS } from './admin-address.js';
+
+// Declare CryptoJS for TypeScript (loaded via CDN at runtime)
+declare const CryptoJS: {
+    SHA256: (value: string) => { toString: () => string };
+};
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');

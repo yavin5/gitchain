@@ -1,9 +1,10 @@
 {
   "name": "gitchain",
   "version": "0.8.0",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "generate-admin": "ts-node src/generate-admin-key.ts"
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-esm.json",
+    "generate-admin-key": "tsc src/generate-admin-key.ts --outDir js && mv js/generate-admin-key.js js/generate-admin-key.cjs && node js/generate-admin-key.cjs"
   },
   "dependencies": {
     "ethereum-cryptography": "^2.2.1"
