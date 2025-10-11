@@ -28,11 +28,9 @@ function createGenesisBlock() {
 function serializeTxn(txn) {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
-// Keccak256 using @adraffy/keccak
+// Keccak256 using js-sha3
 function keccak256(data) {
-    const h = keccak('keccak256');
-    h.update(new TextEncoder().encode(data));
-    const hex = h.hex();
+    const hex = sha3.keccak256(data);
     const matches = hex.match(/.{2}/g);
     if (!matches) {
         throw new Error('Failed to parse hex string');

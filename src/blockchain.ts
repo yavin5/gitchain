@@ -8,8 +8,10 @@ declare const CryptoJS: {
 // Declare elliptic for secp256k1 (loaded via CDN)
 declare const ec: any;
 
-// Declare @adraffy/keccak for hashing (loaded via CDN)
-declare const keccak: any;
+// Declare js-sha3 for keccak256 (loaded via CDN)
+declare const sha3: {
+    keccak256: (data: string) => string;
+};
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -69,11 +71,9 @@ function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
 
-// Keccak256 using @adraffy/keccak
+// Keccak256 using js-sha3
 function keccak256(data: string): Uint8Array {
-    const h = keccak('keccak256');
-    h.update(new TextEncoder().encode(data));
-    const hex = h.hex();
+    const hex = sha3.keccak256(data);
     const matches = hex.match(/.{2}/g);
     if (!matches) {
         throw new Error('Failed to parse hex string');
