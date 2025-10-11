@@ -1,7 +1,6 @@
 admin.key
 src/admin-address.ts
 node_modules/
-js/
 
 # Logs
 logs
