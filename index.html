@@ -6,15 +6,47 @@
     <title>Gitchain</title>
     <!-- CSP: Allow scripts from self and CDNs, no inline scripts -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
+    <style>
+        #processingMessage {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 1.5em;
+            z-index: 1000;
+        }
+        #tokenMessage {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        #blockHeight {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        #version {
+            font-size: 0.8em;
+            color: #555;
+            margin-left: 10px;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
-    <h1>Gitchain</h1>
+    <h1>Gitchain <span id="version">v0.8.0</span></h1>
     <p>Enter your GitHub Personal Access Token (with repo contents read/write and issues read/write permissions):</p>
     <input type="text" id="githubAccessToken" placeholder="Enter GitHub PAT">
+    <div id="tokenMessage"></div>
     <button id="saveTokenButton">Save Token</button>
     <button id="viewChainButton">View Chain</button>
     <button id="processTxnsButton">Process Transactions</button>
+    <div id="blockHeight"></div>
     <div id="output"></div>
+    <div id="processingMessage">PROCESSING TRANSACTIONS</div>
 
     <!-- Load crypto-js for SHA256 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>

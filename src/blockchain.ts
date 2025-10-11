@@ -179,14 +179,13 @@ export function saveGithubAccessToken(): void {
     const githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
-        alert('GitHub access token saved.');
     } else {
-        alert('Enter a GitHub access token first.');
+        throw new Error('Enter a GitHub access token first.');
     }
 }
 
 // Fetch state
-async function fetchState(): Promise<{ content: State; sha: string } | null> {
+export async function fetchState(): Promise<{ content: State; sha: string } | null> {
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken) return null;
     try {
@@ -275,6 +274,8 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
 // Process txns via open issues
 export async function processTxns(): Promise<void> {
     const output = document.getElementById('output') as HTMLDivElement;
+    const processingMessage = document.getElementById('processingMessage') as HTMLDivElement;
+    processingMessage.style.display = 'block';
     let stateData = await fetchState();
     let state = stateData?.content;
     if (!state) {
@@ -288,6 +289,7 @@ export async function processTxns(): Promise<void> {
         const success = await updateState(state, null, 'Initialize state');
         if (!success) {
             output.textContent += '\nFailed to initialize.';
+            processingMessage.style.display = 'none';
             return;
         }
         stateData = await fetchState();
@@ -322,9 +324,11 @@ export async function processTxns(): Promise<void> {
         }
 
         const { valid, txid } = await processTxn(txn, state);
+        console.log(`Attempting to settle transaction ID: ${txid} from issue #${issue.number}`);
         const blockIndex = valid ? await mineBlock(state) : null;
         await closeIssueWithComment(issue.number, blockIndex, valid);
-        if (valid) {
+        if (valid && blockIndex !== null) {
+            console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
             output.textContent += `\nProcessed txn ${txid} from issue #${issue.number} in block ${blockIndex}`;
         } else {
             output.textContent += `\nRejected invalid txn from issue #${issue.number}`;
@@ -332,6 +336,7 @@ export async function processTxns(): Promise<void> {
         const success = await updateState(state, stateData!.sha, `Process issue #${issue.number}`);
         if (!success) {
             output.textContent += `\nFailed to update state after issue #${issue.number}`;
+            processingMessage.style.display = 'none';
             return;
         }
         stateData = await fetchState();
@@ -347,15 +352,15 @@ export async function processTxns(): Promise<void> {
         state.lastProcessedDate = newLastDate;
         await updateState(state, stateData!.sha, 'Update last processed date');
     }
-    output.textContent += '\nProcessing complete';
+    processingMessage.style.display = 'none';
 }
 
 // View chain
 export async function viewChain(): Promise<void> {
     const output = document.getElementById('output') as HTMLDivElement;
     const state = await fetchState();
-    if (!state) {
-        output.textContent = 'Chain not initialized.';
+    if (!state || !state.content.chain || state.content.chain.length === 0) {
+        output.textContent = 'No transactions in the chain yet.';
         return;
     }
     const chain = state.content.chain;
@@ -390,3 +395,4 @@ window.addEventListener('load', () => {
 window.saveGithubAccessToken = saveGithubAccessToken;
 window.viewChain = viewChain;
 window.processTxns = processTxns;
+window.fetchState = fetchState;
