@@ -1,4 +1,4 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState } from './blockchain.js?v=6';
+import { saveGithubAccessToken, viewChain, processTxns, fetchState } from './blockchain.js?v=7';
 
 console.log('Imported functions:', { saveGithubAccessToken, viewChain, processTxns, fetchState });
 console.log('Window object before assignments:', {
@@ -20,6 +20,8 @@ try {
         windowProcessTxns: window.processTxns,
         windowFetchState: window.fetchState
     });
+    // Dispatch custom event to signal main.js
+    window.dispatchEvent(new Event('gitchain:init'));
 } catch (error) {
     console.error('Error setting global functions:', error);
 }
