@@ -24,6 +24,101 @@ function createGenesisBlock() {
         hash: calculateHash(0, '0', timestamp, [])
     };
 }
+// Serialize txn for signing/hash
+function serializeTxn(txn) {
+    return JSON.stringify(txn, Object.keys(txn).sort());
+}
+// Keccak256 using polyfill
+function keccak256(data) {
+    const hasher = new Keccak(256);
+    hasher.update(data);
+    const hex = hasher.digest('hex');
+    const matches = hex.match(/.{2}/g);
+    if (!matches) {
+        throw new Error('Failed to parse hex string');
+    }
+    return new Uint8Array(matches.map((byte) => parseInt(byte, 16)));
+}
+// Hex to bytes
+function hexToBytes(hex) {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
+}
+// Bytes to hex
+function bytesToHex(bytes) {
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+// Verify signature using elliptic
+function verifyTxn(txn) {
+    try {
+        const msgHash = keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }));
+        const sigBytes = hexToBytes(txn.signature);
+        if (sigBytes.length !== 65)
+            return false;
+        const r = bytesToHex(sigBytes.slice(0, 32));
+        const s = bytesToHex(sigBytes.slice(32, 64));
+        const v = sigBytes[64] - 27; // Normalize v to 0 or 1
+        const curve = new ec.curves.secp256k1;
+        const msgHashHex = bytesToHex(msgHash);
+        const signature = { r: r, s: s };
+        const publicKey = curve.recoverPubKey(msgHashHex, signature, v);
+        const addrHash = keccak256(publicKey.encode('array', true).slice(1)); // Compressed public key without 0x04
+        const recoveredAddr = `0x${bytesToHex(addrHash.slice(-20))}`;
+        return recoveredAddr.toLowerCase() === txn.from.toLowerCase();
+    }
+    catch {
+        return false;
+    }
+}
+// Process a single txn (mint if from admin)
+async function processTxn(txn, state) {
+    const txid = bytesToHex(keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
+    if (!verifyTxn(txn))
+        return { valid: false, txid };
+    if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce)
+        return { valid: false, txid };
+    if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount)
+        return { valid: false, txid };
+    if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to))
+        return { valid: false, txid };
+    state.pending.push(txn);
+    return { valid: true, txid };
+}
+// Mine block
+async function mineBlock(state) {
+    if (state.pending.length === 0)
+        return null;
+    const validTxns = [];
+    const newBalances = { ...state.balances };
+    const newNonces = { ...state.nonces };
+    for (const txn of state.pending) {
+        if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
+            if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+                newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
+            }
+            newBalances[txn.to] = (newBalances[txn.to] || 0) + txn.amount;
+            newNonces[txn.from] = txn.nonce;
+            validTxns.push(txn);
+        }
+    }
+    if (validTxns.length === 0) {
+        state.pending = [];
+        return null;
+    }
+    const nextIndex = state.chain.length;
+    const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : '0';
+    const timestamp = new Date().toISOString();
+    const hash = calculateHash(nextIndex, previousHash, timestamp, validTxns);
+    const newBlock = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash };
+    state.chain.push(newBlock);
+    state.pending = [];
+    state.balances = newBalances;
+    state.nonces = newNonces;
+    return nextIndex;
+}
 // Get GitHub access token
 function getGithubAccessToken() {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
@@ -38,7 +133,7 @@ function getGithubAccessToken() {
     return githubAccessToken;
 }
 // Save GitHub access token
-window.saveGithubAccessToken = function () {
+export function saveGithubAccessToken() {
     const githubAccessToken = document.getElementById('githubAccessToken')?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
@@ -47,7 +142,7 @@ window.saveGithubAccessToken = function () {
     else {
         alert('Enter a GitHub access token first.');
     }
-};
+}
 // Fetch state
 async function fetchState() {
     const githubAccessToken = getGithubAccessToken();
@@ -110,76 +205,7 @@ async function updateState(newContent, oldSha, message, retries = 3) {
         return false;
     }
 }
-// Serialize txn for signing/hash
-function serializeTxn(txn) {
-    return JSON.stringify(txn, Object.keys(txn).sort());
-}
-// Verify signature
-function verifyTxn(txn) {
-    try {
-        const msgHash = window.ethereumCryptography.keccak256(new TextEncoder().encode(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
-        const sigBytes = window.ethereumCryptography.hexToBytes(txn.signature);
-        if (sigBytes.length !== 65)
-            return false;
-        const r = sigBytes.slice(0, 32);
-        const s = sigBytes.slice(32, 64);
-        const v = sigBytes[64];
-        const pubKey = window.ethereumCryptography.secp256k1.recoverPublicKey(msgHash, { r, s }, v - 27);
-        const addrHash = window.ethereumCryptography.keccak256(pubKey.slice(1)).slice(-20);
-        const recoveredAddr = `0x${window.ethereumCryptography.bytesToHex(addrHash)}`;
-        return recoveredAddr.toLowerCase() === txn.from.toLowerCase();
-    }
-    catch {
-        return false;
-    }
-}
-// Process a single txn (mint if from admin)
-async function processTxn(txn, state) {
-    const txid = window.ethereumCryptography.bytesToHex(window.ethereumCryptography.keccak256(new TextEncoder().encode(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
-    if (!verifyTxn(txn))
-        return { valid: false, txid };
-    if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce)
-        return { valid: false, txid };
-    if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount)
-        return { valid: false, txid };
-    if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to))
-        return { valid: false, txid };
-    state.pending.push(txn);
-    return { valid: true, txid };
-}
-// Mine block (handle mints without deduction)
-async function mineBlock(state) {
-    if (state.pending.length === 0)
-        return null;
-    const validTxns = [];
-    const newBalances = { ...state.balances };
-    const newNonces = { ...state.nonces };
-    for (const txn of state.pending) {
-        if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
-            if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
-                newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
-            }
-            newBalances[txn.to] = (newBalances[txn.to] || 0) + txn.amount;
-            newNonces[txn.from] = txn.nonce;
-            validTxns.push(txn);
-        }
-    }
-    if (validTxns.length === 0) {
-        state.pending = [];
-        return null;
-    }
-    const nextIndex = state.chain.length;
-    const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : '0';
-    const timestamp = new Date().toISOString();
-    const hash = calculateHash(nextIndex, previousHash, timestamp, validTxns);
-    const newBlock = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash };
-    state.chain.push(newBlock);
-    state.pending = [];
-    state.balances = newBalances;
-    state.nonces = newNonces;
-    return nextIndex;
-}
-// Close issue with comment (viral ad included)
+// Close issue with comment
 async function closeIssueWithComment(issueNumber, blockIndex, valid) {
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken)
@@ -210,7 +236,7 @@ async function closeIssueWithComment(issueNumber, blockIndex, valid) {
     });
 }
 // Process txns via open issues
-window.processTxns = async function () {
+export async function processTxns() {
     const output = document.getElementById('output');
     let stateData = await fetchState();
     let state = stateData?.content;
@@ -238,9 +264,9 @@ window.processTxns = async function () {
     let newLastDate = state.lastProcessedDate;
     for (const issue of issues) {
         if (!issue.title.toLowerCase().startsWith('tx'))
-            continue; // Only process issues starting with "tx"
+            continue;
         if (new Date(issue.created_at) <= new Date(state.lastProcessedDate))
-            continue; // Skip issues before lastProcessedDate
+            continue;
         let txn;
         try {
             const parsed = JSON.parse(issue.body);
@@ -284,9 +310,9 @@ window.processTxns = async function () {
         await updateState(state, stateData.sha, 'Update last processed date');
     }
     output.textContent += '\nProcessing complete';
-};
+}
 // View chain
-window.viewChain = async function () {
+export async function viewChain() {
     const output = document.getElementById('output');
     const state = await fetchState();
     if (!state) {
@@ -309,13 +335,13 @@ window.viewChain = async function () {
             b.transactions.map(t => `    ${t.from} sends ${t.amount} to ${t.to} (nonce ${t.nonce})`).join('\n') + '\n\n';
     });
     output.textContent = text;
-};
+}
 // Auto-process every 15 seconds
 window.addEventListener('load', () => {
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
         alert('Enter your GitHub access token (repo contents read/write, issues read/write) and save.');
     }
     setInterval(() => {
-        window.processTxns();
-    }, 15000); // 15 seconds
+        processTxns();
+    }, 15000);
 });

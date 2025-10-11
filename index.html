@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitchain</title>
-    <!-- Content Security Policy: Allow scripts from self, CDNs, and API calls -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://cdnjs.cloudflare.com; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
+    <!-- CSP: Allow scripts from self and CDNs -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
 </head>
 <body>
     <h1>Gitchain</h1>
@@ -16,15 +16,17 @@
     <button id="processTxnsButton">Process Transactions</button>
     <div id="output"></div>
 
-    <!-- Load crypto-js from CDN -->
+    <!-- Load crypto-js for SHA256 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- Load ethereum-cryptography from CDN -->
-    <script src="https://unpkg.com/ethereum-cryptography@2.2.1/index.js"></script>
+    <!-- Load elliptic for secp256k1 (UMD browser bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.7/dist/elliptic.min.js"></script>
+    <!-- Load keccak polyfill for browser (minimal, UMD) -->
+    <script src="https://cdn.jsdelivr.net/npm/keccak@3.0.4/dist/keccak.min.js"></script>
     <!-- Load blockchain.js as ESM and attach event listeners -->
     <script type="module">
         import { saveGithubAccessToken, viewChain, processTxns } from './js/blockchain.js';
 
-        // Expose functions to global scope (optional, for debugging)
+        // Expose functions to global scope
         window.saveGithubAccessToken = saveGithubAccessToken;
         window.viewChain = viewChain;
         window.processTxns = processTxns;

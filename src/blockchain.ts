@@ -5,6 +5,12 @@ declare const CryptoJS: {
     SHA256: (value: string) => { toString: () => string };
 };
 
+// Declare elliptic for secp256k1 (loaded via CDN)
+declare const ec: any;
+
+// Declare keccak for hashing (loaded via CDN)
+declare const Keccak: any;
+
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
 const OWNER: string = hostnameParts[0];
@@ -58,6 +64,102 @@ function createGenesisBlock(): Block {
     };
 }
 
+// Serialize txn for signing/hash
+function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
+    return JSON.stringify(txn, Object.keys(txn).sort());
+}
+
+// Keccak256 using polyfill
+function keccak256(data: string): Uint8Array {
+    const hasher = new Keccak(256);
+    hasher.update(data);
+    const hex = hasher.digest('hex');
+    const matches = hex.match(/.{2}/g);
+    if (!matches) {
+        throw new Error('Failed to parse hex string');
+    }
+    return new Uint8Array(matches.map((byte: string) => parseInt(byte, 16)));
+}
+
+// Hex to bytes
+function hexToBytes(hex: string): Uint8Array {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
+}
+
+// Bytes to hex
+function bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// Verify signature using elliptic
+function verifyTxn(txn: Transaction): boolean {
+    try {
+        const msgHash = keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }));
+        const sigBytes = hexToBytes(txn.signature);
+        if (sigBytes.length !== 65) return false;
+        const r = bytesToHex(sigBytes.slice(0, 32));
+        const s = bytesToHex(sigBytes.slice(32, 64));
+        const v = sigBytes[64] - 27; // Normalize v to 0 or 1
+
+        const curve = new ec.curves.secp256k1;
+        const msgHashHex = bytesToHex(msgHash);
+        const signature = { r: r, s: s };
+        const publicKey = curve.recoverPubKey(msgHashHex, signature, v);
+        const addrHash = keccak256(publicKey.encode('array', true).slice(1)); // Compressed public key without 0x04
+        const recoveredAddr = `0x${bytesToHex(addrHash.slice(-20))}`;
+        return recoveredAddr.toLowerCase() === txn.from.toLowerCase();
+    } catch {
+        return false;
+    }
+}
+
+// Process a single txn (mint if from admin)
+async function processTxn(txn: Transaction, state: State): Promise<{ valid: boolean; txid: string }> {
+    const txid = bytesToHex(keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
+    if (!verifyTxn(txn)) return { valid: false, txid };
+    if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce) return { valid: false, txid };
+    if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount) return { valid: false, txid };
+    if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to)) return { valid: false, txid };
+    state.pending.push(txn);
+    return { valid: true, txid };
+}
+
+// Mine block
+async function mineBlock(state: State): Promise<number | null> {
+    if (state.pending.length === 0) return null;
+    const validTxns: Transaction[] = [];
+    const newBalances = { ...state.balances };
+    const newNonces = { ...state.nonces };
+    for (const txn of state.pending) {
+        if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
+            if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+                newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
+            }
+            newBalances[txn.to] = (newBalances[txn.to] || 0) + txn.amount;
+            newNonces[txn.from] = txn.nonce;
+            validTxns.push(txn);
+        }
+    }
+    if (validTxns.length === 0) {
+        state.pending = [];
+        return null;
+    }
+    const nextIndex = state.chain.length;
+    const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : '0';
+    const timestamp = new Date().toISOString();
+    const hash = calculateHash(nextIndex, previousHash, timestamp, validTxns);
+    const newBlock: Block = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash };
+    state.chain.push(newBlock);
+    state.pending = [];
+    state.balances = newBalances;
+    state.nonces = newNonces;
+    return nextIndex;
+}
+
 // Get GitHub access token
 function getGithubAccessToken(): string | null {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
@@ -73,7 +175,7 @@ function getGithubAccessToken(): string | null {
 }
 
 // Save GitHub access token
-(window as any).saveGithubAccessToken = function(): void {
+export function saveGithubAccessToken(): void {
     const githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
@@ -81,7 +183,7 @@ function getGithubAccessToken(): string | null {
     } else {
         alert('Enter a GitHub access token first.');
     }
-};
+}
 
 // Fetch state
 async function fetchState(): Promise<{ content: State; sha: string } | null> {
@@ -140,73 +242,7 @@ async function updateState(newContent: State, oldSha: string | null, message: st
     }
 }
 
-// Serialize txn for signing/hash
-function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
-    return JSON.stringify(txn, Object.keys(txn).sort());
-}
-
-// Verify signature
-function verifyTxn(txn: Transaction): boolean {
-    try {
-        const msgHash = (window as any).ethereumCryptography.keccak256(new TextEncoder().encode(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
-        const sigBytes = (window as any).ethereumCryptography.hexToBytes(txn.signature);
-        if (sigBytes.length !== 65) return false;
-        const r = sigBytes.slice(0, 32);
-        const s = sigBytes.slice(32, 64);
-        const v = sigBytes[64];
-        const pubKey = (window as any).ethereumCryptography.secp256k1.recoverPublicKey(msgHash, { r, s }, v - 27);
-        const addrHash = (window as any).ethereumCryptography.keccak256(pubKey.slice(1)).slice(-20);
-        const recoveredAddr = `0x${(window as any).ethereumCryptography.bytesToHex(addrHash)}`;
-        return recoveredAddr.toLowerCase() === txn.from.toLowerCase();
-    } catch {
-        return false;
-    }
-}
-
-// Process a single txn (mint if from admin)
-async function processTxn(txn: Transaction, state: State): Promise<{ valid: boolean; txid: string }> {
-    const txid = (window as any).ethereumCryptography.bytesToHex((window as any).ethereumCryptography.keccak256(new TextEncoder().encode(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
-    if (!verifyTxn(txn)) return { valid: false, txid };
-    if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce) return { valid: false, txid };
-    if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount) return { valid: false, txid };
-    if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to)) return { valid: false, txid };
-    state.pending.push(txn);
-    return { valid: true, txid };
-}
-
-// Mine block (handle mints without deduction)
-async function mineBlock(state: State): Promise<number | null> {
-    if (state.pending.length === 0) return null;
-    const validTxns: Transaction[] = [];
-    const newBalances = { ...state.balances };
-    const newNonces = { ...state.nonces };
-    for (const txn of state.pending) {
-        if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
-            if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
-                newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
-            }
-            newBalances[txn.to] = (newBalances[txn.to] || 0) + txn.amount;
-            newNonces[txn.from] = txn.nonce;
-            validTxns.push(txn);
-        }
-    }
-    if (validTxns.length === 0) {
-        state.pending = [];
-        return null;
-    }
-    const nextIndex = state.chain.length;
-    const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : '0';
-    const timestamp = new Date().toISOString();
-    const hash = calculateHash(nextIndex, previousHash, timestamp, validTxns);
-    const newBlock: Block = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash };
-    state.chain.push(newBlock);
-    state.pending = [];
-    state.balances = newBalances;
-    state.nonces = newNonces;
-    return nextIndex;
-}
-
-// Close issue with comment (viral ad included)
+// Close issue with comment
 async function closeIssueWithComment(issueNumber: number, blockIndex: number | null, valid: boolean): Promise<void> {
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken) return;
@@ -237,7 +273,7 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
 }
 
 // Process txns via open issues
-(window as any).processTxns = async function(): Promise<void> {
+export async function processTxns(): Promise<void> {
     const output = document.getElementById('output') as HTMLDivElement;
     let stateData = await fetchState();
     let state = stateData?.content;
@@ -266,8 +302,8 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
 
     let newLastDate = state.lastProcessedDate;
     for (const issue of issues) {
-        if (!issue.title.toLowerCase().startsWith('tx')) continue; // Only process issues starting with "tx"
-        if (new Date(issue.created_at) <= new Date(state.lastProcessedDate)) continue; // Skip issues before lastProcessedDate
+        if (!issue.title.toLowerCase().startsWith('tx')) continue;
+        if (new Date(issue.created_at) <= new Date(state.lastProcessedDate)) continue;
         let txn: Transaction;
         try {
             const parsed = JSON.parse(issue.body);
@@ -312,10 +348,10 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
         await updateState(state, stateData!.sha, 'Update last processed date');
     }
     output.textContent += '\nProcessing complete';
-};
+}
 
 // View chain
-(window as any).viewChain = async function(): Promise<void> {
+export async function viewChain(): Promise<void> {
     const output = document.getElementById('output') as HTMLDivElement;
     const state = await fetchState();
     if (!state) {
@@ -338,7 +374,7 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
                 b.transactions.map(t => `    ${t.from} sends ${t.amount} to ${t.to} (nonce ${t.nonce})`).join('\n') + '\n\n';
     });
     output.textContent = text;
-};
+}
 
 // Auto-process every 15 seconds
 window.addEventListener('load', () => {
@@ -346,6 +382,6 @@ window.addEventListener('load', () => {
         alert('Enter your GitHub access token (repo contents read/write, issues read/write) and save.');
     }
     setInterval(() => {
-        (window as any).processTxns();
-    }, 15000);  // 15 seconds
+        processTxns();
+    }, 15000);
 });
