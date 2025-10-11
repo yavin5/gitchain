@@ -8,8 +8,8 @@ declare const CryptoJS: {
 // Declare elliptic for secp256k1 (loaded via CDN)
 declare const ec: any;
 
-// Declare keccak for hashing (loaded via CDN)
-declare const Keccak: any;
+// Declare @adraffy/keccak for hashing (loaded via CDN)
+declare const keccak: any;
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -69,11 +69,11 @@ function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
 
-// Keccak256 using polyfill
+// Keccak256 using @adraffy/keccak
 function keccak256(data: string): Uint8Array {
-    const hasher = new Keccak(256);
-    hasher.update(data);
-    const hex = hasher.digest('hex');
+    const h = keccak('keccak256');
+    h.update(new TextEncoder().encode(data));
+    const hex = h.hex();
     const matches = hex.match(/.{2}/g);
     if (!matches) {
         throw new Error('Failed to parse hex string');
@@ -105,7 +105,7 @@ function verifyTxn(txn: Transaction): boolean {
         const s = bytesToHex(sigBytes.slice(32, 64));
         const v = sigBytes[64] - 27; // Normalize v to 0 or 1
 
-        const curve = new ec.curves.secp256k1;
+        const curve = new ec('secp256k1');
         const msgHashHex = bytesToHex(msgHash);
         const signature = { r: r, s: s };
         const publicKey = curve.recoverPubKey(msgHashHex, signature, v);

@@ -19,9 +19,9 @@
     <!-- Load crypto-js for SHA256 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Load elliptic for secp256k1 (UMD browser bundle) -->
-    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.7/lib/elliptic.js"></script>
-    <!-- Load keccak polyfill for browser (minimal, UMD) -->
-    <script src="https://cdn.jsdelivr.net/npm/keccak@3.0.4/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+    <!-- Load @adraffy/keccak for keccak256 (UMD browser bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/@adraffy/keccak@1.3.4/dist/index.min.js"></script>
     <!-- Load blockchain.js as ESM and attach event listeners -->
     <script type="module">
         import { saveGithubAccessToken, viewChain, processTxns } from './js/blockchain.js';

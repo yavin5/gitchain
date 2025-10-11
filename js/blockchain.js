@@ -28,11 +28,11 @@ function createGenesisBlock() {
 function serializeTxn(txn) {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
-// Keccak256 using polyfill
+// Keccak256 using @adraffy/keccak
 function keccak256(data) {
-    const hasher = new Keccak(256);
-    hasher.update(data);
-    const hex = hasher.digest('hex');
+    const h = keccak('keccak256');
+    h.update(new TextEncoder().encode(data));
+    const hex = h.hex();
     const matches = hex.match(/.{2}/g);
     if (!matches) {
         throw new Error('Failed to parse hex string');
@@ -61,7 +61,7 @@ function verifyTxn(txn) {
         const r = bytesToHex(sigBytes.slice(0, 32));
         const s = bytesToHex(sigBytes.slice(32, 64));
         const v = sigBytes[64] - 27; // Normalize v to 0 or 1
-        const curve = new ec.curves.secp256k1;
+        const curve = new ec('secp256k1');
         const msgHashHex = bytesToHex(msgHash);
         const signature = { r: r, s: s };
         const publicKey = curve.recoverPubKey(msgHashHex, signature, v);
