@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitchain</title>
-    <!-- CSP: Allow scripts from self and CDNs -->
+    <!-- CSP: Allow scripts from self and CDNs, no inline scripts -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
 </head>
 <body>
@@ -22,14 +22,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
     <!-- Load js-sha3 for keccak256 (UMD browser bundle) -->
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/build/sha3.min.js"></script>
-    <!-- Load blockchain.js as a module -->
-    <script type="module">
-        import { saveGithubAccessToken, viewChain, processTxns } from './js/blockchain.js';
-        // Expose functions to global scope for main.js
-        window.saveGithubAccessToken = saveGithubAccessToken;
-        window.viewChain = viewChain;
-        window.processTxns = processTxns;
-    </script>
+    <!-- Load init.js as a module to set up globals -->
+    <script type="module" src="./js/init.js"></script>
     <!-- Load main.js for event listeners -->
     <script src="./js/main.js"></script>
 </body>
