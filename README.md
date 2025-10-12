@@ -15,7 +15,18 @@ A fully functional cryptocurrency blockchain that runs on top of Github and can 
 - Only requires 1 browser running the web page to process transactions
 - Written in Typescript and Javascript, browser native
 
-#### Ecosystem: Future Works
+#### Technology Stack
+
+- Github git filesystem for data storage, including block storage
+- Github Pages web page for a UI and for running Javascript server code
+- Github Issues as a blockchain transaction queue
+- Github API called by the Javascript to make use of server capabilities
+- CDNs for a dynamic way to load common JS libraries from the web page
+- Typescript 5+ transpiled into Javascript
+- ethereum-cryptography for cryptographic functions
+- Web browser DOM and other capabilities for localStorage and secure access
+
+#### Ecosystem: Currently In Development
 
 - Gitchain Wallet: Mobile Wallet App. The app can connect with any number of gitchains that the user wants it to connect with, and each primary coin of each gitchain shows up like tokens in a Solana or Ethereum wallet. The wallet should support swaps using Gitswap DEX, and also sending transactions to other Gitchain wallets.
 - Gitswap DEX: Liquidity pools of Gitchain coins in trading pairs. This DEX can address and access multiple Gitchains, and the DEX offers trading. Users may input the path to their gitchain in the form of:
@@ -66,4 +77,4 @@ Notes for Modifications:
 - Update index.html, js/main.js, or js/init.js as needed, incrementing ?v=7 to ?v=8 (or higher) for cache busting.
 - Ensure new scripts adhere to CSP and use CDNs for external libraries.
 - Transactions require valid secp256k1 signatures and must match the format in processTxns.
-- Deploy changes to GitHub Pages (yavin5/gitchain, docs/ folder) and clear browser cache for testing.
+- Deploy changes to GitHub Pages (yavin5/gitchain, / folder) and clear browser cache for testing.
