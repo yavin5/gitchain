@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitchain</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://api.github.com *.webrtc *.stun.l.google.com; style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval'; connect-src https://api.github.com *.webrtc *.stun.l.google.com; style-src 'self' 'unsafe-inline'">
     <style>
         #processingMessage {
             display: none;
@@ -50,7 +50,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/build/sha3.min.js"></script>
-    <!-- Updated CDNs for Helia / WebRTC / libp2p and dependencies -->
+    <!-- Updated CDNs for libp2p and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/libp2p@1.2.1/dist/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@libp2p/webrtc@3.2.0/dist/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@chainsafe/libp2p-noise@15.0.0/dist/index.min.js"></script>
