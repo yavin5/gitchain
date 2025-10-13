@@ -193,20 +193,24 @@ function getGithubAccessToken(): string | null {
     if (!githubAccessToken) {
         githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
         if (!githubAccessToken) {
+            console.log('No GitHub access token provided');
             alert('Please enter your GitHub access token.');
             return null;
         }
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
     }
+    console.log('Retrieved GitHub access token');
     return githubAccessToken;
 }
 
 // Initialize Helia/libp2p
 async function initP2P(isHostMode: boolean) {
+    console.log('Entering initP2P, isHost:', isHostMode);
     isHost = isHostMode;
     const { createHelia, createLibp2p, webRTC, noise, yamux } = window;
 
     try {
+        console.log('Creating libp2p node...');
         const libp2pNode = await createLibp2p({
             transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] })],
             connectionEncryption: [noise()],
@@ -216,25 +220,30 @@ async function initP2P(isHostMode: boolean) {
             }
         });
 
+        console.log('Creating Helia instance...');
         helia = await createHelia({ libp2p: libp2pNode });
         libp2p = libp2pNode;
+        console.log('Starting libp2p node...');
         await libp2p.start();
+        console.log('libp2p started, peerId:', libp2p.peerId.toString());
 
-        // Ensure libp2p is fully initialized before advertising
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Ensure libp2p is fully initialized
+        console.log('Waiting for libp2p initialization...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         libp2p.addEventListener('peer:connect', (evt: any) => {
             console.log('Connected to peer:', evt.detail.toString());
         });
 
         // Register protocol handler for incoming TX
+        console.log('Registering protocol handler for:', PROTOCOL);
         await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
             console.log('Incoming TX stream from', connection.remotePeer.toString());
             const txJson = await pipeToString(stream);
             try {
                 const tx = JSON.parse(txJson) as Transaction;
                 if (await verifyTxn(tx)) {
-                    // Create GitHub issue with formatted body
+                    console.log('Valid TX received, creating GitHub issue');
                     const issueBody = JSON.stringify({
                         type: 'gitchain_txn',
                         repo: FQ_REPO,
@@ -255,7 +264,7 @@ async function initP2P(isHostMode: boolean) {
                     if (issueResponse.ok) {
                         console.log('Created issue for anonymous TX');
                     } else {
-                        console.error('Failed to create issue:', await issueResponse.text());
+                        console.error('Failed to create issue:', issueResponse.status, await issueResponse.text());
                     }
                 } else {
                     console.error('Invalid TX from P2P');
@@ -267,14 +276,16 @@ async function initP2P(isHostMode: boolean) {
         });
 
         if (isHost) {
-            // Advertise immediately and set interval
+            console.log('Host mode: Advertising peer info');
             await advertiseHostPeer();
+            console.log('Setting interval for periodic peer advertising');
             setInterval(advertiseHostPeer, UPDATE_INTERVAL);
-            // Remove peer file on unload
             window.addEventListener('beforeunload', async () => {
+                console.log('Window unloading, deleting host peer file');
                 await deleteHostPeerFile();
             });
         }
+        console.log('initP2P completed successfully');
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
         if (isHost) {
@@ -285,11 +296,16 @@ async function initP2P(isHostMode: boolean) {
 
 // Advertise host peer info to GitHub with retries
 async function advertiseHostPeer(retries = 3, delayMs = 1000): Promise<boolean> {
-    if (!isHost || !libp2p) return false;
+    console.log('Entering advertiseHostPeer, retries:', retries);
+    if (!isHost || !libp2p) {
+        console.log('Not in host mode or libp2p not initialized');
+        return false;
+    }
     const peerId = libp2p.peerId.toString();
     const multiaddrs = libp2p.getMultiaddrs().map((ma: any) => ma.toString());
     const peerInfo = { peerId, multiaddrs, timestamp: Date.now() };
     const content = JSON.stringify(peerInfo, null, 2);
+    console.log('Peer info to advertise:', content);
 
     // Only update if changed
     if (content === lastPeerInfo) {
@@ -305,14 +321,18 @@ async function advertiseHostPeer(retries = 3, delayMs = 1000): Promise<boolean> 
     }
 
     for (let attempt = 1; attempt <= retries; attempt++) {
+        console.log(`Attempt ${attempt}/${retries} to advertise peer info`);
         try {
+            console.log('Fetching SHA for', HOST_PEER_FILE);
             const sha = await getFileSha(HOST_PEER_FILE);
+            console.log('SHA:', sha || 'none (new file)');
             const body: any = {
                 message: 'Update host peer info',
                 content: btoa(content),
                 branch: 'main'
             };
-            if (sha) body.sha = sha; // Include SHA only if file exists
+            if (sha) body.sha = sha;
+            console.log('Sending PUT request to:', `https://api.github.com/repos/${FQ_REPO}/contents/${HOST_PEER_FILE}`);
             const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${HOST_PEER_FILE}`, {
                 method: 'PUT',
                 headers: {
@@ -329,8 +349,8 @@ async function advertiseHostPeer(retries = 3, delayMs = 1000): Promise<boolean> 
                 const errorText = await response.text();
                 console.error(`Attempt ${attempt}/${retries} - Failed to advertise peer: ${response.status} ${errorText}`);
                 if (response.status === 403 || response.status === 429) {
+                    console.log(`Retrying after ${delayMs}ms due to ${response.status}`);
                     if (attempt < retries) {
-                        console.log(`Retrying after ${delayMs}ms...`);
                         await new Promise(resolve => setTimeout(resolve, delayMs));
                         continue;
                     }
@@ -340,26 +360,34 @@ async function advertiseHostPeer(retries = 3, delayMs = 1000): Promise<boolean> 
         } catch (error) {
             console.error(`Attempt ${attempt}/${retries} - Error advertising peer:`, error);
             if (attempt === retries) {
+                console.error('All retries failed, alerting user');
                 alert('Failed to advertise host peer info. Ensure your PAT has repo scope and check API rate limits. Contact the administrator if the issue persists.');
                 return false;
             }
             await new Promise(resolve => setTimeout(resolve, delayMs));
         }
     }
+    console.log('Exiting advertiseHostPeer, failed after all retries');
     return false;
 }
 
 // Delete host peer file on unload
 async function deleteHostPeerFile(): Promise<void> {
+    console.log('Entering deleteHostPeerFile');
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return;
+    if (!githubAccessToken) {
+        console.log('No PAT available for deleting host peer file');
+        return;
+    }
 
     try {
+        console.log('Fetching SHA for', HOST_PEER_FILE);
         const sha = await getFileSha(HOST_PEER_FILE);
         if (!sha) {
             console.log('No host peer file to delete');
             return;
         }
+        console.log('Sending DELETE request for', HOST_PEER_FILE);
         const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${HOST_PEER_FILE}`, {
             method: 'DELETE',
             headers: {
@@ -373,9 +401,9 @@ async function deleteHostPeerFile(): Promise<void> {
             })
         });
         if (response.ok) {
-            console.log('Deleted host peer file');
+            console.log('Deleted host peer file successfully');
         } else {
-            console.error('Failed to delete peer file:', await response.text());
+            console.error('Failed to delete peer file:', response.status, await response.text());
         }
     } catch (error) {
         console.error('Error deleting peer file:', error);
@@ -384,9 +412,14 @@ async function deleteHostPeerFile(): Promise<void> {
 
 // Get file SHA for updates/deletes
 async function getFileSha(path: string): Promise<string | null> {
+    console.log('Entering getFileSha for', path);
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return null;
+    if (!githubAccessToken) {
+        console.log('No PAT available for fetching SHA');
+        return null;
+    }
     try {
+        console.log('Fetching SHA from:', `https://api.github.com/repos/${FQ_REPO}/contents/${path}?ref=main`);
         const res = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${path}?ref=main`, {
             headers: {
                 'Authorization': `token ${githubAccessToken}`,
@@ -395,10 +428,12 @@ async function getFileSha(path: string): Promise<string | null> {
         });
         if (res.ok) {
             const data = await res.json();
+            console.log('SHA retrieved:', data.sha);
             return data.sha;
         }
         if (res.status === 404) {
-            return null; // File doesn't exist
+            console.log('File does not exist, returning null SHA');
+            return null;
         }
         console.error(`Failed to fetch SHA for ${path}: ${res.status} ${await res.text()}`);
         return null;
@@ -410,8 +445,9 @@ async function getFileSha(path: string): Promise<string | null> {
 
 // Client-side: Connect and send TX
 export async function connectAndSendTx(tx: Transaction) {
+    console.log('Entering connectAndSendTx, tx:', tx);
     if (isHost) {
-        // Host uses direct issue creation
+        console.log('Host mode: Creating issue directly');
         const issueBody = JSON.stringify({
             type: 'gitchain_txn',
             repo: FQ_REPO,
@@ -432,35 +468,37 @@ export async function connectAndSendTx(tx: Transaction) {
         if (response.ok) {
             console.log('Host created issue for TX');
         } else {
-            console.error('Host failed to create issue:', await response.text());
+            console.error('Host failed to create issue:', response.status, await response.text());
         }
         return;
     }
 
-    // Check for host peer file
+    console.log('Client mode: Fetching host peer file');
     const res = await fetch(`https://raw.githubusercontent.com/${FQ_REPO}/main/${HOST_PEER_FILE}`);
     if (!res.ok) {
+        console.error('Failed to fetch host peer file:', res.status, await res.text());
         alert('No server node connected. Please notify the blockchain administrator.');
         return;
     }
     const { peerId, multiaddrs, timestamp } = await res.json();
+    console.log('Host peer info:', { peerId, multiaddrs, timestamp });
 
-    // Check staleness (<10 min)
     if (Date.now() - timestamp > 10 * 60 * 1000) {
-        console.warn('Stale host info, retry later');
+        console.warn('Stale host info, timestamp:', timestamp);
         alert('Host peer info is stale. Try again later or notify the administrator.');
         return;
     }
 
-    // Initialize P2P if not already
     if (!helia) {
+        console.log('Initializing P2P for client');
         await initP2P(false);
     }
 
-    // Dial host
     try {
+        console.log('Dialing host multiaddr:', multiaddrs[0]);
         const ma = window.multiaddr(multiaddrs[0]);
         const connection = await libp2p.dial(ma);
+        console.log('Connected to host, creating stream for:', PROTOCOL);
         const stream = await connection.newStream(PROTOCOL);
         const txJson = JSON.stringify(tx);
         await pipeStringToStream(txJson, stream);
@@ -473,36 +511,48 @@ export async function connectAndSendTx(tx: Transaction) {
 
 // Stream helpers
 async function pipeToString(stream: any): Promise<string> {
+    console.log('Reading stream to string');
     const chunks: Uint8Array[] = [];
     for await (const chunk of stream.source) {
         chunks.push(chunk);
     }
     const data = window.uint8arrays.concat(chunks);
-    return window.uint8arrays.toString(data);
+    const result = window.uint8arrays.toString(data);
+    console.log('Stream read complete, length:', result.length);
+    return result;
 }
 
 async function pipeStringToStream(str: string, stream: any) {
+    console.log('Writing string to stream, length:', str.length);
     const data = window.uint8arrays.fromString(str);
     await stream.sink([data]);
+    console.log('String written to stream');
 }
 
 // Save GitHub access token
 export function saveGithubAccessToken(): void {
+    console.log('Entering saveGithubAccessToken');
     const githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
-        // Initialize as host and advertise peer info
+        console.log('PAT saved, initializing P2P as host');
         initP2P(true);
     } else {
+        console.error('No GitHub access token provided');
         throw new Error('Enter a GitHub access token first.');
     }
 }
 
 // Fetch state
 export async function fetchState(): Promise<{ content: State; sha: string } | null> {
+    console.log('Entering fetchState');
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return null;
+    if (!githubAccessToken) {
+        console.log('No PAT available for fetching state');
+        return null;
+    }
     try {
+        console.log('Fetching state from:', BASE_URL);
         const response = await fetch(`${BASE_URL}?ref=main`, {
             headers: {
                 'Authorization': `token ${githubAccessToken}`,
@@ -510,26 +560,36 @@ export async function fetchState(): Promise<{ content: State; sha: string } | nu
             }
         });
         if (!response.ok) {
-            if (response.status === 404) return null;
+            if (response.status === 404) {
+                console.log('State file not found');
+                return null;
+            }
+            console.error('Error fetching state:', response.status, await response.text());
             throw new Error(`Error fetching state: ${response.statusText}`);
         }
         const file = await response.json();
         const content: State = JSON.parse(atob(file.content));
+        console.log('State fetched, chain length:', content.chain.length);
         return { content, sha: file.sha };
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching state:', error);
         return null;
     }
 }
 
 // Update state with retries
 async function updateState(newContent: State, oldSha: string | null, message: string, retries = 3): Promise<boolean> {
+    console.log('Entering updateState, message:', message);
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return false;
+    if (!githubAccessToken) {
+        console.log('No PAT available for updating state');
+        return false;
+    }
     const fileContent = btoa(JSON.stringify(newContent, null, 2));
     try {
         const body: any = { message, content: fileContent, branch: 'main' };
         if (oldSha) body.sha = oldSha;
+        console.log('Sending PUT request to update state');
         const response = await fetch(BASE_URL, {
             method: 'PUT',
             headers: {
@@ -541,29 +601,35 @@ async function updateState(newContent: State, oldSha: string | null, message: st
         });
         if (!response.ok) {
             if (response.status === 409 && retries > 0) {
-                console.log('Conflict, retrying...');
+                console.log('Conflict detected, retrying...');
                 const current = await fetchState();
                 if (!current) throw new Error('Failed to refetch');
                 return updateState(newContent, current.sha, message, retries - 1);
             }
+            console.error('Error updating state:', response.status, await response.text());
             throw new Error(`Error updating state: ${response.statusText}`);
         }
+        console.log('State updated successfully');
         return true;
     } catch (error) {
-        console.error(error);
+        console.error('Error updating state:', error);
         return false;
     }
 }
 
 // Close issue with comment
 async function closeIssueWithComment(issueNumber: number, blockIndex: number | null, valid: boolean): Promise<void> {
+    console.log('Entering closeIssueWithComment, issue:', issueNumber);
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return;
+    if (!githubAccessToken) {
+        console.log('No PAT available for closing issue');
+        return;
+    }
     const status = valid && blockIndex !== null ? `Confirmed in block ${blockIndex}` : 'Invalid transaction';
     const intro = "Gitchain is an innovative centralized blockchain using GitHub for storage and processing. It enables secure, transparent transactions via issues. Join the experiment in decentralized finance today!";
     const gitchain_url = `https://github.com/${FQ_REPO}`;
     const commentBody = `${status}. ${intro} Learn more: ${gitchain_url} (Repo: ${FQ_REPO})`;
-    // Create comment
+    console.log('Creating comment for issue:', issueNumber);
     await fetch(`${ISSUES_URL}/${issueNumber}/comments`, {
         method: 'POST',
         headers: {
@@ -573,7 +639,7 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
         },
         body: JSON.stringify({ body: commentBody })
     });
-    // Close issue
+    console.log('Closing issue:', issueNumber);
     await fetch(`${ISSUES_URL}/${issueNumber}`, {
         method: 'PATCH',
         headers: {
@@ -587,12 +653,14 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
 
 // Process txns via open issues
 export async function processTxns(): Promise<void> {
+    console.log('Entering processTxns');
     const output = document.getElementById('output') as HTMLDivElement;
     const processingMessage = document.getElementById('processingMessage') as HTMLDivElement;
     processingMessage.style.display = 'block';
     let stateData = await fetchState();
     let state = stateData?.content;
     if (!state) {
+        console.log('No state found, initializing');
         state = {
             chain: [createGenesisBlock()],
             pending: [],
@@ -602,6 +670,7 @@ export async function processTxns(): Promise<void> {
         };
         const success = await updateState(state, null, 'Initialize state');
         if (!success) {
+            console.log('Failed to initialize state');
             output.textContent += '\nFailed to initialize.';
             processingMessage.style.display = 'none';
             return;
@@ -609,7 +678,7 @@ export async function processTxns(): Promise<void> {
         stateData = await fetchState();
         state = stateData!.content;
     }
-    // Fetch open issues created since lastProcessedDate with "tx" in title
+    console.log('Fetching open issues');
     const issuesRes = await fetch(`${ISSUES_URL}?state=open&sort=created&direction=asc&per_page=100`, {
         headers: { 'Authorization': `token ${getGithubAccessToken()}`, 'Accept': 'application/vnd.github.v3+json' }
     });
@@ -622,30 +691,36 @@ export async function processTxns(): Promise<void> {
         try {
             const parsed = JSON.parse(issue.body);
             if (parsed.type !== 'gitchain_txn') {
+                console.log('Skipping non-gitchain issue:', issue.number);
                 await closeIssueWithComment(issue.number, null, false);
                 continue;
             }
             if (parsed.repo !== FQ_REPO) {
+                console.log('Skipping issue from wrong repo:', issue.number);
                 await closeIssueWithComment(issue.number, null, false);
                 continue;
             }
             txn = parsed.txn;
         } catch {
+            console.log('Invalid issue body, closing:', issue.number);
             await closeIssueWithComment(issue.number, null, false);
             continue;
         }
+        console.log('Processing transaction from issue:', issue.number);
         const { valid, txid } = await processTxn(txn, state);
-        console.log(`Attempting to settle transaction ID: ${txid} from issue #${issue.number}`);
+        console.log(`Transaction ID: ${txid}, valid: ${valid}`);
         const blockIndex = valid ? await mineBlock(state) : null;
         await closeIssueWithComment(issue.number, blockIndex, valid);
         if (valid && blockIndex !== null) {
             console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
             output.textContent += `\nProcessed txn ${txid} from issue #${issue.number} in block ${blockIndex}`;
         } else {
+            console.log(`Rejected invalid txn from issue #${issue.number}`);
             output.textContent += `\nRejected invalid txn from issue #${issue.number}`;
         }
         const success = await updateState(state, stateData!.sha, `Process issue #${issue.number}`);
         if (!success) {
+            console.log('Failed to update state after issue:', issue.number);
             output.textContent += `\nFailed to update state after issue #${issue.number}`;
             processingMessage.style.display = 'none';
             return;
@@ -658,17 +733,21 @@ export async function processTxns(): Promise<void> {
         }
     }
     if (newLastDate !== state.lastProcessedDate) {
+        console.log('Updating last processed date:', newLastDate);
         state.lastProcessedDate = newLastDate;
         await updateState(state, stateData!.sha, 'Update last processed date');
     }
+    console.log('processTxns completed');
     processingMessage.style.display = 'none';
 }
 
 // View chain
 export async function viewChain(): Promise<void> {
+    console.log('Entering viewChain');
     const output = document.getElementById('output') as HTMLDivElement;
     const state = await fetchState();
     if (!state || !state.content.chain || state.content.chain.length === 0) {
+        console.log('No transactions in chain');
         output.textContent = 'No transactions in the chain yet.';
         return;
     }
@@ -688,15 +767,20 @@ export async function viewChain(): Promise<void> {
                 b.transactions.map(t => ` ${t.from} sends ${t.amount} to ${t.to} (nonce ${t.nonce})`).join('\n') + '\n\n';
     });
     output.textContent = text;
+    console.log('viewChain completed, chain length:', chain.length);
 }
 
 // Auto-process every 15 seconds and initialize host if PAT exists
 window.addEventListener('load', () => {
+    console.log('Window loaded, checking for PAT');
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
+        console.log('No PAT found, prompting user');
         alert('Enter your GitHub access token (repo contents read/write, issues read/write) and save.');
     } else {
+        console.log('PAT found, initializing P2P as host');
         initP2P(true);
     }
+    console.log('Setting interval for transaction processing');
     setInterval(() => {
         processTxns();
     }, 15000);
