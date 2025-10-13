@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitchain</title>
-    <!-- CSP: Allow scripts from self and CDNs, no inline scripts -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://api.github.com; style-src 'self' 'unsafe-inline'">
+    <!-- Updated CSP: Add unpkg.com for Helia/libp2p CDNs -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; connect-src https://api.github.com *.webrtc; style-src 'self' 'unsafe-inline'">
     <style>
         #processingMessage {
             display: none;
@@ -47,16 +47,19 @@
     <div id="blockHeight"></div>
     <div id="output"></div>
     <div id="processingMessage">PROCESSING TRANSACTIONS</div>
-
-    <!-- Load crypto-js for SHA256 -->
+    <!-- Existing CDNs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- Load elliptic for secp256k1 (UMD browser bundle) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
-    <!-- Load js-sha3 for keccak256 (UMD browser bundle) -->
     <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/build/sha3.min.js"></script>
-    <!-- Load init.js as a module to set up globals -->
-    <script type="module" src="./js/init.js?v=7"></script>
-    <!-- Load main.js for event listeners -->
-    <script src="./js/main.js?v=7"></script>
+    <!-- Lib CDNs for Helia/libp2p -->
+    <script src="https://unpkg.com/helia@3.0.7/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/libp2p@1.0.12/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/@libp2p/webrtc@5.1.0/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/@chainsafe/libp2p-noise@15.0.0/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/@chainsafe/libp2p-yamux@6.0.2/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/multiaddr@12.2.0/dist/index.min.js?v=8"></script>
+    <script src="https://unpkg.com/uint8arrays@5.1.0/dist/index.min.js?v=8"></script>
+    <script type="module" src="./js/init.js?v=8"></script>
+    <script src="./js/main.js?v=8"></script>
 </body>
 </html>

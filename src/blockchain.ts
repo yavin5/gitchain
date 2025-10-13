@@ -13,6 +13,22 @@ declare const sha3: {
     keccak256: (data: string) => string;
 };
 
+declare global {
+  interface Window {
+    createHelia: (options?: any) => Promise<any>;
+    createLibp2p: (options?: any) => Promise<any>;
+    webRTC: any;
+    noise: any;
+    yamux: any;
+    multiaddr: (addr: string) => any;
+    uint8arrays: {
+      fromString: (s: string) => Uint8Array;
+      toString: (u: Uint8Array) => string;
+      concat: (arrays: Uint8Array[]) => Uint8Array; // Added for build fix
+    };
+  }
+}
+
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
 const OWNER: string = hostnameParts[0];
@@ -22,6 +38,17 @@ const STATE_PATH: string = 'data/state.json';
 const BASE_URL: string = `https://api.github.com/repos/${FQ_REPO}/contents/${STATE_PATH}`;
 const GITHUB_ACCESS_TOKEN_KEY: string = 'gitchain_github_access_token';
 const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
+
+// NEW: Constants for P2P
+const PROTOCOL = '/gitchain/tx/1.0.0';
+const HOST_PEER_FILE = 'data/host-peer.json';
+const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+// NEW: Global P2P state
+let helia: any = null;
+let libp2p: any = null;
+let isHost = false;
+let lastPeerInfo: string | null = null; // Track for change detection
 
 // Interfaces
 interface Transaction {
@@ -104,7 +131,6 @@ function verifyTxn(txn: Transaction): boolean {
         const r = bytesToHex(sigBytes.slice(0, 32));
         const s = bytesToHex(sigBytes.slice(32, 64));
         const v = sigBytes[64] - 27; // Normalize v to 0 or 1
-
         const curve = new ec('secp256k1');
         const msgHashHex = bytesToHex(msgHash);
         const signature = { r: r, s: s };
@@ -174,11 +200,251 @@ function getGithubAccessToken(): string | null {
     return githubAccessToken;
 }
 
+// NEW: Initialize Helia/libp2p
+async function initP2P(isHostMode: boolean) {
+    isHost = isHostMode;
+    const { createHelia, createLibp2p, webRTC, noise, yamux } = window;
+
+    const libp2pNode = await createLibp2p({
+        transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] })],
+        connectionEncryption: [noise()],
+        streamMuxers: [yamux()],
+        addresses: {
+            listen: ['/webrtc']
+        }
+    });
+
+    helia = await createHelia({ libp2p: libp2pNode });
+    libp2p = libp2pNode;
+    await libp2p.start();
+
+    libp2p.addEventListener('peer:connect', (evt: any) => {
+        console.log('Connected to peer:', evt.detail.toString());
+    });
+
+    // Register protocol handler for incoming TX
+    await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
+        console.log('Incoming TX stream from', connection.remotePeer.toString());
+        const txJson = await pipeToString(stream);
+        try {
+            const tx = JSON.parse(txJson) as Transaction;
+            if (await verifyTxn(tx)) {
+                // Create GitHub issue with formatted body
+                const issueBody = JSON.stringify({
+                    type: 'gitchain_txn',
+                    repo: FQ_REPO,
+                    txn: tx
+                });
+                const issueResponse = await fetch(ISSUES_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${getGithubAccessToken()}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: `tx ${tx.from} to ${tx.to}`,
+                        body: issueBody
+                    })
+                });
+                if (issueResponse.ok) {
+                    console.log('Created issue for anonymous TX');
+                } else {
+                    console.error('Failed to create issue:', await issueResponse.text());
+                }
+            } else {
+                console.error('Invalid TX from P2P');
+            }
+        } catch (error) {
+            console.error('Error processing TX:', error);
+        }
+        stream.close();
+    });
+
+    if (isHost) {
+        // Advertise immediately and set interval
+        await advertiseHostPeer();
+        setInterval(advertiseHostPeer, UPDATE_INTERVAL);
+        // Remove peer file on unload
+        window.addEventListener('beforeunload', async () => {
+            await deleteHostPeerFile();
+        });
+    }
+}
+
+// NEW: Advertise host peer info to GitHub if changed
+async function advertiseHostPeer() {
+    if (!isHost || !libp2p) return;
+    const peerId = libp2p.peerId.toString();
+    const multiaddrs = libp2p.getMultiaddrs().map((ma: any) => ma.toString());
+    const peerInfo = { peerId, multiaddrs, timestamp: Date.now() };
+    const content = JSON.stringify(peerInfo, null, 2);
+
+    // Only update if changed
+    if (content === lastPeerInfo) return;
+    lastPeerInfo = content;
+
+    const githubAccessToken = getGithubAccessToken();
+    if (!githubAccessToken) return;
+
+    try {
+        const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${HOST_PEER_FILE}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${githubAccessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: 'Update host peer info',
+                content: btoa(content),
+                sha: await getFileSha(HOST_PEER_FILE)
+            })
+        });
+        if (response.ok) {
+            console.log('Advertised peer info');
+        } else {
+            console.error('Failed to advertise peer:', await response.text());
+        }
+    } catch (error) {
+        console.error('Error advertising peer:', error);
+    }
+}
+
+// NEW: Delete host peer file on unload
+async function deleteHostPeerFile() {
+    const githubAccessToken = getGithubAccessToken();
+    if (!githubAccessToken) return;
+
+    try {
+        const sha = await getFileSha(HOST_PEER_FILE);
+        if (!sha) return; // No file to delete
+        const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${HOST_PEER_FILE}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `token ${githubAccessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: 'Remove host peer info on unload',
+                sha
+            })
+        });
+        if (response.ok) {
+            console.log('Deleted host peer file');
+        } else {
+            console.error('Failed to delete peer file:', await response.text());
+        }
+    } catch (error) {
+        console.error('Error deleting peer file:', error);
+    }
+}
+
+// NEW: Get file SHA for updates/deletes
+async function getFileSha(path: string): Promise<string | null> {
+    try {
+        const res = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${path}`, {
+            headers: {
+                'Authorization': `token ${getGithubAccessToken()}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            return data.sha;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+// NEW: Client-side: Connect and send TX
+export async function connectAndSendTx(tx: Transaction) {
+    if (isHost) {
+        // Host uses direct issue creation
+        const issueBody = JSON.stringify({
+            type: 'gitchain_txn',
+            repo: FQ_REPO,
+            txn: tx
+        });
+        const response = await fetch(ISSUES_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${getGithubAccessToken()}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: `tx ${tx.from} to ${tx.to}`,
+                body: issueBody
+            })
+        });
+        if (response.ok) {
+            console.log('Host created issue for TX');
+        } else {
+            console.error('Host failed to create issue');
+        }
+        return;
+    }
+
+    // Check for host peer file
+    const res = await fetch(`https://raw.githubusercontent.com/${FQ_REPO}/main/${HOST_PEER_FILE}`);
+    if (!res.ok) {
+        alert('No server node connected. Please notify the blockchain administrator.');
+        return;
+    }
+    const { peerId, multiaddrs, timestamp } = await res.json();
+
+    // Check staleness (<10 min)
+    if (Date.now() - timestamp > 10 * 60 * 1000) {
+        console.warn('Stale host info, retry later');
+        alert('Host peer info is stale. Try again later or notify the administrator.');
+        return;
+    }
+
+    // Initialize P2P if not already
+    if (!helia) {
+        await initP2P(false);
+    }
+
+    // Dial host
+    try {
+        const ma = window.multiaddr(multiaddrs[0]);
+        const connection = await libp2p.dial(ma);
+        const stream = await connection.newStream(PROTOCOL);
+        const txJson = JSON.stringify(tx);
+        await pipeStringToStream(txJson, stream);
+        console.log('TX sent via P2P');
+    } catch (error) {
+        console.error('Failed to connect or send TX:', error);
+        alert('Failed to connect to host. Please try again or notify the administrator.');
+    }
+}
+
+// NEW: Stream helpers
+async function pipeToString(stream: any): Promise<string> {
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of stream.source) {
+        chunks.push(chunk);
+    }
+    const data = window.uint8arrays.concat(chunks);
+    return window.uint8arrays.toString(data);
+}
+
+async function pipeStringToStream(str: string, stream: any) {
+    const data = window.uint8arrays.fromString(str);
+    await stream.sink([data]);
+}
+
 // Save GitHub access token
 export function saveGithubAccessToken(): void {
     const githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
+        // NEW: Initialize as host and advertise peer info
+        initP2P(true);
     } else {
         throw new Error('Enter a GitHub access token first.');
     }
@@ -295,13 +561,11 @@ export async function processTxns(): Promise<void> {
         stateData = await fetchState();
         state = stateData!.content;
     }
-
     // Fetch open issues created since lastProcessedDate with "tx" in title
     const issuesRes = await fetch(`${ISSUES_URL}?state=open&sort=created&direction=asc&per_page=100`, {
         headers: { 'Authorization': `token ${getGithubAccessToken()}`, 'Accept': 'application/vnd.github.v3+json' }
     });
     const issues = await issuesRes.json();
-
     let newLastDate = state.lastProcessedDate;
     for (const issue of issues) {
         if (!issue.title.toLowerCase().startsWith('tx')) continue;
@@ -322,7 +586,6 @@ export async function processTxns(): Promise<void> {
             await closeIssueWithComment(issue.number, null, false);
             continue;
         }
-
         const { valid, txid } = await processTxn(txn, state);
         console.log(`Attempting to settle transaction ID: ${txid} from issue #${issue.number}`);
         const blockIndex = valid ? await mineBlock(state) : null;
@@ -341,13 +604,11 @@ export async function processTxns(): Promise<void> {
         }
         stateData = await fetchState();
         state = stateData!.content;
-
         const issueCreated = issue.created_at;
         if (new Date(issueCreated) > new Date(newLastDate)) {
             newLastDate = issueCreated;
         }
     }
-
     if (newLastDate !== state.lastProcessedDate) {
         state.lastProcessedDate = newLastDate;
         await updateState(state, stateData!.sha, 'Update last processed date');
@@ -367,16 +628,16 @@ export async function viewChain(): Promise<void> {
     const balances = state.content.balances;
     let text = `Chain length: ${chain.length}\nPending txns: ${state.content.pending.length}\nLast processed: ${state.content.lastProcessedDate}\nBalances:\n`;
     for (const [addr, bal] of Object.entries(balances)) {
-        text += `  ${addr}: ${bal}\n`;
+        text += ` ${addr}: ${bal}\n`;
     }
     text += '\n';
     chain.forEach(b => {
         text += `Block ${b.index}:\n` +
-                `  Hash: ${b.hash}\n` +
-                `  Prev Hash: ${b.previousHash}\n` +
-                `  Timestamp: ${b.timestamp}\n` +
-                `  Transactions:\n` +
-                b.transactions.map(t => `    ${t.from} sends ${t.amount} to ${t.to} (nonce ${t.nonce})`).join('\n') + '\n\n';
+                ` Hash: ${b.hash}\n` +
+                ` Prev Hash: ${b.previousHash}\n` +
+                ` Timestamp: ${b.timestamp}\n` +
+                ` Transactions:\n` +
+                b.transactions.map(t => ` ${t.from} sends ${t.amount} to ${t.to} (nonce ${t.nonce})`).join('\n') + '\n\n';
     });
     output.textContent = text;
 }
@@ -385,6 +646,9 @@ export async function viewChain(): Promise<void> {
 window.addEventListener('load', () => {
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
         alert('Enter your GitHub access token (repo contents read/write, issues read/write) and save.');
+    } else {
+        // NEW: Initialize as host if PAT exists
+        initP2P(true);
     }
     setInterval(() => {
         processTxns();
