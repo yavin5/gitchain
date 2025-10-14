@@ -1,13 +1,5 @@
 import { ADMIN_ADDRESS } from './admin-address.js';
 
-// Debug trap to catch inline style assignments
-if (window.location.hostname === 'localhost') {
-    Object.defineProperty(HTMLElement.prototype, 'style', {
-        set: () => console.error('Inline style set detected in blockchain.ts! Check stack trace.'),
-        configurable: true
-    });
-}
-
 // Declare CryptoJS for TypeScript (loaded via CDN at runtime)
 declare const CryptoJS: {
     SHA256: (value: string) => { toString: () => string };
@@ -769,3 +761,14 @@ window.addEventListener('load', () => {
         processTxns();
     }, 15000);
 });
+
+// Expose functions to window.gitchain
+window.gitchain = {
+    saveGithubAccessToken,
+    viewChain,
+    processTxns,
+    fetchState
+};
+
+// Dispatch custom event to signal main.js
+window.dispatchEvent(new Event('gitchain:init'));

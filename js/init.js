@@ -1,5 +1,3 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState } from './bundle.js';
-
 // Debug trap to catch inline style assignments
 if (window.location.hostname === 'localhost') {
     Object.defineProperty(HTMLElement.prototype, 'style', {

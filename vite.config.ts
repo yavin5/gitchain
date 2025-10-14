@@ -16,19 +16,6 @@ export default defineConfig({
       }
     }
   ],
-  resolve: {
-    alias: {
-      'libp2p': 'libp2p',
-      '@libp2p/webrtc': '@libp2p/webrtc',
-      '@libp2p/circuit-relay-v2': '@libp2p/circuit-relay-v2',
-      '@libp2p/bootstrap': '@libp2p/bootstrap',
-      '@chainsafe/libp2p-noise': '@chainsafe/libp2p-noise',
-      '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
-      '@libp2p/identify': '@libp2p/identify',
-      '@multiformats/multiaddr': '@multiformats/multiaddr',
-      'uint8arrays': 'uint8arrays'
-    }
-  },
   build: {
     emptyOutDir: false,
     outDir: 'js',
@@ -36,7 +23,7 @@ export default defineConfig({
       input: 'src/blockchain.ts',
       output: {
         entryFileNames: 'bundle.js',
-        format: 'es',
+        format: 'iife',
         preserveModules: false,
         exports: 'named'
       }
