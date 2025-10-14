@@ -17,7 +17,7 @@
   "dependencies": {
     "ethereum-cryptography": "^2.2.1",
     "libp2p": "1.9.4",
-    "webrtc": "^1.14.1",
+    "@libp2p/webrtc": "4.1.10",
     "@chainsafe/libp2p-noise": "15.0.0",
     "@chainsafe/libp2p-yamux": "^6.0.0",
     "@libp2p/identify": "2.1.5",
