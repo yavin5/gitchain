@@ -1,6 +1,6 @@
 import { ADMIN_ADDRESS } from './admin-address.js';
 import { createLibp2p } from 'libp2p';
-let webRTC = require('webrtc/webrtc.js');
+import { webRTC } from '@libp2p/webrtc';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
@@ -154,7 +154,7 @@ async function initP2P(isHostMode) {
     try {
         console.log('Creating libp2p node...');
         const libp2pNode = await createLibp2p({
-            transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] })],
+            transports: [webRTC()],
             connectionEncryption: [noise()],
             streamMuxers: [yamux()],
             services: {
