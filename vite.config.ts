@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
+import typescript from 'vite-plugin-typescript';
 
 export default defineConfig({
+  plugins: [typescript()],
   build: {
     emptyOutDir: false,
     outDir: 'js',
@@ -8,7 +10,7 @@ export default defineConfig({
       input: 'src/blockchain.ts',
       output: {
         entryFileNames: 'bundle.js',
-        format: 'es'  // Changed to 'es' for module bundling
+        format: 'es'
       }
     }
   },
