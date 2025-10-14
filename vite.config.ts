@@ -16,6 +16,19 @@ export default defineConfig({
       }
     }
   ],
+  resolve: {
+    alias: {
+      'libp2p': 'libp2p',
+      '@libp2p/webrtc': '@libp2p/webrtc',
+      '@libp2p/circuit-relay-v2': '@libp2p/circuit-relay-v2',
+      '@libp2p/bootstrap': '@libp2p/bootstrap',
+      '@chainsafe/libp2p-noise': '@chainsafe/libp2p-noise',
+      '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
+      '@libp2p/identify': '@libp2p/identify',
+      '@multiformats/multiaddr': '@multiformats/multiaddr',
+      'uint8arrays': 'uint8arrays'
+    }
+  },
   build: {
     emptyOutDir: false,
     outDir: 'js',
@@ -25,19 +38,8 @@ export default defineConfig({
         entryFileNames: 'bundle.js',
         format: 'es',
         preserveModules: false,
-        exports: 'named' // Ensure named exports are preserved
-      },
-      external: [
-        'libp2p',
-        '@libp2p/webrtc',
-        '@libp2p/circuit-relay-v2',
-        '@libp2p/bootstrap',
-        '@chainsafe/libp2p-noise',
-        '@chainsafe/libp2p-yamux',
-        '@libp2p/identify',
-        '@multiformats/multiaddr',
-        'uint8arrays'
-      ]
+        exports: 'named'
+      }
     }
   },
   optimizeDeps: {
