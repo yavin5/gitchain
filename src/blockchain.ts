@@ -187,8 +187,8 @@ export async function initP2P(host: boolean): Promise<void> {
             const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`);
             if (response.ok) {
                 const peerData = await response.json();
-                console.log('Raw peer data from server-peer.json:', peerData);
-                bootstrapList = (peerData.peers || []).filter((addr: string) => {
+                console.log('Raw peer data from server-peer.json:', peerData.content);
+                bootstrapList = (peerData.content.peers || []).filter((addr: string) => {
                     try {
                         multiaddr(addr); // Validate multiaddr
                         console.log(`Valid multiaddr: ${addr}`);
@@ -215,7 +215,9 @@ export async function initP2P(host: boolean): Promise<void> {
                     const tempNode = await createLibp2p(tempConfig);
                     const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
                     await tempNode.stop(); // Close temp node
-                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64') + '=';
+		    bootstrapList.push(JSON.stringify({ peers: [peerInfo] }));
+		    console.log('bootstrapList: ' + JSON.stringify(bootstrapList));
+                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootsrapList)]), 'base64') + '=';
                     const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
