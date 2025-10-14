@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun.l.google.com:19302; style-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun.l.google.com:19302; style-src 'self' 'unsafe-inline';">
   <title>Gitchain</title>
   <style>
     body {
@@ -23,6 +23,10 @@
     #output.loading {
       opacity: 0.5;
       background-color: #f0f0f0;
+    }
+    #output.error {
+      color: red;
+      border-color: red;
     }
     #processingMessage {
       display: none;
@@ -73,7 +77,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
   <!-- Local scripts with cache-busting -->
   <script src="js/main.js?v=8"></script>
-  <script src="js/init.js?v=8"></script>
-  <script src="js/bundle.js?v=8"></script>
+  <script type="module" src="js/init.js?v=8"></script>
+  <script type="module" src="js/bundle.js?v=8"></script>
 </body>
 </html>
