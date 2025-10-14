@@ -215,7 +215,7 @@ export async function initP2P(host: boolean): Promise<void> {
                     const tempNode = await createLibp2p(tempConfig);
                     const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
                     await tempNode.stop(); // Close temp node
-                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64');
+                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64') + '=';
                     const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
