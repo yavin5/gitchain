@@ -1,4 +1,12 @@
 (function () {
+    // Debug trap to catch inline style assignments
+    if (window.location.hostname === 'localhost') {
+        Object.defineProperty(HTMLElement.prototype, 'style', {
+            set: () => console.error('Inline style set detected! Check stack trace.'),
+            configurable: true
+        });
+    }
+
     // Wait for init.js to signal that window assignments are complete
     function initialize() {
         // Access exported functions from blockchain.js (attached to window by init.js)
@@ -112,7 +120,7 @@
             }
         });
 
-        // Update block height on load and after processing transactions
+        // Update block height on load
         updateBlockHeight();
     }
 
