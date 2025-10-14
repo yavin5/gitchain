@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
-    outDir: 'docs/js',
+    emptyOutDir: false,
+    outDir: 'js',
     rollupOptions: {
       input: 'src/blockchain.ts',
       output: {
