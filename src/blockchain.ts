@@ -15,6 +15,8 @@ import { webRTC, WebRTCTransportInit } from '@libp2p/webrtc';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
+import { circuitRelayTransport, CircuitRelayTransportInit } from '@libp2p/circuit-relay-v2';
+import { bootstrap } from '@libp2p/bootstrap';
 import { multiaddr } from '@multiformats/multiaddr';
 import { fromString as uint8FromString, toString as uint8ToString, concat as uint8Concat } from 'uint8arrays';
 
@@ -181,14 +183,37 @@ async function initP2P(isHostMode: boolean) {
     try {
         console.log('Creating libp2p node...');
         const libp2pNode = await createLibp2p({
-            transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } as WebRTCTransportInit)],
+            addresses: {
+                listen: ['/webrtc', '/p2p-circuit']
+            },
+            transports: [
+                circuitRelayTransport({
+                    hop: {
+                        enabled: false  // Browsers cannot act as relays
+                    }
+                } as CircuitRelayTransportInit),
+                webRTC({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                } as WebRTCTransportInit)
+            ],
             connectionEncrypters: [noise()],
             streamMuxers: [yamux()],
+            peerDiscovery: [
+                bootstrap({
+                    list: [
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbX7TbXrHRQHh2',
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqduuO5wL',
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76C42gEOzRVzYVdigitaltA5dyxuEXsBC',
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp'
+                    ]
+                })
+            ],
             services: {
                 identify: identify()
             },
-            addresses: {
-                listen: ['/webrtc']
+            connectionGater: {
+                denyDialMultiaddr: async () => false  // Allow private addresses for testing
             }
         });
         libp2p = libp2pNode;
@@ -258,6 +283,7 @@ async function initP2P(isHostMode: boolean) {
         }
     }
 }
+
 // Advertise server peer info to GitHub with retries
 async function advertiseServerPeer(retries = 3, delayMs = 1000): Promise<boolean> {
     console.log('Entering advertiseServerPeer, retries:', retries);
