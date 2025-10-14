@@ -769,6 +769,3 @@ window.addEventListener('load', () => {
         processTxns();
     }, 15000);
 });
-
-// Ensure all functions are exported
-export { saveGithubAccessToken, viewChain, processTxns, fetchState, initP2P };

@@ -17,15 +17,27 @@ export default defineConfig({
     }
   ],
   build: {
-    emptyOutDir: false, // Respect user's preference
+    emptyOutDir: false,
     outDir: 'js',
     rollupOptions: {
       input: 'src/blockchain.ts',
       output: {
         entryFileNames: 'bundle.js',
         format: 'es',
-	preserveModules: false
-      }
+        preserveModules: false,
+        exports: 'named' // Ensure named exports are preserved
+      },
+      external: [
+        'libp2p',
+        '@libp2p/webrtc',
+        '@libp2p/circuit-relay-v2',
+        '@libp2p/bootstrap',
+        '@chainsafe/libp2p-noise',
+        '@chainsafe/libp2p-yamux',
+        '@libp2p/identify',
+        '@multiformats/multiaddr',
+        'uint8arrays'
+      ]
     }
   },
   optimizeDeps: {
