@@ -27008,7 +27008,7 @@ async function initP2P(host) {
           return;
         }
         try {
-          const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
+          const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             headers: {
               "Authorization": `token ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json"
@@ -27019,7 +27019,7 @@ async function initP2P(host) {
             const data = await response.json();
             sha2 = data.sha;
           }
-          await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
+          await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {
               "Authorization": `token ${githubAccessToken}`,
