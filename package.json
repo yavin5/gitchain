@@ -15,13 +15,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@chainsafe/libp2p-noise": "^17.0.0",
+    "@chainsafe/libp2p-yamux": "^8.0.0",
+    "@libp2p/identify": "^4.0.5",
+    "@libp2p/webrtc": "^6.0.6",
+    "@multiformats/multiaddr": "^13.0.1",
     "ethereum-cryptography": "^2.2.1",
-    "libp2p": "1.9.4",
-    "@libp2p/webrtc": "4.1.10",
-    "@chainsafe/libp2p-noise": "15.0.0",
-    "@chainsafe/libp2p-yamux": "^6.0.0",
-    "@libp2p/identify": "2.1.5",
-    "@multiformats/multiaddr": "^12.0.0",
+    "libp2p": "^3.0.6",
     "uint8arrays": "^5.0.0"
   },
   "devDependencies": {

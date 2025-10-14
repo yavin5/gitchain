@@ -154,8 +154,8 @@ async function initP2P(isHostMode) {
     try {
         console.log('Creating libp2p node...');
         const libp2pNode = await createLibp2p({
-            transports: [webRTC()],
-            connectionEncryption: [noise()],
+            transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] })],
+            connectionEncrypters: [noise()],
             streamMuxers: [yamux()],
             services: {
                 identify: identify()

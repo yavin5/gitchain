@@ -11,7 +11,7 @@ declare const sha3: {
 };
 
 import { createLibp2p } from 'libp2p';
-import { webRTC } from '@libp2p/webrtc';
+import { webRTC, WebRTCTransportInit } from '@libp2p/webrtc';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
@@ -181,8 +181,8 @@ async function initP2P(isHostMode: boolean) {
     try {
         console.log('Creating libp2p node...');
         const libp2pNode = await createLibp2p({
-            transports: [webRTC()],
-            connectionEncryption: [noise()],
+            transports: [webRTC({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } as WebRTCTransportInit)],
+            connectionEncrypters: [noise()],
             streamMuxers: [yamux()],
             services: {
                 identify: identify()
