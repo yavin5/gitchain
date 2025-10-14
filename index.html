@@ -1,63 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gitchain</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval'; connect-src https://api.github.com *.webrtc *.stun.l.google.com; style-src 'self' 'unsafe-inline'">
-    <style>
-        #processingMessage {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 5px;
-            font-size: 1.5em;
-            z-index: 1000;
-        }
-        #tokenMessage {
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-        #blockHeight {
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-        #version {
-            font-size: 0.8em;
-            color: #555;
-            margin-left: 10px;
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://cdnjs.cloudflare.com;
+    connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun:stun.l.google.com:19302;
+    style-src 'self';
+  ">
+  <title>Gitchain</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    #processingMessage {
+      display: none;
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    button, input {
+      margin: 5px;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Gitchain <span id="version">v0.8.0</span></h1>
-    <p>Enter your GitHub Personal Access Token (with repo contents read/write and issues read/write permissions):</p>
-    <input type="text" id="githubAccessToken" placeholder="Enter GitHub PAT">
-    <div id="tokenMessage"></div>
-    <button id="saveTokenButton">Save Token</button>
-    <button id="viewChainButton">View Chain</button>
-    <button id="processTxnsButton">Process Transactions</button>
-    <div id="blockHeight"></div>
-    <div id="output"></div>
-    <div id="processingMessage">PROCESSING TRANSACTIONS</div>
-    <!-- Existing CDNs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/build/sha3.min.js"></script>
-    <!-- Updated CDNs for libp2p and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/libp2p@1.2.1/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@libp2p/webrtc@6.0.6/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@chainsafe/libp2p-noise@15.0.0/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@chainsafe/libp2p-yamux@6.0.2/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/multiaddr@10.0.1/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uint8arrays@5.1.0/dist/index.min.js"></script>
-    <script type="module" src="./js/init.js?v=9"></script>
-    <script src="./js/main.js?v=9"></script>
+  <h1>Gitchain</h1>
+  <p>Enter your GitHub Personal Access Token (PAT) with repo and issues read/write permissions:</p>
+  <input type="text" id="githubAccessToken" placeholder="GitHub PAT">
+  <button onclick="window.gitchain.saveGithubAccessToken()">Save PAT</button>
+  <button onclick="window.gitchain.viewChain()">View Chain</button>
+  <button onclick="window.gitchain.processTxns()">Process Transactions</button>
+  <div id="processingMessage">Processing transactions...</div>
+  <div id="output"></div>
+
+  <!-- CDN-loaded libraries for blockchain operations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
+  <!-- Local scripts with cache-busting -->
+  <script src="js/main.js?v=8"></script>
+  <script type="module" src="js/init.js?v=8"></script>
+  <script src="js/bundle.js?v=8"></script>
 </body>
 </html>

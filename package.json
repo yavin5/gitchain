@@ -1,16 +1,31 @@
 {
   "name": "gitchain",
   "version": "0.8.0",
-  "type": "module",
+  "description": "A centralized blockchain using GitHub for storage and transaction processing",
+  "main": "js/main.js",
+  "module": "js/init.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-esm.json",
-    "generate-admin-key": "tsc src/generate-admin-key.ts --outDir js && mv js/generate-admin-key.js js/generate-admin-key.cjs && node js/generate-admin-key.cjs"
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-esm.json && vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yavin5/gitchain.git"
+  },
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "ethereum-cryptography": "^2.2.1"
+    "ethereum-cryptography": "^2.2.1",
+    "libp2p": "1.9.4",
+    "webrtc": "^1.14.1",
+    "@chainsafe/libp2p-noise": "15.0.0",
+    "@chainsafe/libp2p-yamux": "^6.0.0",
+    "@libp2p/identify": "2.1.5",
+    "@multiformats/multiaddr": "^12.0.0",
+    "uint8arrays": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
-    "ts-node": "^10.9.2"
+    "vite": "^5.0.0"
   }
 }
