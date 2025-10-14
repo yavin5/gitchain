@@ -2,9 +2,22 @@ import { defineConfig } from 'vite';
 import typescript from 'vite-plugin-typescript';
 
 export default defineConfig({
-  plugins: [typescript()],
+  plugins: [
+    typescript(),
+    {
+      name: 'debug-bundling',
+      buildEnd(err) {
+        if (err) {
+          console.error('Build error:', err);
+        } else {
+          console.log('Build completed. Output files in js/:');
+          console.log('Expected: bundle.js, main.js, init.js');
+        }
+      }
+    }
+  ],
   build: {
-    emptyOutDir: false,
+    emptyOutDir: false, // Respect user's preference
     outDir: 'js',
     rollupOptions: {
       input: 'src/blockchain.ts',

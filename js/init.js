@@ -1,4 +1,12 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState } from './blockchain.js?v=7';
+import { saveGithubAccessToken, viewChain, processTxns, fetchState } from './bundle.js';
+
+// Debug trap to catch inline style assignments
+if (window.location.hostname === 'localhost') {
+    Object.defineProperty(HTMLElement.prototype, 'style', {
+        set: () => console.error('Inline style set detected in init.js! Check stack trace.'),
+        configurable: true
+    });
+}
 
 console.log('Imported functions:', { saveGithubAccessToken, viewChain, processTxns, fetchState });
 console.log('Window object before assignments:', {
@@ -7,7 +15,6 @@ console.log('Window object before assignments:', {
     windowProcessTxns: window.processTxns,
     windowFetchState: window.fetchState
 });
-
 try {
     // Expose functions to global scope for main.js
     window.saveGithubAccessToken = saveGithubAccessToken;
@@ -25,7 +32,6 @@ try {
 } catch (error) {
     console.error('Error setting global functions:', error);
 }
-
 // Verify assignments after try-catch
 console.log('Final window assignments:', {
     windowSaveGithubAccessToken: window.saveGithubAccessToken,
