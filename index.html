@@ -40,9 +40,9 @@
   <h1>Gitchain</h1>
   <p>Enter your GitHub Personal Access Token (PAT) with repo and issues read/write permissions:</p>
   <input type="text" id="githubAccessToken" placeholder="GitHub PAT">
-  <button onclick="window.gitchain.saveGithubAccessToken()">Save PAT</button>
-  <button onclick="window.gitchain.viewChain()">View Chain</button>
-  <button onclick="window.gitchain.processTxns()">Process Transactions</button>
+  <button id="savePatButton">Save PAT</button>
+  <button id="viewChainButton">View Chain</button>
+  <button id="processTxnsButton">Process Transactions</button>
   <div id="processingMessage">Processing transactions...</div>
   <div id="output"></div>
 
