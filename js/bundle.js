@@ -26931,21 +26931,48 @@ async function initP2P(host) {
       const response = await fetch(`/${SERVER_PEER_FILE}`);
       if (response.ok) {
         const peerData = await response.json();
+        console.log("Raw peer data from server-peer.json:", peerData);
         bootstrapList = (peerData.peers || []).filter((addr) => {
           try {
             multiaddr(addr);
+            console.log(`Valid multiaddr: ${addr}`);
             return true;
           } catch (e2) {
             console.error(`Invalid multiaddr in server-peer.json: ${addr}`, e2);
             return false;
           }
         });
-        console.log("Loaded valid peers from server-peer.json:", bootstrapList);
+        console.log("Filtered bootstrapList:", bootstrapList);
+      } else if (response.status === 404) {
+        console.log("server-peer.json not found, creating with empty peers");
+        const githubAccessToken = getGithubAccessToken();
+        if (!githubAccessToken) {
+          console.log("No PAT available for creating server-peer.json");
+        } else {
+          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [] }))]), "base64");
+          const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
+            method: "POST",
+            headers: {
+              "Authorization": `token ${githubAccessToken}`,
+              "Accept": "application/vnd.github.v3+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              message: "Create server-peer.json",
+              content: initialContent
+            })
+          });
+          if (createResponse.ok) {
+            console.log("server-peer.json created successfully");
+          } else {
+            console.error("Failed to create server-peer.json:", await createResponse.text());
+          }
+        }
       } else {
-        console.log("No server-peer.json found, starting without bootstrap peers");
+        console.log("Error fetching server-peer.json, status:", response.status);
       }
     } catch (error) {
-      console.error("Error loading server-peer.json:", error);
+      console.error("Error loading/creating server-peer.json:", error);
     }
   }
   try {
@@ -26957,6 +26984,8 @@ async function initP2P(host) {
     };
     if (bootstrapList.length) {
       config.peerDiscovery = [bootstrap({ list: bootstrapList })];
+    } else {
+      console.log("No valid peers in bootstrapList, initializing libp2p without peer discovery");
     }
     libp2p = await createLibp2p(config);
     console.log("P2P node started:", libp2p.peerId.toString());

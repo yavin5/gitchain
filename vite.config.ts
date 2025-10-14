@@ -32,8 +32,8 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     outDir: 'js',
-    minify: false, // Prevent mangling
-    sourcemap: true, // Enable sourcemaps for debugging
+    minify: false,
+    sourcemap: true,
     rollupOptions: {
       input: 'src/blockchain.ts',
       output: {
