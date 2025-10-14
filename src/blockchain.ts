@@ -200,14 +200,14 @@ export async function initP2P(host: boolean): Promise<void> {
                 });
                 console.log('Filtered bootstrapList:', bootstrapList);
             } else if (response.status === 404) {
-                console.log('server-peer.json not found, creating with empty peers');
+	        console.log('server-peer.json not found, creating with empty peers');
                 const githubAccessToken = getGithubAccessToken();
                 if (!githubAccessToken) {
-                    console.log('No PAT available for creating server-peer.json');
+                     console.log('No PAT available for creating server-peer.json');
                 } else {
                     const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [] }))]), 'base64');
-                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
-                        method: 'POST',
+                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+                        method: 'PUT',
                         headers: {
                             'Authorization': `token ${githubAccessToken}`,
                             'Accept': 'application/vnd.github.v3+json',

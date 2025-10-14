@@ -26950,8 +26950,8 @@ async function initP2P(host) {
           console.log("No PAT available for creating server-peer.json");
         } else {
           const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [] }))]), "base64");
-          const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
-            method: "POST",
+          const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+            method: "PUT",
             headers: {
               "Authorization": `token ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json",
