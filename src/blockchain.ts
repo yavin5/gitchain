@@ -184,7 +184,7 @@ export async function initP2P(host: boolean): Promise<void> {
     let bootstrapList: string[] = [];
     if (isHost) {
         try {
-            const response = await fetch(`/${SERVER_PEER_FILE}`);
+            const response = await fetch(`/${SERVER_PEER_FILE}?ref=main`);
             if (response.ok) {
                 const peerData = await response.json();
                 console.log('Raw peer data from server-peer.json:', peerData);
@@ -216,7 +216,7 @@ export async function initP2P(host: boolean): Promise<void> {
                     const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
                     await tempNode.stop(); // Close temp node
                     const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64');
-                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
+                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `token ${githubAccessToken}`,
