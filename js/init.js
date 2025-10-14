@@ -1,29 +1,3 @@
-// Debug trap to catch inline style assignments
-if (window.location.hostname === 'localhost') {
-    Object.defineProperty(HTMLElement.prototype, 'style', {
-        set: () => console.error('Inline style set detected in init.js! Check stack trace.'),
-        configurable: true
-    });
-}
-
-// Verify imports
-if (!saveGithubAccessToken || !viewChain || !processTxns || !fetchState) {
-    console.error('One or more imports missing from bundle.js:', {
-        saveGithubAccessToken,
-        viewChain,
-        processTxns,
-        fetchState
-    });
-    throw new Error('Missing exports in bundle.js');
-}
-
-console.log('Imported functions:', { saveGithubAccessToken, viewChain, processTxns, fetchState });
-console.log('Window object before assignments:', {
-    windowSaveGithubAccessToken: window.saveGithubAccessToken,
-    windowViewChain: window.viewChain,
-    windowProcessTxns: window.processTxns,
-    windowFetchState: window.fetchState
-});
 try {
     // Expose functions to global scope for main.js
     window.saveGithubAccessToken = saveGithubAccessToken;
