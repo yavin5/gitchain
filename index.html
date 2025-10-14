@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://cdnjs.cloudflare.com;
-    connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun:stun.l.google.com:19302;
+    connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun.l.google.com:19302;
     style-src 'self';
   ">
   <title>Gitchain</title>
@@ -26,6 +26,9 @@
       color: green;
       font-weight: bold;
       margin-top: 10px;
+    }
+    #processingMessage.visible {
+      display: block;
     }
     button, input {
       margin: 5px;

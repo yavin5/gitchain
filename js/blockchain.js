@@ -622,7 +622,7 @@ export async function processTxns() {
     console.log('Entering processTxns');
     const output = document.getElementById('output');
     const processingMessage = document.getElementById('processingMessage');
-    processingMessage.style.display = 'block';
+    processingMessage.classList.add('visible');
     let stateData = await fetchState();
     let state = stateData?.content;
     if (!state) {
@@ -638,7 +638,7 @@ export async function processTxns() {
         if (!success) {
             console.log('Failed to initialize state');
             output.textContent += '\nFailed to initialize.';
-            processingMessage.style.display = 'none';
+            processingMessage.classList.remove('visible');
             return;
         }
         stateData = await fetchState();
@@ -692,7 +692,7 @@ export async function processTxns() {
         if (!success) {
             console.log('Failed to update state after issue:', issue.number);
             output.textContent += `\nFailed to update state after issue #${issue.number}`;
-            processingMessage.style.display = 'none';
+            processingMessage.classList.remove('visible');
             return;
         }
         stateData = await fetchState();
@@ -708,7 +708,7 @@ export async function processTxns() {
         await updateState(state, stateData.sha, 'Update last processed date');
     }
     console.log('processTxns completed');
-    processingMessage.style.display = 'none';
+    processingMessage.classList.remove('visible');
 }
 // View chain
 export async function viewChain() {
