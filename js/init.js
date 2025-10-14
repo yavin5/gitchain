@@ -1,5 +1,3 @@
-await new Promise(resolve => setTimeout(resolve, 1000));
-
 // Debug trap to catch inline style assignments
 if (window.location.hostname === 'localhost') {
     Object.defineProperty(HTMLElement.prototype, 'style', {
