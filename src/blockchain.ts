@@ -1,4 +1,13 @@
 import { ADMIN_ADDRESS } from './admin-address.js';
+
+// Debug trap to catch inline style assignments
+if (window.location.hostname === 'localhost') {
+    Object.defineProperty(HTMLElement.prototype, 'style', {
+        set: () => console.error('Inline style set detected in blockchain.ts! Check stack trace.'),
+        configurable: true
+    });
+}
+
 // Declare CryptoJS for TypeScript (loaded via CDN at runtime)
 declare const CryptoJS: {
     SHA256: (value: string) => { toString: () => string };
@@ -177,7 +186,7 @@ function getGithubAccessToken(): string | null {
     return githubAccessToken;
 }
 // Initialize libp2p
-async function initP2P(isHostMode: boolean) {
+export async function initP2P(isHostMode: boolean) {
     console.log('Entering initP2P, isHost:', isHostMode);
     isHost = isHostMode;
     try {
