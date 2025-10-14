@@ -254,7 +254,7 @@ async function initP2P(isHostMode: boolean) {
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
         if (isHost) {
-            alert('Failed to initialize P2P node. Please check your network or contact the administrator.');
+            alert('The server appears to be temporarily down. Please check your network or contact the blockchain administrator.');
         }
     }
 }
