@@ -12,11 +12,11 @@ declare const sha3: {
 };
 
 import { createLibp2p } from 'libp2p';
-import { webRTC, WebRTCTransportInit } from '@libp2p/webrtc';
+import { webRTC } from '@libp2p/webrtc';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
-import { circuitRelayTransport, CircuitRelayTransportInit } from '@libp2p/circuit-relay-v2';
+import { circuitRelayTransport } from '@libp2p/circuit-relay-v2';
 import { bootstrap } from '@libp2p/bootstrap';
 import { multiaddr } from '@multiformats/multiaddr';
 import { fromString as uint8FromString, toString as uint8ToString, concat as uint8Concat } from 'uint8arrays';
@@ -178,110 +178,95 @@ function getGithubAccessToken(): string | null {
     return githubAccessToken;
 }
 // Initialize libp2p
-export async function initP2P(isHostMode: boolean) {
-    console.log('Entering initP2P, isHost:', isHostMode);
-    isHost = isHostMode;
-    try {
-        console.log('Creating libp2p node...');
-        const libp2pNode = await createLibp2p({
-            addresses: {
-                listen: ['/webrtc', '/p2p-circuit']
-            },
-            transports: [
-                circuitRelayTransport({
-                    hop: {
-                        enabled: false  // Browsers cannot act as relays
+export async function initP2P(host: boolean): Promise<void> {
+    console.log('Entering initP2P, host:', host);
+    isHost = host;
+    let bootstrapList: string[] = [];
+    if (isHost) {
+        try {
+            const response = await fetch(`/${SERVER_PEER_FILE}`);
+            if (response.ok) {
+                const peerData = await response.json();
+                bootstrapList = (peerData.peers || []).filter((addr: string) => {
+                    try {
+                        multiaddr(addr); // Validate multiaddr
+                        return true;
+                    } catch (e) {
+                        console.error(`Invalid multiaddr in server-peer.json: ${addr}`, e);
+                        return false;
                     }
-                } as CircuitRelayTransportInit),
-                webRTC({
-                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-                } as WebRTCTransportInit)
-            ],
-            connectionEncrypters: [noise()],
-            streamMuxers: [yamux()],
-            peerDiscovery: [
-                bootstrap({
-                    list: [
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbX7TbXrHRQHh2',
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqduuO5wL',
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76C42gEOzRVzYVdigitaltA5dyxuEXsBC',
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp'
-                    ]
-                })
-            ],
-            services: {
-                identify: identify()
-            },
-            connectionGater: {
-                denyDialMultiaddr: async () => false  // Allow private addresses for testing
+                });
+                console.log('Loaded valid peers from server-peer.json:', bootstrapList);
+            } else {
+                console.log('No server-peer.json found, starting without bootstrap peers');
             }
-        });
-        libp2p = libp2pNode;
-        console.log('Starting libp2p node...');
-        await libp2p.start();
-        console.log('libp2p started, peerId:', libp2p.peerId.toString());
-        // Ensure libp2p is fully initialized
-        console.log('Waiting for libp2p initialization...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        libp2p.addEventListener('peer:connect', (evt: any) => {
-            console.log('Connected to peer:', evt.detail.toString());
-        });
-        // Register protocol handler for incoming TX
-        console.log('Registering protocol handler for:', PROTOCOL);
-        await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
-            console.log('Incoming TX stream from', connection.remotePeer.toString());
-            const txJson = await pipeToString(stream);
-            try {
-                const tx = JSON.parse(txJson) as Transaction;
-                if (verifyTxn(tx)) {
-                    console.log('Valid TX received, creating GitHub issue');
-                    const issueBody = JSON.stringify({
-                        type: 'gitchain_txn',
-                        repo: FQ_REPO,
-                        txn: tx
-                    });
-                    const issueResponse = await fetch(ISSUES_URL, {
-                        method: 'POST',
+        } catch (error) {
+            console.error('Error loading server-peer.json:', error);
+        }
+    }
+    try {
+        const config: any = {
+            transports: [webRTC(), circuitRelayTransport()],
+            connectionEncryption: [noise()],
+            streamMuxers: [yamux()],
+            services: { identify: identify() }
+        };
+        if (bootstrapList.length) {
+            config.peerDiscovery = [bootstrap({ list: bootstrapList })];
+        }
+        libp2p = await createLibp2p(config);
+        console.log('P2P node started:', libp2p.peerId.toString());
+        if (isHost) {
+            const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${libp2p.peerId.toString()}`;
+            if (peerInfo !== lastPeerInfo) {
+                console.log('Updating server-peer.json with:', peerInfo);
+                const githubAccessToken = getGithubAccessToken();
+                if (!githubAccessToken) {
+                    console.log('No PAT available for updating server-peer.json');
+                    return;
+                }
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
                         headers: {
-                            'Authorization': `token ${getGithubAccessToken()}`,
+                            'Authorization': `token ${githubAccessToken}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    let sha: string | null = null;
+                    if (response.ok) {
+                        const data = await response.json();
+                        sha = data.sha;
+                    }
+                    await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
+                        method: sha ? 'PUT' : 'POST',
+                        headers: {
+                            'Authorization': `token ${githubAccessToken}`,
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            title: `tx ${tx.from} to ${tx.to}`,
-                            body: issueBody
+                            message: 'Update server peer info',
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64'),
+                            sha
                         })
                     });
-                    if (issueResponse.ok) {
-                        console.log('Created issue for anonymous TX');
-                    } else {
-                        console.error('Failed to create issue:', issueResponse.status, await issueResponse.text());
-                    }
-                } else {
-                    console.error('Invalid TX from P2P');
+                    lastPeerInfo = peerInfo;
+                } catch (error) {
+                    console.error('Error updating server-peer.json:', error);
                 }
-            } catch (error) {
-                console.error('Error processing TX:', error);
             }
-            stream.close();
-        });
-        if (isHost) {
-            console.log('Host mode: Advertising peer info');
-            await advertiseServerPeer();
-            console.log('Setting interval for periodic peer advertising');
-            setInterval(advertiseServerPeer, UPDATE_INTERVAL);
-            window.addEventListener('beforeunload', async () => {
-                console.log('Window unloading, deleting server peer file');
-                await deleteServerPeerFile();
-            });
         }
-        console.log('initP2P completed successfully');
+        libp2p.addEventListener('peer:discovery', (evt: any) => {
+            console.log('Peer discovered:', evt.detail.id.toString());
+        });
+        await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
+            console.log('Received P2P stream from:', connection.remotePeer.toString());
+            const data = await stream.read();
+            const txn = JSON.parse(uint8ToString(data));
+            console.log('Received transaction via P2P:', txn);
+        });
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
-        if (isHost) {
-            alert('The server appears to be temporarily down. Please check your network or contact the blockchain administrator.');
-        }
     }
 }
 

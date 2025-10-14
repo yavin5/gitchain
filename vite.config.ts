@@ -16,17 +16,42 @@ export default defineConfig({
       }
     }
   ],
+  resolve: {
+    alias: {
+      'libp2p': 'libp2p',
+      '@libp2p/webrtc': '@libp2p/webrtc',
+      '@libp2p/circuit-relay-v2': '@libp2p/circuit-relay-v2',
+      '@libp2p/bootstrap': '@libp2p/bootstrap',
+      '@chainsafe/libp2p-noise': '@chainsafe/libp2p-noise',
+      '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
+      '@libp2p/identify': '@libp2p/identify',
+      '@multiformats/multiaddr': '@multiformats/multiaddr',
+      'uint8arrays': 'uint8arrays'
+    }
+  },
   build: {
     emptyOutDir: false,
     outDir: 'js',
-    minify: false,
+    minify: false, // Prevent mangling
+    sourcemap: true, // Enable sourcemaps for debugging
     rollupOptions: {
       input: 'src/blockchain.ts',
       output: {
         entryFileNames: 'bundle.js',
-        format: 'iife',
+        format: 'es',
         preserveModules: false,
-        exports: 'named'
+        exports: 'named',
+        globals: {
+          'libp2p': 'libp2p',
+          '@libp2p/webrtc': 'webRTC',
+          '@libp2p/circuit-relay-v2': 'circuitRelayTransport',
+          '@libp2p/bootstrap': 'bootstrap',
+          '@chainsafe/libp2p-noise': 'noise',
+          '@chainsafe/libp2p-yamux': 'yamux',
+          '@libp2p/identify': 'identify',
+          '@multiformats/multiaddr': 'multiaddr',
+          'uint8arrays': 'uint8arrays'
+        }
       }
     }
   },
