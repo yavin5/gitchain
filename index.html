@@ -3,12 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://cdnjs.cloudflare.com;
-    connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun.l.google.com:19302;
-    style-src 'self';
-  ">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com stun.l.google.com:19302; style-src 'self';">
   <title>Gitchain</title>
   <style>
     body {
@@ -30,6 +25,19 @@
     #processingMessage.visible {
       display: block;
     }
+    #tokenMessage {
+      margin-top: 10px;
+      display: none;
+    }
+    #tokenMessage.visible {
+      display: block;
+    }
+    #tokenMessage.success {
+      color: green;
+    }
+    #tokenMessage.error {
+      color: red;
+    }
     button, input {
       margin: 5px;
       padding: 5px;
@@ -40,10 +48,11 @@
   <h1>Gitchain</h1>
   <p>Enter your GitHub Personal Access Token (PAT) with repo and issues read/write permissions:</p>
   <input type="text" id="githubAccessToken" placeholder="GitHub PAT">
-  <button id="savePatButton">Save PAT</button>
+  <button id="saveTokenButton">Save PAT</button>
   <button id="viewChainButton">View Chain</button>
   <button id="processTxnsButton">Process Transactions</button>
   <div id="processingMessage">Processing transactions...</div>
+  <div id="tokenMessage"></div>
   <div id="output"></div>
 
   <!-- CDN-loaded libraries for blockchain operations -->
@@ -53,6 +62,6 @@
   <!-- Local scripts with cache-busting -->
   <script src="js/main.js?v=8"></script>
   <script type="module" src="js/init.js?v=8"></script>
-  <script src="js/bundle.js?v=8"></script>
+  <script type="module" src="js/bundle.js?v=8"></script>
 </body>
 </html>

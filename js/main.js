@@ -45,44 +45,44 @@
                     saveGithubAccessToken();
                     tokenMessageDiv.textContent = 'Token saved successfully';
                     tokenMessageDiv.classList.remove('error');
-                    tokenMessageDiv.classList.add('success');
+                    tokenMessageDiv.classList.add('success', 'visible');
                     // Clear message after 5 seconds
                     setTimeout(() => {
                         tokenMessageDiv.textContent = '';
-                        tokenMessageDiv.classList.remove('success');
+                        tokenMessageDiv.classList.remove('success', 'visible');
                     }, 5000);
                 } catch (error) {
                     tokenMessageDiv.textContent = 'Failed to save token';
                     tokenMessageDiv.classList.remove('success');
-                    tokenMessageDiv.classList.add('error');
+                    tokenMessageDiv.classList.add('error', 'visible');
                     setTimeout(() => {
                         tokenMessageDiv.textContent = '';
-                        tokenMessageDiv.classList.remove('error');
+                        tokenMessageDiv.classList.remove('error', 'visible');
                     }, 5000);
                 }
             } else {
                 tokenMessageDiv.textContent = 'Please enter a valid token';
                 tokenMessageDiv.classList.remove('success');
-                tokenMessageDiv.classList.add('error');
+                tokenMessageDiv.classList.add('error', 'visible');
                 setTimeout(() => {
                     tokenMessageDiv.textContent = '';
-                    tokenMessageDiv.classList.remove('error');
+                    tokenMessageDiv.classList.remove('error', 'visible');
                 }, 5000);
             }
         }
 
         // Attach event listeners
-        const savePatButton = document.getElementById('savePatButton');
+        const saveTokenButton = document.getElementById('saveTokenButton');
         const viewChainButton = document.getElementById('viewChainButton');
         const processTxnsButton = document.getElementById('processTxnsButton');
 
-        if (!savePatButton || !viewChainButton || !processTxnsButton) {
+        if (!saveTokenButton || !viewChainButton || !processTxnsButton) {
             console.error('One or more buttons not found');
             return;
         }
 
-        savePatButton.addEventListener('click', () => {
-            console.log('Save PAT button clicked');
+        saveTokenButton.addEventListener('click', () => {
+            console.log('Save Token button clicked');
             handleSaveToken();
         });
 
@@ -112,7 +112,7 @@
             }
         });
 
-        // Update block height on load
+        // Update block height on load and after processing transactions
         updateBlockHeight();
     }
 

@@ -8,7 +8,7 @@ export default defineConfig({
       input: 'src/blockchain.ts',
       output: {
         entryFileNames: 'bundle.js',
-        format: 'iife'
+        format: 'es'  // Changed to 'es' for module bundling
       }
     }
   },
