@@ -184,7 +184,7 @@ export async function initP2P(host: boolean): Promise<void> {
     let bootstrapList: string[] = [];
     if (isHost) {
         try {
-            const response = await fetch(`/${SERVER_PEER_FILE}?ref=main`);
+            const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`);
             if (response.ok) {
                 const peerData = await response.json();
                 console.log('Raw peer data from server-peer.json:', peerData);
@@ -277,7 +277,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         sha = data.sha;
                     }
                     await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
-                        method: sha ? 'PUT' : 'POST',
+                        method: 'PUT',
                         headers: {
                             'Authorization': `token ${githubAccessToken}`,
                             'Accept': 'application/vnd.github.v3+json',
@@ -285,7 +285,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         },
                         body: JSON.stringify({
                             message: 'Update server peer info',
-                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64'),
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]) + '=', 'base64'),
                             sha
                         })
                     });
