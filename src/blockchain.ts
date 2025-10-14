@@ -177,7 +177,7 @@ function getGithubAccessToken(): string | null {
     console.log('Retrieved GitHub access token');
     return githubAccessToken;
 }
-// Initialize libp2p
+// Initialize libp2p / WebRTC server
 export async function initP2P(host: boolean): Promise<void> {
     console.log('Entering initP2P, host:', host);
     isHost = host;
@@ -200,13 +200,23 @@ export async function initP2P(host: boolean): Promise<void> {
                 });
                 console.log('Filtered bootstrapList:', bootstrapList);
             } else if (response.status === 404) {
-	        console.log('server-peer.json not found, creating with empty peers');
+                console.log('server-peer.json not found, creating with host peerInfo');
                 const githubAccessToken = getGithubAccessToken();
                 if (!githubAccessToken) {
-                     console.log('No PAT available for creating server-peer.json');
+                    console.log('No PAT available for creating server-peer.json');
                 } else {
-                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [] }))]), 'base64');
-                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+                    // Generate peerInfo early for creation
+                    const tempConfig = {
+                        transports: [webRTC(), circuitRelayTransport()],
+                        connectionEncryption: [noise()],
+                        streamMuxers: [yamux()],
+                        services: { identify: identify() }
+                    };
+                    const tempNode = await createLibp2p(tempConfig);
+                    const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
+                    await tempNode.stop(); // Close temp node
+                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), 'base64');
+                    const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `token ${githubAccessToken}`,
@@ -214,12 +224,12 @@ export async function initP2P(host: boolean): Promise<void> {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: 'Create server-peer.json',
+                            message: 'Create server-peer.json with host peer',
                             content: initialContent
                         })
                     });
                     if (createResponse.ok) {
-                        console.log('server-peer.json created successfully');
+                        console.log('server-peer.json created successfully with host peerInfo');
                     } else {
                         console.error('Failed to create server-peer.json:', await createResponse.text());
                     }
