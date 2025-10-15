@@ -68,7 +68,7 @@ function calculateHash(index: number, previousHash: string, timestamp: string, t
     return CryptoJS.SHA256(value).toString();
 }
 // Create genesis block
-function createGenesisBlock(): Block {
+function createOriginalBlock(): Block {
     const timestamp = new Date().toISOString();
     return {
         index: 0,
@@ -133,8 +133,8 @@ async function processTxn(txn: Transaction, state: State): Promise<{ valid: bool
     state.pending.push(txn);
     return { valid: true, txid };
 }
-// Mine block
-async function mineBlock(state: State): Promise<number | null> {
+// Create block
+async function createBlock(state: State): Promise<number | null> {
     if (state.pending.length === 0) return null;
     const validTxns: Transaction[] = [];
     const newBalances = { ...state.balances };
@@ -191,9 +191,9 @@ export async function initP2P(host: boolean): Promise<void> {
                 const peerData = await response.json();
                 console.log('Raw peer data from server-peer.json:', peerData.content);
                 let b64Encoded = peerData.content;
-                console.log(`Base64-encoded peer data: ${b64Encoded}`);
+                //console.log(`Base64-encoded peer data: ${b64Encoded}`);
                 let payloadString = atob(b64Encoded);
-                console.log(`Decoded peer data: ${payloadString}`);
+                //console.log(`Decoded peer data: ${payloadString}`);
                 let peerJson = JSON.parse(payloadString);
                 bootstrapList = (peerJson.peers || []).filter((addr: string) => {
                     try {
@@ -494,12 +494,14 @@ export async function connectAndSendTx(tx: Transaction) {
     if (!res.ok) {
         console.error('Failed to fetch server peer file:', res.status, await res.text());
         if (res.status === 404) {
-            alert('The server is currently not running. Please notify the blockchain/project administrator.');
+            alert('The server is currently not running. Please notify the chain/project administrator.');
         } else {
+            // TODO: handle rate limit blocking here.
             alert('Failed to fetch server peer info. Please try again or notify the administrator.');
         }
         return;
     }
+    // TODO: Handle multiple server peers.
     const { peerId, multiaddrs, timestamp } = await res.json();
     console.log('Server peer info:', { peerId, multiaddrs, timestamp });
     try {
@@ -510,10 +512,10 @@ export async function connectAndSendTx(tx: Transaction) {
         const stream = await connection.newStream(PROTOCOL);
         const txJson = JSON.stringify(tx);
         await pipeStringToStream(txJson, stream);
-        console.log('TX sent via P2P');
+        console.log('TX sent successfully to server.');
     } catch (error) {
         console.error('Failed to connect or send TX:', error);
-        alert('Failed to connect to server. Please try again or notify the administrator.');
+        alert('Failed to connect to server. Please try again or notify the server administrator.');
     }
 }
 // Stream helpers
@@ -628,7 +630,7 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
         return;
     }
     const status = valid && blockIndex !== null ? `Confirmed in block ${blockIndex}` : 'Invalid transaction';
-    const intro = "Gitchain is an innovative centralized blockchain using GitHub for storage and processing. It enables secure, transparent transactions via issues. Join the experiment in decentralized finance today!";
+    const intro = "Gitchain is an innovative centralized chain on GitHub. It enables secure, transparent transactions.";
     const gitchain_url = `https://github.com/${FQ_REPO}`;
     const commentBody = `${status}. ${intro} Learn more: ${gitchain_url} (Repo: ${FQ_REPO})`;
     console.log('Creating comment for issue:', issueNumber);
@@ -663,7 +665,7 @@ export async function processTxns(): Promise<void> {
     if (!state) {
         console.log('No state found, initializing');
         state = {
-            chain: [createGenesisBlock()],
+            chain: [createOriginalBlock()],
             pending: [],
             balances: { [ADMIN_ADDRESS]: 1000000 },
             nonces: {},
@@ -692,7 +694,7 @@ export async function processTxns(): Promise<void> {
         try {
             const parsed = JSON.parse(issue.body);
             if (parsed.type !== 'gitchain_txn') {
-                console.log('Skipping non-gitchain issue:', issue.number);
+                console.log('Skipping non-tx issue:', issue.number);
                 await closeIssueWithComment(issue.number, null, false);
                 continue;
             }
@@ -710,7 +712,7 @@ export async function processTxns(): Promise<void> {
         console.log('Processing transaction from issue:', issue.number);
         const { valid, txid } = await processTxn(txn, state);
         console.log(`Transaction ID: ${txid}, valid: ${valid}`);
-        const blockIndex = valid ? await mineBlock(state) : null;
+        const blockIndex = valid ? await createBlock(state) : null;
         await closeIssueWithComment(issue.number, blockIndex, valid);
         if (valid && blockIndex !== null) {
             console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
