@@ -283,6 +283,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         const data = await response.json();
                         sha = data.sha;
                     }
+                    console.log(`peerInfo: ${peerInfo}`);
                     await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
@@ -292,7 +293,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         },
                         body: JSON.stringify({
                             message: 'Update server peer info',
-                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }) + '=')]), 'base64'),
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [ peerInfo ] }) + '=')]), 'base64'),
                             sha
                         })
                     });

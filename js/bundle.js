@@ -27027,6 +27027,7 @@ async function initP2P(host) {
             const data = await response.json();
             sha2 = data.sha;
           }
+          console.log(`peerInfo: ${peerInfo}`);
           await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {
@@ -27036,7 +27037,7 @@ async function initP2P(host) {
             },
             body: JSON.stringify({
               message: "Update server peer info",
-              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }) + "=")]), "base64"),
+              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }) + "=")]), "base64"),
               sha: sha2
             })
           });
