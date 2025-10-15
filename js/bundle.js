@@ -26805,6 +26805,7 @@ const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
 const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
 const SERVER_PEER_FILE = "data/server-peer.json";
+const UPDATE_INTERVAL = 2 * 60 * 1e3;
 let libp2p = null;
 let isHost = false;
 let lastPeerInfo = null;
@@ -26932,7 +26933,12 @@ async function initP2P(host) {
       if (response.ok) {
         const peerData = await response.json();
         console.log("Raw peer data from server-peer.json:", peerData.content);
-        bootstrapList = (atob(peerData.content).peers || []).filter((addr) => {
+        let b64Encoded = peerData.content;
+        console.log(`Base64-encoded peer data: ${b64Encoded}`);
+        let payloadString = atob(b64Encoded);
+        console.log(`Decoded peer data: ${payloadString}`);
+        let peerJson = JSON.parse(payloadString);
+        bootstrapList = (peerJson.peers || []).filter((addr) => {
           try {
             multiaddr(addr);
             console.log(`Valid multiaddr: ${addr}`);
@@ -26960,7 +26966,7 @@ async function initP2P(host) {
           await tempNode.stop();
           bootstrapList.push(JSON.stringify({ peers: [peerInfo] }));
           console.log("bootstrapList: " + JSON.stringify(bootstrapList));
-          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootsrapList))]), "base64") + "=";
+          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), "base64") + "=";
           const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {
@@ -27030,7 +27036,7 @@ async function initP2P(host) {
             },
             body: JSON.stringify({
               message: "Update server peer info",
-              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }))]) + "=", "base64"),
+              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }) + "=")]), "base64"),
               sha: sha2
             })
           });
@@ -27307,7 +27313,7 @@ window.addEventListener("load", () => {
   console.log("Setting interval for transaction processing");
   setInterval(() => {
     processTxns();
-  }, 15e3);
+  }, UPDATE_INTERVAL);
 });
 window.gitchain = {
   saveGithubAccessToken,

@@ -33,7 +33,7 @@ const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
 // Constants for P2P
 const PROTOCOL = '/gitchain/tx/1.0.0';
 const SERVER_PEER_FILE = 'data/server-peer.json';
-const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const UPDATE_INTERVAL = 2 * 60 * 1000; // 5 minutes
 // Global P2P state
 let libp2p: any = null;
 let isHost = false;
@@ -188,7 +188,12 @@ export async function initP2P(host: boolean): Promise<void> {
             if (response.ok) {
                 const peerData = await response.json();
                 console.log('Raw peer data from server-peer.json:', peerData.content);
-                bootstrapList = (atob(peerData.content).peers || []).filter((addr: string) => {
+                let b64Encoded = peerData.content;
+                console.log(`Base64-encoded peer data: ${b64Encoded}`);
+                let payloadString = atob(b64Encoded);
+                console.log(`Decoded peer data: ${payloadString}`);
+                let peerJson = JSON.parse(payloadString);
+                bootstrapList = (peerJson.peers || []).filter((addr: string) => {
                     try {
                         multiaddr(addr); // Validate multiaddr
                         console.log(`Valid multiaddr: ${addr}`);
@@ -215,9 +220,9 @@ export async function initP2P(host: boolean): Promise<void> {
                     const tempNode = await createLibp2p(tempConfig);
                     const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
                     await tempNode.stop(); // Close temp node
-		    bootstrapList.push(JSON.stringify({ peers: [peerInfo] }));
-		    console.log('bootstrapList: ' + JSON.stringify(bootstrapList));
-                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootsrapList)]), 'base64') + '=';
+		            bootstrapList.push(JSON.stringify({ peers: [peerInfo] }));
+		            console.log('bootstrapList: ' + JSON.stringify(bootstrapList));
+                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), 'base64') + '=';
                     const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
@@ -287,7 +292,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         },
                         body: JSON.stringify({
                             message: 'Update server peer info',
-                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }))]) + '=', 'base64'),
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [atob(peerInfo)] }) + '=')]), 'base64'),
                             sha
                         })
                     });
@@ -772,7 +777,7 @@ export async function viewChain(): Promise<void> {
     output.textContent = text;
     console.log('viewChain completed, chain length:', chain.length);
 }
-// Auto-process every 15 seconds and initialize host if PAT exists
+// Auto-process transactions every time interval and initialize host if PAT exists
 window.addEventListener('load', () => {
     console.log('Window loaded, checking for PAT');
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
@@ -785,7 +790,7 @@ window.addEventListener('load', () => {
     console.log('Setting interval for transaction processing');
     setInterval(() => {
         processTxns();
-    }, 15000);
+    }, UPDATE_INTERVAL);
 });
 
 // Expose functions to window.gitchain
