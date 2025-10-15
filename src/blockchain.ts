@@ -234,7 +234,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         },
                         body: JSON.stringify({
                             message: 'Create server-peer.json with host peer',
-                            content: initialContent + '='
+                            content: initialContent
                         })
                     });
                     if (createResponse.ok) {
@@ -276,7 +276,8 @@ export async function initP2P(host: boolean): Promise<void> {
                 try {
                     const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         headers: {
-                            'Authorization': `token ${githubAccessToken}`,
+                            'Authorization': `Bearer ${githubAccessToken}`,
+                            'X-GitHub-Api-Version': '2022-11-28',
                             'Accept': 'application/vnd.github.v3+json'
                         }
                     });
@@ -289,13 +290,14 @@ export async function initP2P(host: boolean): Promise<void> {
                     await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': `token ${githubAccessToken}`,
+                            'Authorization': `Bearer ${githubAccessToken}`,
+                            'X-GitHub-Api-Version': '2022-11-28',
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             message: 'Update server peer info',
-                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [ peerInfo ] }) + '=')]), 'base64'),
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [ peerInfo ] }))]), 'base64'),
                             sha
                         })
                     });

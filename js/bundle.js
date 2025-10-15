@@ -26978,7 +26978,7 @@ async function initP2P(host) {
             },
             body: JSON.stringify({
               message: "Create server-peer.json with host peer",
-              content: initialContent + "="
+              content: initialContent
             })
           });
           if (createResponse.ok) {
@@ -27020,7 +27020,8 @@ async function initP2P(host) {
         try {
           const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             headers: {
-              "Authorization": `token ${githubAccessToken}`,
+              "Authorization": `Bearer ${githubAccessToken}`,
+              "X-GitHub-Api-Version": "2022-11-28",
               "Accept": "application/vnd.github.v3+json"
             }
           });
@@ -27033,13 +27034,14 @@ async function initP2P(host) {
           await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {
-              "Authorization": `token ${githubAccessToken}`,
+              "Authorization": `Bearer ${githubAccessToken}`,
+              "X-GitHub-Api-Version": "2022-11-28",
               "Accept": "application/vnd.github.v3+json",
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
               message: "Update server peer info",
-              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }) + "=")]), "base64"),
+              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), "base64"),
               sha: sha2
             })
           });
