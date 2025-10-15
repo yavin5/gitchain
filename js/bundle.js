@@ -26962,12 +26962,10 @@ async function initP2P(host) {
             services: { identify: identify() }
           };
           const tempNode = await createLibp2p(tempConfig);
-          const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
+          const peerId = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
           await tempNode.stop();
-          for (var value2 of peerInfo) {
-            console.log(`peer being added to bootstrapList: ${value2}`);
-            bootstrapList.push(value2);
-          }
+          console.log(`My peer ID: ${peerId}`);
+          bootstrapList.push(peerId);
           console.log("bootstrapList: " + JSON.stringify(bootstrapList));
           const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), "base64") + "=";
           const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
