@@ -26967,7 +26967,7 @@ async function initP2P(host) {
           console.log(`My peer ID: ${peerId}`);
           bootstrapList.push(peerId);
           console.log("bootstrapList: " + JSON.stringify(bootstrapList));
-          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), "base64") + "=";
+          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), "base64");
           const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {

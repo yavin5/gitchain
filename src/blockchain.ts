@@ -223,7 +223,7 @@ export async function initP2P(host: boolean): Promise<void> {
                     console.log(`My peer ID: ${peerId}`);
                     bootstrapList.push(peerId);
 		            console.log('bootstrapList: ' + JSON.stringify(bootstrapList));
-                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), 'base64') + '=';
+                    const initialContent = uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), 'base64');
                     const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
                         method: 'PUT',
                         headers: {
