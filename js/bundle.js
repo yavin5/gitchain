@@ -24205,7 +24205,7 @@ class YamuxStream extends AbstractStream {
   /**
    * Send a reset message to the remote muxer
    */
-  async sendReset() {
+  sendReset() {
     this.sendFrame({
       type: FrameType.WindowUpdate,
       flag: Flag.RST,
@@ -26799,12 +26799,13 @@ const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
 const FQ_REPO = `${OWNER}/${REPO}`;
+const SERVER_PEER_PATH = "data/server-peer.json";
+const SERVER_PEER_URL = `https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_PATH}`;
 const STATE_PATH = "data/state.json";
-const BASE_URL = `https://api.github.com/repos/${FQ_REPO}/contents/${STATE_PATH}`;
+const STATE_URL = `https://api.github.com/repos/${FQ_REPO}/contents/${STATE_PATH}`;
 const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
 const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
-const SERVER_PEER_FILE = "data/server-peer.json";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
 let libp2p = null;
 let isHost = false;
@@ -26929,7 +26930,7 @@ async function initP2P(host) {
   let bootstrapList = [];
   if (isHost) {
     try {
-      const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`);
+      const response = await fetch(`${SERVER_PEER_URL}?ref=main`);
       if (response.ok) {
         const peerData = await response.json();
         console.log("Raw peer data from server-peer.json:", peerData.content);
@@ -26967,17 +26968,18 @@ async function initP2P(host) {
           console.log(`My peer ID: ${peerId}`);
           bootstrapList.push(peerId);
           console.log("bootstrapList: " + JSON.stringify(bootstrapList));
-          const initialContent = toString(concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), "base64");
-          const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+          const initialContent = btoa(JSON.stringify(bootstrapList, null, 2));
+          const body = { message: "Updated server peer data.", content: initialContent, branch: "main" };
+          const createResponse = await fetch(`${SERVER_PEER_URL}`, {
             method: "PUT",
             headers: {
-              "Authorization": `Bearer ${githubAccessToken}`,
+              "Authorization": `token ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json",
-              "X-GitHub-Api-Version": "2022-11-28"
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
               message: "Create server-peer.json with host peer",
-              content: initialContent
+              content: JSON.stringify(body)
             })
           });
           if (createResponse.ok) {
@@ -27017,10 +27019,9 @@ async function initP2P(host) {
           return;
         }
         try {
-          const response = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+          const response = await fetch(`${SERVER_PEER_URL}?ref=main`, {
             headers: {
-              "Authorization": `Bearer ${githubAccessToken}`,
-              "X-GitHub-Api-Version": "2022-11-28",
+              "Authorization": `token ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json"
             }
           });
@@ -27030,17 +27031,16 @@ async function initP2P(host) {
             sha2 = data.sha;
           }
           console.log(`peerInfo: ${peerInfo}`);
-          await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
+          await fetch(`${SERVER_PEER_URL}`, {
             method: "PUT",
             headers: {
-              "Authorization": `Bearer ${githubAccessToken}`,
-              "X-GitHub-Api-Version": "2022-11-28",
+              "Authorization": `token ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json",
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
               message: "Update server peer info",
-              content: toString(concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]), "base64"),
+              content: btoa(JSON.stringify({ peers: [peerInfo] }, null, 2)),
               sha: sha2
             })
           });
@@ -27084,8 +27084,8 @@ async function fetchState() {
     return null;
   }
   try {
-    console.log("Fetching state from:", BASE_URL);
-    const response = await fetch(`${BASE_URL}?ref=main`, {
+    console.log("Fetching state from:", STATE_URL);
+    const response = await fetch(`${STATE_URL}?ref=main`, {
       headers: {
         "Authorization": `token ${githubAccessToken}`,
         "Accept": "application/vnd.github.v3+json"
@@ -27121,7 +27121,7 @@ async function updateState(newContent, oldSha, message2, retries = 3) {
     if (oldSha)
       body.sha = oldSha;
     console.log("Sending PUT request to update state");
-    const response = await fetch(BASE_URL, {
+    const response = await fetch(STATE_URL, {
       method: "PUT",
       headers: {
         "Authorization": `token ${githubAccessToken}`,
