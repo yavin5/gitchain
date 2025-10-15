@@ -52,8 +52,8 @@ Project Structure:
 
 - index.html: The main HTML file with UI (input for GitHub PAT, buttons for saving token, viewing chain, processing transactions) and loads scripts with ?v={x} (where x is an integer that increments with each new version) for cache busting.
 - js/main.js: Non-module script handling UI events (button clicks, block height display) using functions exposed on window by js/init.js.
-- js/init.js: Module script importing functions from js/blockchain.js and exposing them on window, dispatching a gitchain:init event to signal main.js.
-src/blockchain.ts: Core TypeScript logic for chain operations (state fetching, transaction processing, block creation, chain viewing).
+- js/init.js: Module script importing functions from js/chain.js and exposing them on window, dispatching a gitchain:init event to signal main.js.
+src/chain.ts: Core TypeScript logic for chain operations (state fetching, transaction processing, block creation, chain viewing).
 - src/global.d.ts: Declares window interface for TypeScript.
 - js/admin-address.js: Defines ADMIN_ADDRESS (generated via src/generate-admin-key.ts).
 - vite.config.ts: Configures the vite utility for generating a web page friendly Javascript bundle of the software.

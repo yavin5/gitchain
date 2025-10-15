@@ -35,7 +35,7 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     rollupOptions: {
-      input: 'src/blockchain.ts',
+      input: 'src/chain.ts',
       output: {
         entryFileNames: 'bundle.js',
         format: 'es',

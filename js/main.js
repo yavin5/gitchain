@@ -9,7 +9,7 @@
 
     // Wait for init.js to signal that window assignments are complete
     function initialize() {
-        // Access exported functions from blockchain.js (attached to window by init.js)
+        // Access exported functions from chain.js (attached to window by init.js)
         const { saveGithubAccessToken, viewChain, processTxns, fetchState } = window.gitchain || {};
 
         // Debug: Confirm functions are loaded

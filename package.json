@@ -1,7 +1,7 @@
 {
   "name": "gitchain",
   "version": "0.8.0",
-  "description": "A centralized blockchain using GitHub for storage and transaction processing",
+  "description": "A centralized chain on GitHub",
   "main": "js/main.js",
   "module": "js/init.js",
   "scripts": {

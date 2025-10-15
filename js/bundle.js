@@ -26814,7 +26814,7 @@ function calculateHash(index, previousHash, timestamp, transactions) {
   const value2 = `${index}${previousHash}${timestamp}${JSON.stringify(transactions)}`;
   return CryptoJS.SHA256(value2).toString();
 }
-function createGenesisBlock() {
+function createOriginalBlock() {
   const timestamp = (/* @__PURE__ */ new Date()).toISOString();
   return {
     index: 0,
@@ -26878,7 +26878,7 @@ async function processTxn(txn, state) {
   state.pending.push(txn);
   return { valid: true, txid };
 }
-async function mineBlock(state) {
+async function createBlock(state) {
   if (state.pending.length === 0)
     return null;
   const validTxns = [];
@@ -26935,9 +26935,7 @@ async function initP2P(host) {
         const peerData = await response.json();
         console.log("Raw peer data from server-peer.json:", peerData.content);
         let b64Encoded = peerData.content;
-        console.log(`Base64-encoded peer data: ${b64Encoded}`);
         let payloadString = atob(b64Encoded);
-        console.log(`Decoded peer data: ${payloadString}`);
         let peerJson = JSON.parse(payloadString);
         bootstrapList = (peerJson.peers || []).filter((addr) => {
           try {
@@ -27153,7 +27151,7 @@ async function closeIssueWithComment(issueNumber, blockIndex, valid) {
     return;
   }
   const status = valid && blockIndex !== null ? `Confirmed in block ${blockIndex}` : "Invalid transaction";
-  const intro = "Gitchain is an innovative centralized blockchain using GitHub for storage and processing. It enables secure, transparent transactions via issues. Join the experiment in decentralized finance today!";
+  const intro = "Gitchain is an innovative centralized chain on GitHub. It enables secure, transparent transactions.";
   const gitchain_url = `https://github.com/${FQ_REPO}`;
   const commentBody = `${status}. ${intro} Learn more: ${gitchain_url} (Repo: ${FQ_REPO})`;
   console.log("Creating comment for issue:", issueNumber);
@@ -27187,7 +27185,7 @@ async function processTxns() {
   if (!state) {
     console.log("No state found, initializing");
     state = {
-      chain: [createGenesisBlock()],
+      chain: [createOriginalBlock()],
       pending: [],
       balances: { [ADMIN_ADDRESS]: 1e6 },
       nonces: {},
@@ -27218,7 +27216,7 @@ async function processTxns() {
     try {
       const parsed = JSON.parse(issue.body);
       if (parsed.type !== "gitchain_txn") {
-        console.log("Skipping non-gitchain issue:", issue.number);
+        console.log("Skipping non-tx issue:", issue.number);
         await closeIssueWithComment(issue.number, null, false);
         continue;
       }
@@ -27236,7 +27234,7 @@ async function processTxns() {
     console.log("Processing transaction from issue:", issue.number);
     const { valid, txid } = await processTxn(txn, state);
     console.log(`Transaction ID: ${txid}, valid: ${valid}`);
-    const blockIndex = valid ? await mineBlock(state) : null;
+    const blockIndex = valid ? await createBlock(state) : null;
     await closeIssueWithComment(issue.number, blockIndex, valid);
     if (valid && blockIndex !== null) {
       console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
