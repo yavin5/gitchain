@@ -1,3 +1,5 @@
-[
-  "/ip4/0.0.0.0/tcp/0/p2p/12D3KooWGn2jThDaXmELcEhd3ve3afqAHBHFdoZoLJwDD5hjCDWW"
-]
+{
+  "peers": [
+    "/ip4/0.0.0.0/tcp/0/p2p/12D3KooWMvXNoraf3fdFcTZ7NhxwAkLewGckZtab8m4Uun9Wy9oF"
+  ]
+}
