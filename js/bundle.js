@@ -26973,8 +26973,7 @@ async function initP2P(host) {
             headers: {
               "Authorization": `Bearer ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json",
-              "X-GitHub-Api-Version": "2022-11-28",
-              "Content-Type": "application/json"
+              "X-GitHub-Api-Version": "2022-11-28"
             },
             body: JSON.stringify({
               message: "Create server-peer.json with host peer",
