@@ -2,6 +2,7 @@ admin.key
 js/generate-admin-key.js
 src/admin-address.ts
 node_modules/
+package-lock.json
 
 # Logs
 logs
