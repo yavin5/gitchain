@@ -26977,10 +26977,7 @@ async function initP2P(host) {
               "Accept": "application/vnd.github.v3+json",
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-              message: "Create server-peer.json with host peer",
-              content: JSON.stringify(body)
-            })
+            body: JSON.stringify(body)
           });
           if (createResponse.ok) {
             console.log("server-peer.json created successfully with host peerInfo");
