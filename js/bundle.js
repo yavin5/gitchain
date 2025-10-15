@@ -26971,13 +26971,14 @@ async function initP2P(host) {
           const createResponse = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_FILE}?ref=main`, {
             method: "PUT",
             headers: {
-              "Authorization": `token ${githubAccessToken}`,
+              "Authorization": `Bearer ${githubAccessToken}`,
               "Accept": "application/vnd.github.v3+json",
+              "X-GitHub-Api-Version": "2022-11-28",
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
               message: "Create server-peer.json with host peer",
-              content: initialContent
+              content: initialContent + "="
             })
           });
           if (createResponse.ok) {
