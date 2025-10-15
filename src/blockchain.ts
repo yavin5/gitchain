@@ -188,7 +188,7 @@ export async function initP2P(host: boolean): Promise<void> {
             if (response.ok) {
                 const peerData = await response.json();
                 console.log('Raw peer data from server-peer.json:', peerData.content);
-                bootstrapList = (peerData.content.peers || []).filter((addr: string) => {
+                bootstrapList = (btoa(peerData.content).peers || []).filter((addr: string) => {
                     try {
                         multiaddr(addr); // Validate multiaddr
                         console.log(`Valid multiaddr: ${addr}`);
@@ -287,7 +287,7 @@ export async function initP2P(host: boolean): Promise<void> {
                         },
                         body: JSON.stringify({
                             message: 'Update server peer info',
-                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [peerInfo] }))]) + '=', 'base64'),
+                            content: uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify({ peers: [btoa(peerInfo)] }))]) + '=', 'base64'),
                             sha
                         })
                     });
