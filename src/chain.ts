@@ -18,6 +18,8 @@ import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
 import { circuitRelayTransport } from '@libp2p/circuit-relay-v2';
 import { bootstrap } from '@libp2p/bootstrap';
+import { gossipsub } from '@libp2p/gossipsub';
+import { pubsubPeerDiscovery } from '@libp2p/pubsub-peer-discovery';
 import { multiaddr } from '@multiformats/multiaddr';
 import { fromString as uint8FromString, toString as uint8ToString, concat as uint8Concat } from 'uint8arrays';
 
@@ -35,11 +37,12 @@ const GITHUB_ACCESS_TOKEN_KEY: string = 'gitchain_github_access_token';
 const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
 // Constants for P2P
 const PROTOCOL = '/gitchain/tx/1.0.0';
-const UPDATE_INTERVAL = 2 * 60 * 1000; // 5 minutes
+const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 // Global P2P state
 let libp2p: any = null;
 let isHost = false;
-let lastPeerInfo: string | null = null; // Track for change detection
+let lastPeerId: string | null = null; // Track for change detection
+let serverPeers: string[] = [];
 // Interfaces
 interface Transaction {
     from: string;
@@ -168,7 +171,7 @@ async function createBlock(state: State): Promise<number | null> {
 function getGithubAccessToken(): string | null {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
     if (!githubAccessToken) {
-        githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
+        githubAccessToken = (document.getElementById('github-token') as HTMLInputElement)?.value;
         if (!githubAccessToken) {
             console.log('No GitHub access token provided');
             alert('Please enter your GitHub access token.');
@@ -183,127 +186,46 @@ function getGithubAccessToken(): string | null {
 export async function initP2P(host: boolean): Promise<void> {
     console.log('Entering initP2P, host:', host);
     isHost = host;
+    if (libp2p) {
+        console.log('libp2p already initialized, reusing instance');
+        return;
+    }
     let bootstrapList: string[] = [];
-    if (isHost) {
-        try {
-            const response = await fetch(`${SERVER_PEER_URL}?ref=main`);
-            if (response.ok) {
-                const peerData = await response.json();
-                console.log('Raw peer data from server-peer.json:', peerData.content);
-                let b64Encoded = peerData.content;
-                //console.log(`Base64-encoded peer data: ${b64Encoded}`);
-                let payloadString = atob(b64Encoded);
-                //console.log(`Decoded peer data: ${payloadString}`);
-                let peerJson = JSON.parse(payloadString);
-                bootstrapList = (peerJson.peers || []).filter((addr: string) => {
-                    try {
-                        multiaddr(addr); // Validate multiaddr
-                        console.log(`Valid multiaddr: ${addr}`);
-                        return true;
-                    } catch (e) {
-                        console.error(`Invalid multiaddr in server-peer.json: ${addr}`, e);
-                        return false;
-                    }
-                });
-                console.log('Filtered bootstrapList:', bootstrapList);
-            } else if (response.status === 404) {
-                console.log('server-peer.json not found, creating with host peerInfo');
-                const githubAccessToken = getGithubAccessToken();
-                if (!githubAccessToken) {
-                    console.log('No PAT available for creating server-peer.json');
-                } else {
-                    // Generate peerInfo early for creation
-                    const tempConfig = {
-                        transports: [webRTC(), circuitRelayTransport()],
-                        connectionEncryption: [noise()],
-                        streamMuxers: [yamux()],
-                        services: { identify: identify() }
-                    };
-                    const tempNode = await createLibp2p(tempConfig);
-                    const peerId = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
-                    await tempNode.stop(); // Close temp node
-                    console.log(`My peer ID: ${peerId}`);
-                    bootstrapList.push(peerId);
-		            console.log('bootstrapList: ' + JSON.stringify(bootstrapList));
-                    const initialContent = btoa(JSON.stringify(bootstrapList, null, 2)); //uint8ToString(uint8Concat([new TextEncoder().encode(JSON.stringify(bootstrapList))]), 'base64');
-                    const body: any = { message: 'Updated server peer data.', content: initialContent, branch: 'main' };
-                    const createResponse = await fetch(`${SERVER_PEER_URL}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${githubAccessToken}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body)
-                    });
-                    if (createResponse.ok) {
-                        console.log('server-peer.json created successfully with host peerInfo');
-                    } else {
-                        console.error('Failed to create server-peer.json:', await createResponse.text());
-                    }
-                }
-            } else {
-                console.log('Error fetching server-peer.json, status:', response.status);
-            }
-        } catch (error) {
-            console.error('Error loading/creating server-peer.json:', error);
+    serverPeers = [];
+    try {
+        const response = await fetch(SERVER_PEER_RAW_URL);
+        if (response.ok) {
+            serverPeers = await response.json();
+            bootstrapList = serverPeers.map(peer => `/p2p/${peer}`);
+            console.log('Loaded server peers:', serverPeers);
+        } else if (response.status === 404) {
+            console.log('server-peer.json not found');
+        } else {
+            console.log('Error fetching server-peer.json, status:', response.status);
         }
+    } catch (error) {
+        console.error('Error loading server-peer.json:', error);
     }
     try {
         const config: any = {
             transports: [webRTC(), circuitRelayTransport()],
             connectionEncryption: [noise()],
             streamMuxers: [yamux()],
-            services: { identify: identify() }
+            services: {
+                identify: identify(),
+                pubsub: gossipsub()
+            },
+            peerDiscovery: [
+                pubsubPeerDiscovery()
+            ]
         };
-        if (bootstrapList.length) {
-            config.peerDiscovery = [bootstrap({ list: bootstrapList })];
+        if (bootstrapList.length > 0) {
+            config.peerDiscovery.push(bootstrap({ list: bootstrapList }));
         } else {
-            console.log('No valid peers in bootstrapList, initializing libp2p without peer discovery');
+            console.log('No valid peers in bootstrapList, initializing without bootstrap');
         }
         libp2p = await createLibp2p(config);
         console.log('P2P node started:', libp2p.peerId.toString());
-        if (isHost) {
-            const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${libp2p.peerId.toString()}`;
-            if (peerInfo !== lastPeerInfo) {
-                console.log('Updating server-peer.json with:', peerInfo);
-                const githubAccessToken = getGithubAccessToken();
-                if (!githubAccessToken) {
-                    console.log('No PAT available for updating server-peer.json');
-                    return;
-                }
-                try {
-                    const response = await fetch(`${SERVER_PEER_URL}?ref=main`, {
-                        headers: {
-                            'Authorization': `token ${githubAccessToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    let sha: string | null = null;
-                    if (response.ok) {
-                        const data = await response.json();
-                        sha = data.sha;
-                    }
-                    console.log(`peerInfo: ${peerInfo}`);
-                    await fetch(`${SERVER_PEER_URL}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${githubAccessToken}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: 'Update server peer info',
-                            content: btoa(JSON.stringify({ peers: [ peerInfo ] }, null, 2)),
-                            sha
-                        })
-                    });
-                    lastPeerInfo = peerInfo;
-                } catch (error) {
-                    console.error('Error updating server-peer.json:', error);
-                }
-            }
-        }
         libp2p.addEventListener('peer:discovery', (evt: any) => {
             console.log('Peer discovered:', evt.detail.id.toString());
         });
@@ -313,131 +235,76 @@ export async function initP2P(host: boolean): Promise<void> {
             const txn = JSON.parse(uint8ToString(data));
             console.log('Received transaction via P2P:', txn);
         });
+        if (isHost) {
+            const peerId = libp2p.peerId.toString();
+            if (!serverPeers.includes(peerId)) {
+                serverPeers.push(peerId);
+                await updateServerPeers();
+            }
+            console.log('Host peer ID added to server-peer.json if not present');
+        }
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
     }
 }
-
-// Advertise server peer info to GitHub with retries
-async function advertiseServerPeer(retries = 3, delayMs = 1000): Promise<boolean> {
-    console.log('Entering advertiseServerPeer, retries:', retries);
-    if (!isHost || !libp2p) {
-        console.log('Not in host mode or libp2p not initialized');
-        return false;
-    }
-    const peerId = libp2p.peerId.toString();
-    const multiaddrs = libp2p.getMultiaddrs().map((ma: any) => ma.toString());
-    const peerInfo = { peerId, multiaddrs, timestamp: Date.now() };
-    const content = JSON.stringify(peerInfo, null, 2);
-    console.log('Peer info to advertise:', content);
-    // Only update if changed
-    if (content === lastPeerInfo) {
-        console.log('No change in peer info, skipping update');
-        return true;
-    }
-    lastPeerInfo = content;
+// Update server-peer.json
+async function updateServerPeers(): Promise<boolean> {
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken) {
-        console.error('No PAT available for advertising peer');
+        console.error('No PAT available for updating server-peer.json');
         return false;
-    }
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        console.log(`Attempt ${attempt}/${retries} to advertise peer info`);
-        try {
-            console.log('Fetching SHA for', SERVER_PEER_PATH);
-            const sha = await getFileSha(SERVER_PEER_PATH);
-            console.log('SHA:', sha || 'none (new file)');
-            const body: any = {
-                message: 'Update server peer info',
-                content: btoa(content),
-                branch: 'main'
-            };
-            if (sha) body.sha = sha;
-            console.log('Sending PUT request to:', `${SERVER_PEER_URL}`);
-            const response = await fetch(`${SERVER_PEER_URL}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${githubAccessToken}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-            if (response.ok) {
-                console.log('Advertised peer info successfully');
-                return true;
-            } else {
-                const errorText = await response.text();
-                console.error(`Attempt ${attempt}/${retries} - Failed to advertise peer: ${response.status} ${errorText}`);
-                if (response.status === 403 || response.status === 429) {
-                    console.log(`Retrying after ${delayMs}ms due to ${response.status}`);
-                    if (attempt < retries) {
-                        await new Promise(resolve => setTimeout(resolve, delayMs));
-                        continue;
-                    }
-                }
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
-            }
-        } catch (error) {
-            console.error(`Attempt ${attempt}/${retries} - Error advertising peer:`, error);
-            if (attempt === retries) {
-                console.error('All retries failed, alerting user');
-                alert('Failed to advertise server peer info. Ensure your PAT has repo scope and check API rate limits. Contact the administrator if the issue persists.');
-                return false;
-            }
-            await new Promise(resolve => setTimeout(resolve, delayMs));
-        }
-    }
-    console.log('Exiting advertiseServerPeer, failed after all retries');
-    return false;
-}
-// Delete server peer file on unload
-async function deleteServerPeerFile(): Promise<void> {
-    console.log('Entering deleteServerPeerFile');
-    const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) {
-        console.log('No PAT available for deleting server peer file');
-        return;
     }
     try {
-        console.log('Fetching SHA for', SERVER_PEER_PATH);
-        const sha = await getFileSha(SERVER_PEER_PATH);
-        if (!sha) {
-            console.log('No server peer file to delete');
-            return;
+        const response = await fetch(SERVER_PEER_URL + '?ref=main', {
+            headers: {
+                'Authorization': `token ${githubAccessToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        let sha: string | null = null;
+        if (response.ok) {
+            const data = await response.json();
+            sha = data.sha;
         }
-        console.log('Sending DELETE request for', SERVER_PEER_PATH);
-        const response = await fetch(`${SERVER_PEER_URL}`, {
-            method: 'DELETE',
+        const body = {
+            message: 'Update server peer IDs',
+            content: btoa(JSON.stringify(serverPeers, null, 2)),
+            branch: 'main',
+            sha: sha || undefined
+        };
+        const updateResponse = await fetch(SERVER_PEER_URL, {
+            method: 'PUT',
             headers: {
                 'Authorization': `token ${githubAccessToken}`,
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                message: 'Remove server peer info on unload',
-                sha
-            })
+            body: JSON.stringify(body)
         });
-        if (response.ok) {
-            console.log('Deleted server peer file successfully');
+        if (updateResponse.ok) {
+            console.log('server-peer.json updated successfully');
+            return true;
         } else {
-            console.error('Failed to delete peer file:', response.status, await response.text());
+            console.error('Failed to update server-peer.json:', await updateResponse.text());
+            return false;
         }
     } catch (error) {
-        console.error('Error deleting peer file:', error);
+        console.error('Error updating server-peer.json:', error);
+        return false;
     }
 }
-// Get file SHA for updates/deletes
+// Remove host peer ID on unload
+async function removeHostPeerId(): Promise<void> {
+    if (!isHost || !libp2p) return;
+    const peerId = libp2p.peerId.toString();
+    serverPeers = serverPeers.filter(id => id !== peerId);
+    await updateServerPeers();
+}
+// Get file SHA
 async function getFileSha(path: string): Promise<string | null> {
-    console.log('Entering getFileSha for', path);
     const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) {
-        console.log('No PAT available for fetching SHA');
-        return null;
-    }
+    if (!githubAccessToken) return null;
     try {
-        console.log('Fetching SHA from:', `https://api.github.com/repos/${FQ_REPO}/contents/${path}?ref=main`);
         const res = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${path}?ref=main`, {
             headers: {
                 'Authorization': `token ${githubAccessToken}`,
@@ -446,13 +313,9 @@ async function getFileSha(path: string): Promise<string | null> {
         });
         if (res.ok) {
             const data = await res.json();
-            console.log('SHA retrieved:', data.sha);
             return data.sha;
         }
-        if (res.status === 404) {
-            console.log('File does not exist, returning null SHA');
-            return null;
-        }
+        if (res.status === 404) return null;
         console.error(`Failed to fetch SHA for ${path}: ${res.status} ${await res.text()}`);
         return null;
     } catch (error) {
@@ -460,11 +323,9 @@ async function getFileSha(path: string): Promise<string | null> {
         return null;
     }
 }
-// Client-side: Connect and send TX
+// Client-side: Connect and Send TX
 export async function connectAndSendTx(tx: Transaction) {
-    console.log('Entering connectAndSendTx, tx:', tx);
     if (isHost) {
-        console.log('Host mode: Creating issue directly');
         const issueBody = JSON.stringify({
             type: 'gitchain_txn',
             repo: FQ_REPO,
@@ -489,33 +350,45 @@ export async function connectAndSendTx(tx: Transaction) {
         }
         return;
     }
-    console.log('Client mode: Fetching server peer file');
-    const res = await fetch(`${SERVER_PEER_RAW_URL}`);
-    if (!res.ok) {
-        console.error('Failed to fetch server peer file:', res.status, await res.text());
-        if (res.status === 404) {
-            alert('The server is currently not running. Please notify the chain/project administrator.');
+    let peers: string[] = [];
+    try {
+        const res = await fetch(SERVER_PEER_RAW_URL);
+        if (res.ok) {
+            peers = await res.json();
+            console.log('Loaded active server peers:', peers);
+        } else if (res.status === 404) {
+            alert('The server is currently not running.');
+            return;
         } else {
-            // TODO: handle rate limit blocking here.
             alert('Failed to fetch server peer info. Please try again or notify the administrator.');
+            return;
         }
+    } catch (error) {
+        console.error('Failed to fetch server-peer.json:', error);
+        alert('Failed to connect to server. Please try again or notify the server administrator.');
         return;
     }
-    // TODO: Handle multiple server peers.
-    const { peerId, multiaddrs, timestamp } = await res.json();
-    console.log('Server peer info:', { peerId, multiaddrs, timestamp });
-    try {
-        console.log('Dialing server multiaddr:', multiaddrs[0]);
-        const ma = multiaddr(multiaddrs[0]);
-        const connection = await libp2p.dial(ma);
-        console.log('Connected to server, creating stream for:', PROTOCOL);
-        const stream = await connection.newStream(PROTOCOL);
-        const txJson = JSON.stringify(tx);
-        await pipeStringToStream(txJson, stream);
-        console.log('TX sent successfully to server.');
-    } catch (error) {
-        console.error('Failed to connect or send TX:', error);
-        alert('Failed to connect to server. Please try again or notify the server administrator.');
+    if (peers.length === 0) {
+        alert('The server is currently not running.');
+        return;
+    }
+    let connected = false;
+    for (const peerId of peers) {
+        try {
+            const ma = multiaddr(`/p2p/${peerId}`);
+            const connection = await libp2p.dial(ma);
+            const stream = await connection.newStream(PROTOCOL);
+            const txJson = JSON.stringify(tx);
+            await pipeStringToStream(txJson, stream);
+            console.log('TX sent to server peer:', peerId);
+            connected = true;
+            break;
+        } catch (error) {
+            console.error('Failed to dial server peer:', peerId, error);
+        }
+    }
+    if (!connected) {
+        alert('Failed to connect to any server. Please try again or notify the server administrator.');
     }
 }
 // Stream helpers
@@ -539,7 +412,7 @@ async function pipeStringToStream(str: string, stream: any) {
 // Save GitHub access token
 export function saveGithubAccessToken(): void {
     console.log('Entering saveGithubAccessToken');
-    const githubAccessToken = (document.getElementById('githubAccessToken') as HTMLInputElement)?.value;
+    const githubAccessToken = (document.getElementById('github-token') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
         console.log('PAT saved, initializing P2P as host');
@@ -658,7 +531,7 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
 export async function processTxns(): Promise<void> {
     console.log('Entering processTxns');
     const output = document.getElementById('output') as HTMLDivElement;
-    const processingMessage = document.getElementById('processingMessage') as HTMLDivElement;
+    const processingMessage = document.getElementById('processing-message') as HTMLDivElement;
     processingMessage.classList.add('visible');
     let stateData = await fetchState();
     let state = stateData?.content;
@@ -743,7 +616,6 @@ export async function processTxns(): Promise<void> {
     console.log('processTxns completed');
     processingMessage.classList.remove('visible');
 }
-
 // View chain
 export async function viewChain(): Promise<void> {
     console.log('Entering viewChain');
@@ -772,7 +644,14 @@ export async function viewChain(): Promise<void> {
     output.textContent = text;
     console.log('viewChain completed, chain length:', chain.length);
 }
-// Auto-process transactions every time interval and initialize host if PAT exists
+// Expose libp2p and server peers
+export function getLibp2p() {
+    return libp2p;
+}
+export function getServerPeers() {
+    return serverPeers;
+}
+// Auto-process and initialize
 window.addEventListener('load', () => {
     console.log('Window loaded, checking for PAT');
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
@@ -787,14 +666,17 @@ window.addEventListener('load', () => {
         processTxns();
     }, UPDATE_INTERVAL);
 });
-
-// Expose functions to window.gitchain
+// Unload event for removing peer ID
+window.addEventListener('unload', async () => {
+    await removeHostPeerId();
+});
+// Expose to window.gitchain
 window.gitchain = {
     saveGithubAccessToken,
     viewChain,
     processTxns,
-    fetchState
+    fetchState,
+    connectAndSendTx
 };
-
-// Dispatch custom event to signal main.js
+// Dispatch event
 window.dispatchEvent(new Event('gitchain:init'));

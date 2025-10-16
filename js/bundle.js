@@ -17,7 +17,7 @@ var __privateWrapper = (obj, member, setter, getter) => ({
     return __privateGet(obj, member, getter);
   }
 });
-var _a, _b, _c, _d, _e, _f, _listeners, _g, _h, _i, _j, _k, _l, _m, _n, _components, _string, _bytes, _o, _PersistentStore_instances, findExistingPeer_fn, saveIfDifferent_fn, peerIsExpired_fn, _p, _PersistentPeerStore_instances, emitIfUpdated_fn, _q, _queue, _carryoverIntervalCount, _isIntervalIgnored, _intervalCount, _intervalCap, _rateLimitedInInterval, _rateLimitFlushScheduled, _interval, _intervalEnd, _lastExecutionTime, _intervalId, _timeoutId, _queue2, _queueClass, _pending, _concurrency, _isPaused, _idAssigner, _runningTasks, _PQueue_instances, doesIntervalAllowAnother_get, doesConcurrentAllowAnother_get, next_fn, onResumeInterval_fn, isIntervalPaused_get, createIntervalTimeout_fn, clearIntervalTimer_fn, clearTimeoutTimer_fn, tryToStartAnother_fn, initializeIntervalIfNeeded_fn, onInterval_fn, processQueue_fn, throwOnAbort_fn, onEvent_fn, setupRateLimitTracking_fn, scheduleRateLimitUpdate_fn, updateRateLimitState_fn, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _Libp2p_instances, onDiscoveryPeer_fn, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _ReservationStore_instances, createReservation_fn, removeReservation_fn, checkReservationCount_fn, _Q, _R, _S, _T, _U, _V, _W, _X;
+var _a, _b, _c, _d, _e, _f, _listeners, _g, _h, _i, _j, _k, _l, _m, _n, _components, _string, _bytes, _o, _PersistentStore_instances, findExistingPeer_fn, saveIfDifferent_fn, peerIsExpired_fn, _p, _PersistentPeerStore_instances, emitIfUpdated_fn, _q, _queue, _carryoverIntervalCount, _isIntervalIgnored, _intervalCount, _intervalCap, _rateLimitedInInterval, _rateLimitFlushScheduled, _interval, _intervalEnd, _lastExecutionTime, _intervalId, _timeoutId, _queue2, _queueClass, _pending, _concurrency, _isPaused, _idAssigner, _runningTasks, _PQueue_instances, doesIntervalAllowAnother_get, doesConcurrentAllowAnother_get, next_fn, onResumeInterval_fn, isIntervalPaused_get, createIntervalTimeout_fn, clearIntervalTimer_fn, clearTimeoutTimer_fn, tryToStartAnother_fn, initializeIntervalIfNeeded_fn, onInterval_fn, processQueue_fn, throwOnAbort_fn, onEvent_fn, setupRateLimitTracking_fn, scheduleRateLimitUpdate_fn, updateRateLimitState_fn, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _Libp2p_instances, onDiscoveryPeer_fn, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _ReservationStore_instances, createReservation_fn, removeReservation_fn, checkReservationCount_fn, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca;
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
 const connectionSymbol = Symbol.for("@libp2p/connection");
 const contentRoutingSymbol = Symbol.for("@libp2p/content-routing");
@@ -400,19 +400,19 @@ function base(ALPHABET, name2) {
       return "";
     }
     var zeroes = 0;
-    var length2 = 0;
+    var length3 = 0;
     var pbegin = 0;
     var pend = source.length;
     while (pbegin !== pend && source[pbegin] === 0) {
       pbegin++;
       zeroes++;
     }
-    var size = (pend - pbegin) * iFACTOR + 1 >>> 0;
-    var b58 = new Uint8Array(size);
+    var size2 = (pend - pbegin) * iFACTOR + 1 >>> 0;
+    var b58 = new Uint8Array(size2);
     while (pbegin !== pend) {
       var carry = source[pbegin];
       var i3 = 0;
-      for (var it1 = size - 1; (carry !== 0 || i3 < length2) && it1 !== -1; it1--, i3++) {
+      for (var it1 = size2 - 1; (carry !== 0 || i3 < length3) && it1 !== -1; it1--, i3++) {
         carry += 256 * b58[it1] >>> 0;
         b58[it1] = carry % BASE >>> 0;
         carry = carry / BASE >>> 0;
@@ -420,15 +420,15 @@ function base(ALPHABET, name2) {
       if (carry !== 0) {
         throw new Error("Non-zero carry");
       }
-      length2 = i3;
+      length3 = i3;
       pbegin++;
     }
-    var it2 = size - length2;
-    while (it2 !== size && b58[it2] === 0) {
+    var it2 = size2 - length3;
+    while (it2 !== size2 && b58[it2] === 0) {
       it2++;
     }
     var str = LEADER.repeat(zeroes);
-    for (; it2 < size; ++it2) {
+    for (; it2 < size2; ++it2) {
       str += ALPHABET.charAt(b58[it2]);
     }
     return str;
@@ -445,20 +445,20 @@ function base(ALPHABET, name2) {
       return;
     }
     var zeroes = 0;
-    var length2 = 0;
+    var length3 = 0;
     while (source[psz] === LEADER) {
       zeroes++;
       psz++;
     }
-    var size = (source.length - psz) * FACTOR + 1 >>> 0;
-    var b256 = new Uint8Array(size);
+    var size2 = (source.length - psz) * FACTOR + 1 >>> 0;
+    var b256 = new Uint8Array(size2);
     while (source[psz]) {
       var carry = BASE_MAP[source.charCodeAt(psz)];
       if (carry === 255) {
         return;
       }
       var i3 = 0;
-      for (var it3 = size - 1; (carry !== 0 || i3 < length2) && it3 !== -1; it3--, i3++) {
+      for (var it3 = size2 - 1; (carry !== 0 || i3 < length3) && it3 !== -1; it3--, i3++) {
         carry += BASE * b256[it3] >>> 0;
         b256[it3] = carry % 256 >>> 0;
         carry = carry / 256 >>> 0;
@@ -466,19 +466,19 @@ function base(ALPHABET, name2) {
       if (carry !== 0) {
         throw new Error("Non-zero carry");
       }
-      length2 = i3;
+      length3 = i3;
       psz++;
     }
     if (source[psz] === " ") {
       return;
     }
-    var it4 = size - length2;
-    while (it4 !== size && b256[it4] === 0) {
+    var it4 = size2 - length3;
+    while (it4 !== size2 && b256[it4] === 0) {
       it4++;
     }
-    var vch = new Uint8Array(zeroes + (size - it4));
+    var vch = new Uint8Array(zeroes + (size2 - it4));
     var j2 = zeroes;
-    while (it4 !== size) {
+    while (it4 !== size2) {
       vch[j2++] = b256[it4++];
     }
     return vch;
@@ -789,15 +789,15 @@ function encode$4(num, out, offset) {
 var decode$5 = read$1;
 var MSB$1$1 = 128, REST$1 = 127;
 function read$1(buf, offset) {
-  var res = 0, offset = offset || 0, shift = 0, counter = offset, b, l2 = buf.length;
+  var res = 0, offset = offset || 0, shift2 = 0, counter = offset, b, l2 = buf.length;
   do {
     if (counter >= l2) {
       read$1.bytes = 0;
       throw new RangeError("Could not decode varint");
     }
     b = buf[counter++];
-    res += shift < 28 ? (b & REST$1) << shift : (b & REST$1) * Math.pow(2, shift);
-    shift += 7;
+    res += shift2 < 28 ? (b & REST$1) << shift2 : (b & REST$1) * Math.pow(2, shift2);
+    shift2 += 7;
   } while (b >= MSB$1$1);
   read$1.bytes = counter - offset;
   return res;
@@ -832,24 +832,24 @@ function encodingLength$1(int) {
   return _brrp_varint.encodingLength(int);
 }
 function create(code2, digest2) {
-  const size = digest2.byteLength;
+  const size2 = digest2.byteLength;
   const sizeOffset = encodingLength$1(code2);
-  const digestOffset = sizeOffset + encodingLength$1(size);
-  const bytes = new Uint8Array(digestOffset + size);
+  const digestOffset = sizeOffset + encodingLength$1(size2);
+  const bytes = new Uint8Array(digestOffset + size2);
   encodeTo(code2, bytes, 0);
-  encodeTo(size, bytes, sizeOffset);
+  encodeTo(size2, bytes, sizeOffset);
   bytes.set(digest2, digestOffset);
-  return new Digest(code2, size, digest2, bytes);
+  return new Digest(code2, size2, digest2, bytes);
 }
 function decode$3(multihash) {
   const bytes = coerce(multihash);
   const [code2, sizeOffset] = decode$4(bytes);
-  const [size, digestOffset] = decode$4(bytes.subarray(sizeOffset));
+  const [size2, digestOffset] = decode$4(bytes.subarray(sizeOffset));
   const digest2 = bytes.subarray(sizeOffset + digestOffset);
-  if (digest2.byteLength !== size) {
+  if (digest2.byteLength !== size2) {
     throw new Error("Incorrect length");
   }
-  return new Digest(code2, size, digest2, bytes);
+  return new Digest(code2, size2, digest2, bytes);
 }
 function equals$1(a2, b) {
   if (a2 === b) {
@@ -863,13 +863,13 @@ class Digest {
   /**
    * Creates a multihash digest.
    */
-  constructor(code2, size, digest2, bytes) {
+  constructor(code2, size2, digest2, bytes) {
     __publicField(this, "code");
     __publicField(this, "size");
     __publicField(this, "digest");
     __publicField(this, "bytes");
     this.code = code2;
-    this.size = size;
+    this.size = size2;
     this.digest = digest2;
     this.bytes = bytes;
   }
@@ -1103,8 +1103,8 @@ class CID {
   static inspectBytes(initialBytes) {
     let offset = 0;
     const next = () => {
-      const [i2, length2] = decode$4(initialBytes.subarray(offset));
-      offset += length2;
+      const [i2, length3] = decode$4(initialBytes.subarray(offset));
+      offset += length3;
       return i2;
     };
     let version2 = next();
@@ -1121,9 +1121,9 @@ class CID {
     const prefixSize = offset;
     const multihashCode = next();
     const digestSize = next();
-    const size = offset + digestSize;
-    const multihashSize = size - prefixSize;
-    return { version: version2, codec, multihashCode, digestSize, multihashSize, size };
+    const size2 = offset + digestSize;
+    const multihashSize = size2 - prefixSize;
+    return { version: version2, codec, multihashCode, digestSize, multihashSize, size: size2 };
   }
   /**
    * Takes cid in a string representation and creates an instance. If `base`
@@ -1234,20 +1234,20 @@ function equals(a2, b) {
   }
   return true;
 }
-function alloc$1(size = 0) {
-  return new Uint8Array(size);
+function alloc$1(size2 = 0) {
+  return new Uint8Array(size2);
 }
-function allocUnsafe(size = 0) {
-  return new Uint8Array(size);
+function allocUnsafe(size2 = 0) {
+  return new Uint8Array(size2);
 }
 function asUint8Array(buf) {
   return buf;
 }
-function concat(arrays, length2) {
-  if (length2 == null) {
-    length2 = arrays.reduce((acc, curr) => acc + curr.length, 0);
+function concat(arrays, length3) {
+  if (length3 == null) {
+    length3 = arrays.reduce((acc, curr) => acc + curr.length, 0);
   }
-  const output = allocUnsafe(length2);
+  const output = allocUnsafe(length3);
   let offset = 0;
   for (const arr of arrays) {
     output.set(arr, offset);
@@ -1303,19 +1303,19 @@ class Uint8ArrayList {
    * Add all `bufs` to the end of this Uint8ArrayList
    */
   appendAll(bufs) {
-    let length2 = 0;
+    let length3 = 0;
     for (const buf of bufs) {
       if (buf instanceof Uint8Array) {
-        length2 += buf.byteLength;
+        length3 += buf.byteLength;
         this.bufs.push(buf);
       } else if (isUint8ArrayList(buf)) {
-        length2 += buf.byteLength;
+        length3 += buf.byteLength;
         this.bufs.push(...buf.bufs);
       } else {
         throw new Error("Could not append value, must be an Uint8Array or a Uint8ArrayList");
       }
     }
-    this.length += length2;
+    this.length += length3;
   }
   /**
    * Add one or more `bufs` to the start of this Uint8ArrayList
@@ -1327,19 +1327,19 @@ class Uint8ArrayList {
    * Add all `bufs` to the start of this Uint8ArrayList
    */
   prependAll(bufs) {
-    let length2 = 0;
+    let length3 = 0;
     for (const buf of bufs.reverse()) {
       if (buf instanceof Uint8Array) {
-        length2 += buf.byteLength;
+        length3 += buf.byteLength;
         this.bufs.unshift(buf);
       } else if (isUint8ArrayList(buf)) {
-        length2 += buf.byteLength;
+        length3 += buf.byteLength;
         this.bufs.unshift(...buf.bufs);
       } else {
         throw new Error("Could not prepend value, must be an Uint8Array or a Uint8ArrayList");
       }
     }
-    this.length += length2;
+    this.length += length3;
   }
   /**
    * Read the value at `index`
@@ -1403,8 +1403,8 @@ class Uint8ArrayList {
    * - note this is different to the behaviour of Node Buffers.
    */
   slice(beginInclusive, endExclusive) {
-    const { bufs, length: length2 } = this._subList(beginInclusive, endExclusive);
-    return concat(bufs, length2);
+    const { bufs, length: length3 } = this._subList(beginInclusive, endExclusive);
+    return concat(bufs, length3);
   }
   /**
    * Returns a alloc from the given start and end element index.
@@ -1413,11 +1413,11 @@ class Uint8ArrayList {
    * internally this is a no-copy operation otherwise it is a copy operation.
    */
   subarray(beginInclusive, endExclusive) {
-    const { bufs, length: length2 } = this._subList(beginInclusive, endExclusive);
+    const { bufs, length: length3 } = this._subList(beginInclusive, endExclusive);
     if (bufs.length === 1) {
       return bufs[0];
     }
-    return concat(bufs, length2);
+    return concat(bufs, length3);
   }
   /**
    * Returns a allocList from the given start and end element index.
@@ -1425,9 +1425,9 @@ class Uint8ArrayList {
    * This is a no-copy operation.
    */
   sublist(beginInclusive, endExclusive) {
-    const { bufs, length: length2 } = this._subList(beginInclusive, endExclusive);
+    const { bufs, length: length3 } = this._subList(beginInclusive, endExclusive);
     const list = new Uint8ArrayList();
-    list.length = length2;
+    list.length = length3;
     list.bufs = [...bufs];
     return list;
   }
@@ -1670,13 +1670,13 @@ class Uint8ArrayList {
    * Create a Uint8ArrayList from a pre-existing list of Uint8Arrays.  Use this
    * method if you know the total size of all the Uint8Arrays ahead of time.
    */
-  static fromUint8Arrays(bufs, length2) {
+  static fromUint8Arrays(bufs, length3) {
     const list = new Uint8ArrayList();
     list.bufs = bufs;
-    if (length2 == null) {
-      length2 = bufs.reduce((acc, curr) => acc + curr.byteLength, 0);
+    if (length3 == null) {
+      length3 = bufs.reduce((acc, curr) => acc + curr.byteLength, 0);
     }
-    list.length = length2;
+    list.length = length3;
     return list;
   }
 }
@@ -1950,7 +1950,7 @@ function decodeDer(buf, context = { offset: 0 }) {
   throw new Error("No decoder for tag " + tag);
 }
 function readLength(buf, context) {
-  let length2 = 0;
+  let length3 = 0;
   if ((buf[context.offset] & LONG_LENGTH_MASK) === LONG_LENGTH_MASK) {
     const count = buf[context.offset] & LONG_LENGTH_BYTES_MASK;
     let str = "0x";
@@ -1958,12 +1958,12 @@ function readLength(buf, context) {
     for (let i2 = 0; i2 < count; i2++, context.offset++) {
       str += buf[context.offset].toString(16).padStart(2, "0");
     }
-    length2 = parseInt(str, 16);
+    length3 = parseInt(str, 16);
   } else {
-    length2 = buf[context.offset];
+    length3 = buf[context.offset];
     context.offset++;
   }
-  return length2;
+  return length3;
 }
 function readSequence(buf, context) {
   readLength(buf, context);
@@ -1981,9 +1981,9 @@ function readSequence(buf, context) {
   return entries;
 }
 function readInteger(buf, context) {
-  const length2 = readLength(buf, context);
+  const length3 = readLength(buf, context);
   const start2 = context.offset;
-  const end = context.offset + length2;
+  const end = context.offset + length3;
   const vals = [];
   for (let i2 = start2; i2 < end; i2++) {
     if (i2 === start2 && buf[i2] === 0) {
@@ -1991,7 +1991,7 @@ function readInteger(buf, context) {
     }
     vals.push(buf[i2]);
   }
-  context.offset += length2;
+  context.offset += length3;
   return Uint8Array.from(vals);
 }
 function readObjectIdentifier(buf, context) {
@@ -2034,20 +2034,20 @@ function readNull(buf, context) {
   return null;
 }
 function readBitString(buf, context) {
-  const length2 = readLength(buf, context);
+  const length3 = readLength(buf, context);
   const unusedBits = buf[context.offset];
   context.offset++;
-  const bytes = buf.subarray(context.offset, context.offset + length2 - 1);
-  context.offset += length2;
+  const bytes = buf.subarray(context.offset, context.offset + length3 - 1);
+  context.offset += length3;
   if (unusedBits !== 0) {
     throw new Error("Unused bits in bit string is unimplemented");
   }
   return bytes;
 }
 function readOctetString(buf, context) {
-  const length2 = readLength(buf, context);
-  const bytes = buf.subarray(context.offset, context.offset + length2);
-  context.offset += length2;
+  const length3 = readLength(buf, context);
+  const bytes = buf.subarray(context.offset, context.offset + length3);
+  context.offset += length3;
   return bytes;
 }
 function encodeNumber(value2) {
@@ -2065,10 +2065,10 @@ function encodeLength(bytes) {
   if (bytes.byteLength < 128) {
     return Uint8Array.from([bytes.byteLength]);
   }
-  const length2 = encodeNumber(bytes.byteLength);
+  const length3 = encodeNumber(bytes.byteLength);
   return new Uint8ArrayList(Uint8Array.from([
-    length2.byteLength | LONG_LENGTH_MASK
-  ]), length2);
+    length3.byteLength | LONG_LENGTH_MASK
+  ]), length3);
 }
 function encodeInteger(value2) {
   const contents = new Uint8ArrayList();
@@ -2236,13 +2236,13 @@ function anumber$1(n2, title = "") {
     throw new Error(`${prefix}expected integer >= 0, got ${n2}`);
   }
 }
-function abytes$1(value2, length2, title = "") {
+function abytes$1(value2, length3, title = "") {
   const bytes = isBytes$1(value2);
   const len = value2 == null ? void 0 : value2.length;
-  const needsLen = length2 !== void 0;
-  if (!bytes || needsLen && len !== length2) {
+  const needsLen = length3 !== void 0;
+  if (!bytes || needsLen && len !== length3) {
     const prefix = title && `"${title}" `;
-    const ofLen = needsLen ? ` of length ${length2}` : "";
+    const ofLen = needsLen ? ` of length ${length3}` : "";
     const got = bytes ? `length=${len}` : `type=${typeof value2}`;
     throw new Error(prefix + "expected Uint8Array" + ofLen + ", got " + got);
   }
@@ -2275,8 +2275,8 @@ function clean$1(...arrays) {
 function createView$1(arr) {
   return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
 }
-function rotr(word, shift) {
-  return word << 32 - shift | word >>> shift;
+function rotr(word, shift2) {
+  return word << 32 - shift2 | word >>> shift2;
 }
 const hasHexBuiltin = /* @__PURE__ */ (() => (
   // @ts-ignore
@@ -2445,12 +2445,12 @@ class HashMD {
   _cloneInto(to) {
     to || (to = new this.constructor());
     to.set(...this.get());
-    const { blockLen, buffer, length: length2, finished, destroyed, pos } = this;
+    const { blockLen, buffer, length: length3, finished, destroyed, pos } = this;
     to.destroyed = destroyed;
     to.finished = finished;
-    to.length = length2;
+    to.length = length3;
     to.pos = pos;
-    if (length2 % blockLen)
+    if (length3 % blockLen)
       to.buffer.set(buffer);
     return to;
   }
@@ -3378,8 +3378,8 @@ function getFieldBytesLength(fieldOrder) {
   return Math.ceil(bitLength / 8);
 }
 function getMinHashLength(fieldOrder) {
-  const length2 = getFieldBytesLength(fieldOrder);
-  return length2 + Math.ceil(length2 / 2);
+  const length3 = getFieldBytesLength(fieldOrder);
+  return length3 + Math.ceil(length3 / 2);
 }
 function mapHashToField(key, fieldOrder, isLE2 = false) {
   abytes$1(key);
@@ -4017,18 +4017,18 @@ function eddsa(Point, cHash, eddsaOpts = {}) {
      */
     toMontgomery(publicKey) {
       const { y } = Point.fromBytes(publicKey);
-      const size = lengths.publicKey;
-      const is25519 = size === 32;
-      if (!is25519 && size !== 57)
+      const size2 = lengths.publicKey;
+      const is25519 = size2 === 32;
+      if (!is25519 && size2 !== 57)
         throw new Error("only defined for 25519 and 448");
       const u = is25519 ? Fp.div(_1n$3 + y, _1n$3 - y) : Fp.div(y - _1n$3, y + _1n$3);
       return Fp.toBytes(u);
     },
     toMontgomerySecret(secretKey) {
-      const size = lengths.secretKey;
-      abytes$1(secretKey, size);
-      const hashed = cHash(secretKey.subarray(0, size));
-      return adjustScalarBytes2(hashed).subarray(0, size);
+      const size2 = lengths.secretKey;
+      abytes$1(secretKey, size2);
+      const hashed = cHash(secretKey.subarray(0, size2));
+      return adjustScalarBytes2(hashed).subarray(0, size2);
     }
   };
   return Object.freeze({
@@ -4411,10 +4411,10 @@ async function generateEd25519KeyPair() {
   const { privateKey, publicKey } = generateKey();
   return new Ed25519PrivateKey(privateKey, publicKey);
 }
-function ensureEd25519Key(key, length2) {
+function ensureEd25519Key(key, length3) {
   key = Uint8Array.from(key ?? []);
-  if (key.length !== length2) {
-    throw new InvalidParametersError$1(`Key must be a Uint8Array of length ${length2}, got ${key.length}`);
+  if (key.length !== length3) {
+    throw new InvalidParametersError$1(`Key must be a Uint8Array of length ${length3}, got ${key.length}`);
   }
   return key;
 }
@@ -5023,13 +5023,13 @@ class Uint8ArrayReader {
    * Reads a sequence of bytes preceded by its length as a varint
    */
   bytes() {
-    const length2 = this.uint32();
+    const length3 = this.uint32();
     const start2 = this.pos;
-    const end = this.pos + length2;
+    const end = this.pos + length3;
     if (end > this.len) {
-      throw indexOutOfRange(this, length2);
+      throw indexOutOfRange(this, length3);
     }
-    this.pos += length2;
+    this.pos += length3;
     return start2 === end ? new Uint8Array(0) : this.buf.subarray(start2, end);
   }
   /**
@@ -5042,12 +5042,12 @@ class Uint8ArrayReader {
   /**
    * Skips the specified number of bytes if specified, otherwise skips a varint
    */
-  skip(length2) {
-    if (typeof length2 === "number") {
-      if (this.pos + length2 > this.len) {
-        throw indexOutOfRange(this, length2);
+  skip(length3) {
+    if (typeof length3 === "number") {
+      if (this.pos + length3 > this.len) {
+        throw indexOutOfRange(this, length3);
       }
-      this.pos += length2;
+      this.pos += length3;
     } else {
       do {
         if (this.pos >= this.len) {
@@ -5246,20 +5246,20 @@ function decodeMessage(buf, codec, opts) {
   const reader = createReader(buf);
   return codec.decode(reader, void 0, opts);
 }
-function pool(size) {
+function pool(size2) {
   const SIZE = 8192;
   const MAX = SIZE >>> 1;
   let slab;
   let offset = SIZE;
-  return function poolAlloc(size2) {
-    if (size2 < 1 || size2 > MAX) {
-      return allocUnsafe(size2);
+  return function poolAlloc(size3) {
+    if (size3 < 1 || size3 > MAX) {
+      return allocUnsafe(size3);
     }
-    if (offset + size2 > SIZE) {
+    if (offset + size3 > SIZE) {
       slab = allocUnsafe(SIZE);
       offset = 0;
     }
-    const buf = slab.subarray(offset, offset += size2);
+    const buf = slab.subarray(offset, offset += size3);
     if ((offset & 7) !== 0) {
       offset = (offset | 7) + 1;
     }
@@ -5317,11 +5317,11 @@ class State {
   }
 }
 const bufferPool = pool();
-function alloc(size) {
+function alloc(size2) {
   if (globalThis.Buffer != null) {
-    return allocUnsafe(size);
+    return allocUnsafe(size2);
   }
-  return bufferPool(size);
+  return bufferPool(size2);
 }
 class Uint8ArrayWriter {
   constructor() {
@@ -5752,9 +5752,9 @@ var PublicKey;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -5804,9 +5804,9 @@ var PrivateKey;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -5836,11 +5836,11 @@ var PrivateKey;
     return decodeMessage(buf, PrivateKey2.codec(), opts);
   };
 })(PrivateKey || (PrivateKey = {}));
-function randomBytes(length2) {
-  if (isNaN(length2) || length2 <= 0) {
+function randomBytes(length3) {
+  if (isNaN(length3) || length3 <= 0) {
     throw new InvalidParametersError$1("random bytes length must be a Number bigger than 0");
   }
-  return randomBytes$1(length2);
+  return randomBytes$1(length3);
 }
 class RSAPublicKey {
   constructor(jwk, digest2) {
@@ -6088,9 +6088,9 @@ const DER = {
         throw new E("tlv.decode: wrong tlv");
       const first = data[pos++];
       const isLong = !!(first & 128);
-      let length2 = 0;
+      let length3 = 0;
       if (!isLong)
-        length2 = first;
+        length3 = first;
       else {
         const lenLen = first & 127;
         if (!lenLen)
@@ -6103,15 +6103,15 @@ const DER = {
         if (lengthBytes[0] === 0)
           throw new E("tlv.decode(long): zero leftmost byte");
         for (const b of lengthBytes)
-          length2 = length2 << 8 | b;
+          length3 = length3 << 8 | b;
         pos += lenLen;
-        if (length2 < 128)
+        if (length3 < 128)
           throw new E("tlv.decode(long): not minimal encoding");
       }
-      const v = data.subarray(pos, pos + length2);
-      if (v.length !== length2)
+      const v = data.subarray(pos, pos + length3);
+      if (v.length !== length3)
         throw new E("tlv.decode: wrong value length");
-      return { v, l: data.subarray(pos + length2) };
+      return { v, l: data.subarray(pos + length3) };
     }
   },
   // https://crypto.stackexchange.com/a/57734 Leftmost bit of first byte is 'negative' flag,
@@ -6199,10 +6199,10 @@ function weierstrass(params, extraOpts = {}) {
   function pointFromBytes(bytes) {
     abytes$1(bytes, void 0, "Point");
     const { publicKey: comp, publicKeyUncompressed: uncomp } = lengths;
-    const length2 = bytes.length;
+    const length3 = bytes.length;
     const head = bytes[0];
     const tail = bytes.subarray(1);
-    if (length2 === comp && (head === 2 || head === 3)) {
+    if (length3 === comp && (head === 2 || head === 3)) {
       const x = Fp.fromBytes(tail);
       if (!Fp.isValid(x))
         throw new Error("bad point: is not on curve, wrong x");
@@ -6220,7 +6220,7 @@ function weierstrass(params, extraOpts = {}) {
       if (evenH !== evenY)
         y = Fp.neg(y);
       return { x, y };
-    } else if (length2 === uncomp && head === 4) {
+    } else if (length3 === uncomp && head === 4) {
       const L = Fp.BYTES;
       const x = Fp.fromBytes(tail.subarray(0, L));
       const y = Fp.fromBytes(tail.subarray(L, L * 2));
@@ -6228,7 +6228,7 @@ function weierstrass(params, extraOpts = {}) {
         throw new Error("bad point: is not on curve");
       return { x, y };
     } else {
-      throw new Error(`bad point: got length ${length2}, expected compressed=${comp} or uncompressed=${uncomp}`);
+      throw new Error(`bad point: got length ${length3}, expected compressed=${comp} or uncompressed=${uncomp}`);
     }
   }
   const encodePoint = extraOpts.toBytes || pointToBytes;
@@ -6691,8 +6691,8 @@ function ecdsa(Point, hash, ecdsaOpts = {}) {
   }
   function validateSigLength(bytes, format2) {
     validateSigFormat(format2);
-    const size = lengths.signature;
-    const sizer = format2 === "compact" ? size : format2 === "recovered" ? size + 1 : void 0;
+    const size2 = lengths.signature;
+    const sizer = format2 === "compact" ? size2 : format2 === "recovered" ? size2 + 1 : void 0;
     return abytes$1(bytes, sizer);
   }
   class Signature {
@@ -7888,43 +7888,43 @@ const FNV_OFFSETS = {
   1024: 14197795064947621068722070641403218320880622795441933960878474914617582723252296732303717722150864096521202355549365628174669108571814760471015076148029755969804077320157692458563003215304957150157403644460363550505412711285966361610267868082893823963790439336411086884584107735010676915n
 };
 const cachedEncoder = new globalThis.TextEncoder();
-function fnv1aUint8Array(uint8Array, size) {
-  const fnvPrime = FNV_PRIMES[size];
-  let hash = FNV_OFFSETS[size];
+function fnv1aUint8Array(uint8Array, size2) {
+  const fnvPrime = FNV_PRIMES[size2];
+  let hash = FNV_OFFSETS[size2];
   for (let index = 0; index < uint8Array.length; index++) {
     hash ^= BigInt(uint8Array[index]);
-    hash = BigInt.asUintN(size, hash * fnvPrime);
+    hash = BigInt.asUintN(size2, hash * fnvPrime);
   }
   return hash;
 }
-function fnv1aEncodeInto(string2, size, utf8Buffer) {
+function fnv1aEncodeInto(string2, size2, utf8Buffer) {
   if (utf8Buffer.length === 0) {
     throw new Error("The `utf8Buffer` option must have a length greater than zero");
   }
-  const fnvPrime = FNV_PRIMES[size];
-  let hash = FNV_OFFSETS[size];
+  const fnvPrime = FNV_PRIMES[size2];
+  let hash = FNV_OFFSETS[size2];
   let remaining = string2;
   while (remaining.length > 0) {
     const result = cachedEncoder.encodeInto(remaining, utf8Buffer);
     remaining = remaining.slice(result.read);
     for (let index = 0; index < result.written; index++) {
       hash ^= BigInt(utf8Buffer[index]);
-      hash = BigInt.asUintN(size, hash * fnvPrime);
+      hash = BigInt.asUintN(size2, hash * fnvPrime);
     }
   }
   return hash;
 }
-function fnv1a$1(value2, { size = 32, utf8Buffer } = {}) {
-  if (!FNV_PRIMES[size]) {
+function fnv1a$1(value2, { size: size2 = 32, utf8Buffer } = {}) {
+  if (!FNV_PRIMES[size2]) {
     throw new Error("The `size` option must be one of 32, 64, 128, 256, 512, or 1024");
   }
   if (typeof value2 === "string") {
     if (utf8Buffer) {
-      return fnv1aEncodeInto(value2, size, utf8Buffer);
+      return fnv1aEncodeInto(value2, size2, utf8Buffer);
     }
     value2 = cachedEncoder.encode(value2);
   }
-  return fnv1aUint8Array(value2, size);
+  return fnv1aUint8Array(value2, size2);
 }
 const fnv1a = {
   hash: (input) => {
@@ -7978,9 +7978,9 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 class Bucket {
-  constructor(size) {
+  constructor(size2) {
     __publicField(this, "contents");
-    this.contents = new Array(size).fill(null);
+    this.contents = new Array(size2).fill(null);
   }
   has(fingerprint) {
     if (!(fingerprint instanceof Fingerprint)) {
@@ -9204,7 +9204,7 @@ function _pushable(getNext, options) {
     buffer.push({ error: err });
     return pushable2;
   };
-  const push = (value2) => {
+  const push2 = (value2) => {
     if (ended) {
       return pushable2;
     }
@@ -9235,7 +9235,7 @@ function _pushable(getNext, options) {
     next: waitNext,
     return: _return,
     throw: _throw,
-    push,
+    push: push2,
     end,
     get readableLength() {
       return buffer.size;
@@ -9295,7 +9295,7 @@ function _pushable(getNext, options) {
       }
       return { done: true };
     },
-    push,
+    push: push2,
     end(err) {
       _pushable2.end(err);
       if (onEnd != null) {
@@ -10624,7 +10624,7 @@ function anySignal(signals) {
       signal2.addEventListener("abort", onAbort);
     }
   }
-  function clear() {
+  function clear2() {
     for (const signal2 of signals) {
       if ((signal2 == null ? void 0 : signal2.removeEventListener) != null) {
         signal2.removeEventListener("abort", onAbort);
@@ -10632,7 +10632,7 @@ function anySignal(signals) {
     }
   }
   const signal = controller.signal;
-  signal.clear = clear;
+  signal.clear = clear2;
   return signal;
 }
 class MovingAverage {
@@ -11239,20 +11239,20 @@ function bytesToComponents(bytes) {
     const code2 = decode$1(bytes, i2);
     const codec = registry.getProtocol(code2);
     const codeLength = encodingLength(code2);
-    const size = sizeForAddr(codec, bytes, i2 + codeLength);
+    const size2 = sizeForAddr(codec, bytes, i2 + codeLength);
     let sizeLength = 0;
-    if (size > 0 && codec.size === V) {
-      sizeLength = encodingLength(size);
+    if (size2 > 0 && codec.size === V) {
+      sizeLength = encodingLength(size2);
     }
-    const componentLength = codeLength + sizeLength + size;
+    const componentLength = codeLength + sizeLength + size2;
     const component = {
       code: code2,
       name: codec.name,
       bytes: bytes.subarray(i2, i2 + componentLength)
     };
-    if (size > 0) {
+    if (size2 > 0) {
       const valueOffset = i2 + codeLength + sizeLength;
-      const valueBytes = bytes.subarray(valueOffset, valueOffset + size);
+      const valueBytes = bytes.subarray(valueOffset, valueOffset + size2);
       component.value = ((_a2 = codec.bytesToValue) == null ? void 0 : _a2.call(codec, valueBytes)) ?? toString(valueBytes);
     }
     components.push(component);
@@ -11262,7 +11262,7 @@ function bytesToComponents(bytes) {
 }
 function componentsToBytes(components) {
   var _a2;
-  let length2 = 0;
+  let length3 = 0;
   const bytes = [];
   for (const component of components) {
     if (component.bytes == null) {
@@ -11292,9 +11292,9 @@ function componentsToBytes(components) {
       component.bytes = bytes2;
     }
     bytes.push(component.bytes);
-    length2 += component.bytes.byteLength;
+    length3 += component.bytes.byteLength;
   }
-  return concat(bytes, length2);
+  return concat(bytes, length3);
 }
 function stringToComponents(string2) {
   var _a2;
@@ -11626,7 +11626,7 @@ class QueuelessPushable {
 function queuelessPushable() {
   return new QueuelessPushable();
 }
-function isAsyncIterable$6(thing) {
+function isAsyncIterable$7(thing) {
   return thing[Symbol.asyncIterator] != null;
 }
 async function addAllToPushable(sources, output, signal) {
@@ -11668,7 +11668,7 @@ function* mergeSyncSources(syncSources) {
 function merge(...sources) {
   const syncSources = [];
   for (const source of sources) {
-    if (!isAsyncIterable$6(source)) {
+    if (!isAsyncIterable$7(source)) {
       syncSources.push(source);
     }
   }
@@ -11677,6 +11677,83 @@ function merge(...sources) {
   }
   return mergeSources(sources);
 }
+function pipe$1(first, ...rest) {
+  if (first == null) {
+    throw new Error("Empty pipeline");
+  }
+  if (isDuplex(first)) {
+    const duplex = first;
+    first = () => duplex.source;
+  } else if (isIterable(first) || isAsyncIterable$6(first)) {
+    const source = first;
+    first = () => source;
+  }
+  const fns = [first, ...rest];
+  if (fns.length > 1) {
+    if (isDuplex(fns[fns.length - 1])) {
+      fns[fns.length - 1] = fns[fns.length - 1].sink;
+    }
+  }
+  if (fns.length > 2) {
+    for (let i2 = 1; i2 < fns.length - 1; i2++) {
+      if (isDuplex(fns[i2])) {
+        fns[i2] = duplexPipelineFn(fns[i2]);
+      }
+    }
+  }
+  return rawPipe(...fns);
+}
+const rawPipe = (...fns) => {
+  let res;
+  while (fns.length > 0) {
+    res = fns.shift()(res);
+  }
+  return res;
+};
+const isAsyncIterable$6 = (obj) => {
+  return (obj == null ? void 0 : obj[Symbol.asyncIterator]) != null;
+};
+const isIterable = (obj) => {
+  return (obj == null ? void 0 : obj[Symbol.iterator]) != null;
+};
+const isDuplex = (obj) => {
+  if (obj == null) {
+    return false;
+  }
+  return obj.sink != null && obj.source != null;
+};
+const duplexPipelineFn = (duplex) => {
+  return (source) => {
+    const p2 = duplex.sink(source);
+    if ((p2 == null ? void 0 : p2.then) != null) {
+      const stream = pushable({
+        objectMode: true
+      });
+      p2.then(() => {
+        stream.end();
+      }, (err) => {
+        stream.end(err);
+      });
+      let sourceWrap;
+      const source2 = duplex.source;
+      if (isAsyncIterable$6(source2)) {
+        sourceWrap = async function* () {
+          yield* source2;
+          stream.end();
+        };
+      } else if (isIterable(source2)) {
+        sourceWrap = function* () {
+          yield* source2;
+          stream.end();
+        };
+      } else {
+        throw new Error("Unknown duplex source type - must be Iterable or AsyncIterable");
+      }
+      return merge(stream, sourceWrap());
+    }
+    return duplex.source;
+  };
+};
 const DEFAULT_MAX_BUFFER_SIZE$1 = 4194304;
 class UnwrappedError extends Error {
   constructor() {
@@ -11921,6 +11998,81 @@ function pbStream(stream, opts) {
   };
   return pbStream2;
 }
+function isMessageStream(obj) {
+  return (obj == null ? void 0 : obj.addEventListener) != null;
+}
+function messageStreamToDuplex(stream) {
+  const source = pushable();
+  let onError;
+  const onMessage = (evt) => {
+    source.push(evt.data);
+  };
+  const onRemoteCloseWrite = () => {
+    source.end();
+    stream.removeEventListener("message", onMessage);
+    stream.removeEventListener("close", onClose);
+    stream.removeEventListener("remoteCloseWrite", onRemoteCloseWrite);
+  };
+  const onClose = (evt) => {
+    source.end(evt.error);
+    if (evt.error != null) {
+      onError == null ? void 0 : onError.reject(evt.error);
+    }
+    stream.removeEventListener("message", onMessage);
+    stream.removeEventListener("close", onClose);
+    stream.removeEventListener("remoteCloseWrite", onRemoteCloseWrite);
+  };
+  stream.addEventListener("message", onMessage);
+  stream.addEventListener("close", onClose, {
+    once: true
+  });
+  stream.addEventListener("remoteCloseWrite", onRemoteCloseWrite, {
+    once: true
+  });
+  return {
+    source,
+    async sink(source2) {
+      async function* toGenerator() {
+        yield* source2;
+      }
+      const gen = toGenerator();
+      while (true) {
+        onError = Promise.withResolvers();
+        const { done, value: value2 } = await Promise.race([
+          gen.next(),
+          onError.promise
+        ]);
+        if (stream.writeStatus === "closing" || stream.writeStatus === "closed") {
+          break;
+        }
+        if (value2 != null) {
+          if (!stream.send(value2)) {
+            await Promise.race([
+              pEvent(stream, "drain", {
+                rejectionEvents: [
+                  "close"
+                ]
+              })
+            ]);
+          }
+        }
+        if (done === true) {
+          break;
+        }
+      }
+      await stream.close();
+    }
+  };
+}
+function pipe(...input) {
+  const sources = input.map((source) => {
+    if (isMessageStream(source)) {
+      return messageStreamToDuplex(source);
+    }
+    return source;
+  });
+  return pipe$1(...sources);
+}
 const DEFAULT_MAX_BUFFER_SIZE = 1024 * 1024 * 4;
 const DEFAULT_MAX_DATA_LENGTH = 1024 * 1024 * 4;
 class LengthPrefixedDecoder {
@@ -12009,10 +12161,10 @@ function validateMaxDataLength(chunk, maxDataLength) {
     throw new InvalidDataLengthError2("Message length too long");
   }
 }
-const defaultEncoder = (length2) => {
-  const lengthLength = encodingLength(length2);
+const defaultEncoder = (length3) => {
+  const lengthLength = encodingLength(length3);
   const lengthBuf = allocUnsafe(lengthLength);
-  encode$1(length2, lengthBuf);
+  encode$1(length3, lengthBuf);
   defaultEncoder.bytes = lengthLength;
   return lengthBuf;
 };
@@ -12023,11 +12175,11 @@ function encode(source, options) {
   const maxDataLength = (options == null ? void 0 : options.maxDataLength) ?? MAX_DATA_LENGTH;
   function* maybeYield(chunk) {
     validateMaxDataLength(chunk, maxDataLength);
-    const length2 = encodeLength2(chunk.byteLength);
-    if (length2 instanceof Uint8Array) {
-      yield length2;
+    const length3 = encodeLength2(chunk.byteLength);
+    if (length3 instanceof Uint8Array) {
+      yield length3;
     } else {
-      yield* length2;
+      yield* length3;
     }
     if (chunk instanceof Uint8Array) {
       yield chunk;
@@ -12061,9 +12213,9 @@ var ReadMode;
   ReadMode2[ReadMode2["DATA"] = 1] = "DATA";
 })(ReadMode || (ReadMode = {}));
 const defaultDecoder = (buf) => {
-  const length2 = decode$1(buf);
-  defaultDecoder.bytes = encodingLength(length2);
-  return length2;
+  const length3 = decode$1(buf);
+  defaultDecoder.bytes = encodingLength(length3);
+  return length3;
 };
 defaultDecoder.bytes = 0;
 function decode(source, options) {
@@ -12460,9 +12612,9 @@ function trackedMap(config) {
   return map;
 }
 class PeerFilter {
-  constructor(size, errorRate) {
+  constructor(size2, errorRate) {
     __publicField(this, "filter");
-    this.filter = createScalableCuckooFilter(size, errorRate);
+    this.filter = createScalableCuckooFilter(size2, errorRate);
   }
   has(peerId) {
     return this.filter.has(peerId.toMultihash().bytes);
@@ -12475,8 +12627,8 @@ class PeerFilter {
     (_b2 = (_a2 = this.filter).remove) == null ? void 0 : _b2.call(_a2, peerId.toMultihash().bytes);
   }
 }
-function peerFilter(size, errorRate = 1e-3) {
-  return new PeerFilter(size, errorRate);
+function peerFilter(size2, errorRate = 1e-3) {
+  return new PeerFilter(size2, errorRate);
 }
 class TrackedPeerMap extends PeerMap {
   constructor(init) {
@@ -12542,14 +12694,14 @@ var Envelope$1;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {
           publicKey: alloc$1(0),
           payloadType: alloc$1(0),
           payload: alloc$1(0),
           signature: alloc$1(0)
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -12713,11 +12865,11 @@ var PeerRecord$1;
           if (opts.lengthDelimited !== false) {
             w.ldelim();
           }
-        }, (reader, length2, opts = {}) => {
+        }, (reader, length3, opts = {}) => {
           const obj = {
             multiaddr: alloc$1(0)
           };
-          const end = length2 == null ? reader.len : reader.pos + length2;
+          const end = length3 == null ? reader.len : reader.pos + length3;
           while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -12767,14 +12919,14 @@ var PeerRecord$1;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2;
         const obj = {
           peerId: alloc$1(0),
           seq: 0n,
           addresses: []
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -13471,8 +13623,8 @@ const handleChannelWorkerLockRequest = (emitter, channel, masterEvent, abortMast
     }
   };
 };
-const nanoid$1 = (size = 10) => {
-  return Math.random().toString().substring(2, size + 2);
+const nanoid$1 = (size2 = 10) => {
+  return Math.random().toString().substring(2, size2 + 2);
 };
 class MorticeChannelWorker {
   constructor(name2) {
@@ -13731,7 +13883,7 @@ function createMortice(options) {
 }
 const MAX_ADDRESS_AGE = 36e5;
 const MAX_PEER_AGE = 216e5;
-var Peer$1;
+var Peer$2;
 (function(Peer2) {
   (function(Peer$metadataEntry) {
     let _codec2;
@@ -13752,12 +13904,12 @@ var Peer$1;
           if (opts.lengthDelimited !== false) {
             w.ldelim();
           }
-        }, (reader, length2, opts = {}) => {
+        }, (reader, length3, opts = {}) => {
           const obj = {
             key: "",
             value: alloc$1(0)
           };
-          const end = length2 == null ? reader.len : reader.pos + length2;
+          const end = length3 == null ? reader.len : reader.pos + length3;
           while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -13806,12 +13958,12 @@ var Peer$1;
           if (opts.lengthDelimited !== false) {
             w.ldelim();
           }
-        }, (reader, length2, opts = {}) => {
+        }, (reader, length3, opts = {}) => {
           var _a2;
           const obj = {
             key: ""
           };
-          const end = length2 == null ? reader.len : reader.pos + length2;
+          const end = length3 == null ? reader.len : reader.pos + length3;
           while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -13889,7 +14041,7 @@ var Peer$1;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2, _c2, _d2, _e2, _f2;
         const obj = {
           addresses: [],
@@ -13897,7 +14049,7 @@ var Peer$1;
           metadata: /* @__PURE__ */ new Map(),
           tags: /* @__PURE__ */ new Map()
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -13966,7 +14118,7 @@ var Peer$1;
   Peer2.decode = (buf, opts) => {
     return decodeMessage(buf, Peer2.codec(), opts);
   };
-})(Peer$1 || (Peer$1 = {}));
+})(Peer$2 || (Peer$2 = {}));
 var Address;
 (function(Address2) {
   let _codec;
@@ -13991,11 +14143,11 @@ var Address;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {
           multiaddr: alloc$1(0)
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -14049,11 +14201,11 @@ var Tag;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {
           value: 0
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -14095,7 +14247,7 @@ function populatePublicKey(peerId, protobuf) {
   return peerIdFromPublicKey(publicKey);
 }
 function bytesToPeer(peerId, buf, maxAddressAge) {
-  const peer = Peer$1.decode(buf);
+  const peer = Peer$2.decode(buf);
   return pbToPeer(peerId, peer, maxAddressAge);
 }
 function pbToPeer(peerId, peer, maxAddressAge) {
@@ -14882,7 +15034,7 @@ class PersistentStore {
   async load(peerId, options) {
     const key = peerIdToDatastoreKey(peerId);
     const buf = await this.datastore.get(key, options);
-    const peer = Peer$1.decode(buf);
+    const peer = Peer$2.decode(buf);
     if (__privateMethod(this, _PersistentStore_instances, peerIsExpired_fn).call(this, peerId, peer)) {
       await this.datastore.delete(key, options);
       throw new NotFoundError$1();
@@ -14920,7 +15072,7 @@ class PersistentStore {
       if (peerId.equals(this.peerId)) {
         continue;
       }
-      const peer = Peer$1.decode(value2);
+      const peer = Peer$2.decode(value2);
       if (__privateMethod(this, _PersistentStore_instances, peerIsExpired_fn).call(this, peerId, peer)) {
         await this.datastore.delete(key, options);
         continue;
@@ -14934,7 +15086,7 @@ findExistingPeer_fn = async function(peerId, options) {
   try {
     const key = peerIdToDatastoreKey(peerId);
     const buf = await this.datastore.get(key, options);
-    const peerPB = Peer$1.decode(buf);
+    const peerPB = Peer$2.decode(buf);
     if (__privateMethod(this, _PersistentStore_instances, peerIsExpired_fn).call(this, peerId, peerPB)) {
       await this.datastore.delete(key, options);
       throw new NotFoundError$1();
@@ -14951,7 +15103,7 @@ findExistingPeer_fn = async function(peerId, options) {
 };
 saveIfDifferent_fn = async function(peerId, peer, existingPeer, options) {
   peer.updated = Date.now();
-  const buf = Peer$1.encode(peer);
+  const buf = Peer$2.encode(peer);
   await this.datastore.put(peerIdToDatastoreKey(peerId), buf, options);
   return {
     peer: pbToPeer(peerId, peer, this.maxAddressAge),
@@ -16981,8 +17133,8 @@ var eventemitter3 = { exports: {} };
       }
       listeners.fn.apply(listeners.context, args);
     } else {
-      var length2 = listeners.length, j;
-      for (i2 = 0; i2 < length2; i2++) {
+      var length3 = listeners.length, j;
+      for (i2 = 0; i2 < length3; i2++) {
         if (listeners[i2].once) this.removeListener(event, listeners[i2].fn, void 0, true);
         switch (len) {
           case 1:
@@ -17026,7 +17178,7 @@ var eventemitter3 = { exports: {} };
         clearEvent(this, evt);
       }
     } else {
-      for (var i2 = 0, events = [], length2 = listeners.length; i2 < length2; i2++) {
+      for (var i2 = 0, events = [], length3 = listeners.length; i2 < length3; i2++) {
         if (listeners[i2].fn !== fn || once && !listeners[i2].once || context && listeners[i2].context !== context) {
           events.push(listeners[i2]);
         }
@@ -17852,12 +18004,12 @@ function defaultResolver() {
 }
 var hashlru = function(max) {
   if (!max) throw Error("hashlru must have a max value, of type number, greater than 0");
-  var size = 0, cache2 = /* @__PURE__ */ Object.create(null), _cache = /* @__PURE__ */ Object.create(null);
+  var size2 = 0, cache2 = /* @__PURE__ */ Object.create(null), _cache = /* @__PURE__ */ Object.create(null);
   function update(key, value2) {
     cache2[key] = value2;
-    size++;
-    if (size >= max) {
-      size = 0;
+    size2++;
+    if (size2 >= max) {
+      size2 = 0;
       _cache = cache2;
       cache2 = /* @__PURE__ */ Object.create(null);
     }
@@ -17946,8 +18098,8 @@ class CachedAnswers {
     this.lru.clear();
   }
 }
-function cache(size) {
-  return new CachedAnswers(size);
+function cache(size2) {
+  return new CachedAnswers(size2);
 }
 const DEFAULT_ANSWER_CACHE_SIZE = 1e3;
 class DNS {
@@ -21165,9 +21317,9 @@ var Message$1;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -21817,9 +21969,9 @@ var Message;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -22359,13 +22511,13 @@ function anumber(n2) {
   if (!Number.isSafeInteger(n2) || n2 < 0)
     throw new Error("positive integer expected, got " + n2);
 }
-function abytes(value2, length2, title = "") {
+function abytes(value2, length3, title = "") {
   const bytes = isBytes(value2);
   const len = value2 == null ? void 0 : value2.length;
-  const needsLen = length2 !== void 0;
-  if (!bytes || needsLen && len !== length2) {
+  const needsLen = length3 !== void 0;
+  if (!bytes || needsLen && len !== length3) {
     const prefix = title && `"${title}" `;
-    const ofLen = needsLen ? ` of length ${length2}` : "";
+    const ofLen = needsLen ? ` of length ${length3}` : "";
     const got = bytes ? `length=${len}` : `type=${typeof value2}`;
     throw new Error(prefix + "expected Uint8Array" + ofLen + ", got " + got);
   }
@@ -22990,13 +23142,13 @@ function extract(hash, ikm, salt) {
 }
 const HKDF_COUNTER = /* @__PURE__ */ Uint8Array.of(0);
 const EMPTY_BUFFER = /* @__PURE__ */ Uint8Array.of();
-function expand(hash, prk, info, length2 = 32) {
+function expand(hash, prk, info, length3 = 32) {
   ahash(hash);
-  anumber$1(length2, "length");
+  anumber$1(length3, "length");
   const olen = hash.outputLen;
-  if (length2 > 255 * olen)
+  if (length3 > 255 * olen)
     throw new Error("Length must be <= 255*HashLen");
-  const blocks = Math.ceil(length2 / olen);
+  const blocks = Math.ceil(length3 / olen);
   if (info === void 0)
     info = EMPTY_BUFFER;
   else
@@ -23014,7 +23166,7 @@ function expand(hash, prk, info, length2 = 32) {
   HMAC.destroy();
   HMACTmp.destroy();
   clean$1(T, HKDF_COUNTER);
-  return okm.slice(0, length2);
+  return okm.slice(0, length3);
 }
 const pureJsCrypto = {
   hashSHA256(data) {
@@ -23455,13 +23607,13 @@ var NoiseExtensions;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2;
         const obj = {
           webtransportCerthashes: [],
           streamMuxers: []
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -23521,13 +23673,13 @@ var NoiseHandshakePayload;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2;
         const obj = {
           identityKey: alloc$1(0),
           identitySig: alloc$1(0)
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -24574,7 +24726,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
     }
   }
   handleFrame(frame) {
-    const { streamID, type, length: length2 } = frame.header;
+    const { streamID, type, length: length3 } = frame.header;
     this.log.trace("received frame %o", debugFrame(frame.header));
     if (streamID === 0) {
       switch (type) {
@@ -24583,7 +24735,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
           return;
         }
         case FrameType.GoAway: {
-          this.handleGoAway(length2);
+          this.handleGoAway(length3);
           return;
         }
         default:
@@ -24772,13 +24924,13 @@ var Identify$1;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2;
         const obj = {
           listenAddrs: [],
           protocols: []
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25178,7 +25330,7 @@ var HopMessage;
         }
         if (obj.peer != null) {
           w.uint32(18);
-          Peer.codec().encode(obj.peer, w);
+          Peer$1.codec().encode(obj.peer, w);
         }
         if (obj.reservation != null) {
           w.uint32(26);
@@ -25195,10 +25347,10 @@ var HopMessage;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2, _c2;
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25207,7 +25359,7 @@ var HopMessage;
               break;
             }
             case 2: {
-              obj.peer = Peer.codec().decode(reader, reader.uint32(), {
+              obj.peer = Peer$1.codec().decode(reader, reader.uint32(), {
                 limits: (_a2 = opts.limits) == null ? void 0 : _a2.peer
               });
               break;
@@ -25275,7 +25427,7 @@ var StopMessage;
         }
         if (obj.peer != null) {
           w.uint32(18);
-          Peer.codec().encode(obj.peer, w);
+          Peer$1.codec().encode(obj.peer, w);
         }
         if (obj.limit != null) {
           w.uint32(26);
@@ -25288,10 +25440,10 @@ var StopMessage;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2;
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25300,7 +25452,7 @@ var StopMessage;
               break;
             }
             case 2: {
-              obj.peer = Peer.codec().decode(reader, reader.uint32(), {
+              obj.peer = Peer$1.codec().decode(reader, reader.uint32(), {
                 limits: (_a2 = opts.limits) == null ? void 0 : _a2.peer
               });
               break;
@@ -25333,7 +25485,7 @@ var StopMessage;
     return decodeMessage(buf, StopMessage2.codec(), opts);
   };
 })(StopMessage || (StopMessage = {}));
-var Peer;
+var Peer$1;
 (function(Peer2) {
   let _codec;
   Peer2.codec = () => {
@@ -25355,13 +25507,13 @@ var Peer;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2;
         const obj = {
           id: alloc$1(0),
           addrs: []
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25393,7 +25545,7 @@ var Peer;
   Peer2.decode = (buf, opts) => {
     return decodeMessage(buf, Peer2.codec(), opts);
   };
-})(Peer || (Peer = {}));
+})(Peer$1 || (Peer$1 = {}));
 var Reservation;
 (function(Reservation2) {
   let _codec;
@@ -25420,13 +25572,13 @@ var Reservation;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2, _b2;
         const obj = {
           expire: 0n,
           addrs: []
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25485,9 +25637,9 @@ var Limit;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {};
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25570,13 +25722,13 @@ var ReservationVoucher;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         const obj = {
           relay: alloc$1(0),
           peer: alloc$1(0),
           expiration: 0n
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -25638,14 +25790,14 @@ var Envelope;
         if (opts.lengthDelimited !== false) {
           w.ldelim();
         }
-      }, (reader, length2, opts = {}) => {
+      }, (reader, length3, opts = {}) => {
         var _a2;
         const obj = {
           publicKey: alloc$1(0),
           payloadType: alloc$1(0),
           signature: alloc$1(0)
         };
-        const end = length2 == null ? reader.len : reader.pos + length2;
+        const end = length3 == null ? reader.len : reader.pos + length3;
         while (reader.pos < end) {
           const tag = reader.uint32();
           switch (tag >>> 3) {
@@ -26045,11 +26197,11 @@ function createListener(options) {
   return new CircuitRelayTransportListener(options);
 }
 const urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
-let nanoid = (size = 21) => {
+let nanoid = (size2 = 21) => {
   let id = "";
-  let bytes = crypto.getRandomValues(new Uint8Array(size |= 0));
-  while (size--) {
-    id += urlAlphabet[bytes[size] & 63];
+  let bytes = crypto.getRandomValues(new Uint8Array(size2 |= 0));
+  while (size2--) {
+    id += urlAlphabet[bytes[size2] & 63];
   }
   return id;
 };
@@ -26795,12 +26947,5714 @@ __publicField(Bootstrap, "tag", "bootstrap");
 function bootstrap(init) {
   return (components) => new Bootstrap(components, init);
 }
+const second = 1e3;
+const minute = 60 * second;
+const FloodsubID = "/floodsub/1.0.0";
+const GossipsubIDv10 = "/meshsub/1.0.0";
+const GossipsubIDv11 = "/meshsub/1.1.0";
+const GossipsubIDv12 = "/meshsub/1.2.0";
+const GossipsubD = 6;
+const GossipsubDlo = 4;
+const GossipsubDhi = 12;
+const GossipsubDscore = 4;
+const GossipsubDout = 2;
+const GossipsubHistoryLength = 5;
+const GossipsubHistoryGossip = 3;
+const GossipsubDlazy = 6;
+const GossipsubGossipFactor = 0.25;
+const GossipsubGossipRetransmission = 3;
+const GossipsubHeartbeatInitialDelay = 100;
+const GossipsubHeartbeatInterval = second;
+const GossipsubFanoutTTL = minute;
+const GossipsubPrunePeers = 16;
+const GossipsubPruneBackoff = minute;
+const GossipsubUnsubscribeBackoff = 10 * second;
+const GossipsubPruneBackoffTicks = 15;
+const GossipsubDirectConnectTicks = 300;
+const GossipsubDirectConnectInitialDelay = second;
+const GossipsubOpportunisticGraftTicks = 60;
+const GossipsubOpportunisticGraftPeers = 2;
+const GossipsubGraftFloodThreshold = 10 * second;
+const GossipsubMaxIHaveLength = 5e3;
+const GossipsubMaxIHaveMessages = 10;
+const GossipsubIWantFollowupTime = 3 * second;
+const GossipsubSeenTTL = 2 * minute;
+const TimeCacheDuration = 120 * 1e3;
+const ERR_TOPIC_VALIDATOR_REJECT = "ERR_TOPIC_VALIDATOR_REJECT";
+const ERR_TOPIC_VALIDATOR_IGNORE = "ERR_TOPIC_VALIDATOR_IGNORE";
+const ACCEPT_FROM_WHITELIST_THRESHOLD_SCORE = 0;
+const ACCEPT_FROM_WHITELIST_MAX_MESSAGES = 128;
+const ACCEPT_FROM_WHITELIST_DURATION_MS = 1e3;
+const DEFAULT_METRIC_MESH_MESSAGE_DELIVERIES_WINDOWS = 1e3;
+const BACKOFF_SLACK = 1;
+const GossipsubIdontwantMinDataSize = 512;
+const GossipsubIdontwantMaxMessages = 512;
+const defaultDecodeRpcLimits = {
+  maxSubscriptions: Infinity,
+  maxMessages: Infinity,
+  maxIhaveMessageIDs: Infinity,
+  maxIwantMessageIDs: Infinity,
+  maxIdontwantMessageIDs: Infinity,
+  maxControlMessages: Infinity,
+  maxPeerInfos: Infinity
+};
+var RPC;
+(function(RPC2) {
+  (function(SubOpts) {
+    let _codec2;
+    SubOpts.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.subscribe != null) {
+            w.uint32(8);
+            w.bool(obj.subscribe);
+          }
+          if (obj.topic != null) {
+            w.uint32(18);
+            w.string(obj.topic);
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          const obj = {};
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.subscribe = reader.bool();
+                break;
+              }
+              case 2: {
+                obj.topic = reader.string();
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    SubOpts.encode = (obj) => {
+      return encodeMessage(obj, SubOpts.codec());
+    };
+    SubOpts.decode = (buf, opts) => {
+      return decodeMessage(buf, SubOpts.codec(), opts);
+    };
+  })(RPC2.SubOpts || (RPC2.SubOpts = {}));
+  (function(Message2) {
+    let _codec2;
+    Message2.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.from != null) {
+            w.uint32(10);
+            w.bytes(obj.from);
+          }
+          if (obj.data != null) {
+            w.uint32(18);
+            w.bytes(obj.data);
+          }
+          if (obj.seqno != null) {
+            w.uint32(26);
+            w.bytes(obj.seqno);
+          }
+          if (obj.topic != null && obj.topic !== "") {
+            w.uint32(34);
+            w.string(obj.topic);
+          }
+          if (obj.signature != null) {
+            w.uint32(42);
+            w.bytes(obj.signature);
+          }
+          if (obj.key != null) {
+            w.uint32(50);
+            w.bytes(obj.key);
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          const obj = {
+            topic: ""
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.from = reader.bytes();
+                break;
+              }
+              case 2: {
+                obj.data = reader.bytes();
+                break;
+              }
+              case 3: {
+                obj.seqno = reader.bytes();
+                break;
+              }
+              case 4: {
+                obj.topic = reader.string();
+                break;
+              }
+              case 5: {
+                obj.signature = reader.bytes();
+                break;
+              }
+              case 6: {
+                obj.key = reader.bytes();
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    Message2.encode = (obj) => {
+      return encodeMessage(obj, Message2.codec());
+    };
+    Message2.decode = (buf, opts) => {
+      return decodeMessage(buf, Message2.codec(), opts);
+    };
+  })(RPC2.Message || (RPC2.Message = {}));
+  (function(ControlMessage) {
+    let _codec2;
+    ControlMessage.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.ihave != null) {
+            for (const value2 of obj.ihave) {
+              w.uint32(10);
+              RPC2.ControlIHave.codec().encode(value2, w);
+            }
+          }
+          if (obj.iwant != null) {
+            for (const value2 of obj.iwant) {
+              w.uint32(18);
+              RPC2.ControlIWant.codec().encode(value2, w);
+            }
+          }
+          if (obj.graft != null) {
+            for (const value2 of obj.graft) {
+              w.uint32(26);
+              RPC2.ControlGraft.codec().encode(value2, w);
+            }
+          }
+          if (obj.prune != null) {
+            for (const value2 of obj.prune) {
+              w.uint32(34);
+              RPC2.ControlPrune.codec().encode(value2, w);
+            }
+          }
+          if (obj.idontwant != null) {
+            for (const value2 of obj.idontwant) {
+              w.uint32(42);
+              RPC2.ControlIDontWant.codec().encode(value2, w);
+            }
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2;
+          const obj = {
+            ihave: [],
+            iwant: [],
+            graft: [],
+            prune: [],
+            idontwant: []
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                if (((_a2 = opts.limits) == null ? void 0 : _a2.ihave) != null && obj.ihave.length === opts.limits.ihave) {
+                  throw new MaxLengthError('Decode error - map field "ihave" had too many elements');
+                }
+                obj.ihave.push(RPC2.ControlIHave.codec().decode(reader, reader.uint32(), {
+                  limits: (_b2 = opts.limits) == null ? void 0 : _b2.ihave$
+                }));
+                break;
+              }
+              case 2: {
+                if (((_c2 = opts.limits) == null ? void 0 : _c2.iwant) != null && obj.iwant.length === opts.limits.iwant) {
+                  throw new MaxLengthError('Decode error - map field "iwant" had too many elements');
+                }
+                obj.iwant.push(RPC2.ControlIWant.codec().decode(reader, reader.uint32(), {
+                  limits: (_d2 = opts.limits) == null ? void 0 : _d2.iwant$
+                }));
+                break;
+              }
+              case 3: {
+                if (((_e2 = opts.limits) == null ? void 0 : _e2.graft) != null && obj.graft.length === opts.limits.graft) {
+                  throw new MaxLengthError('Decode error - map field "graft" had too many elements');
+                }
+                obj.graft.push(RPC2.ControlGraft.codec().decode(reader, reader.uint32(), {
+                  limits: (_f2 = opts.limits) == null ? void 0 : _f2.graft$
+                }));
+                break;
+              }
+              case 4: {
+                if (((_g2 = opts.limits) == null ? void 0 : _g2.prune) != null && obj.prune.length === opts.limits.prune) {
+                  throw new MaxLengthError('Decode error - map field "prune" had too many elements');
+                }
+                obj.prune.push(RPC2.ControlPrune.codec().decode(reader, reader.uint32(), {
+                  limits: (_h2 = opts.limits) == null ? void 0 : _h2.prune$
+                }));
+                break;
+              }
+              case 5: {
+                if (((_i2 = opts.limits) == null ? void 0 : _i2.idontwant) != null && obj.idontwant.length === opts.limits.idontwant) {
+                  throw new MaxLengthError('Decode error - map field "idontwant" had too many elements');
+                }
+                obj.idontwant.push(RPC2.ControlIDontWant.codec().decode(reader, reader.uint32(), {
+                  limits: (_j2 = opts.limits) == null ? void 0 : _j2.idontwant$
+                }));
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlMessage.encode = (obj) => {
+      return encodeMessage(obj, ControlMessage.codec());
+    };
+    ControlMessage.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlMessage.codec(), opts);
+    };
+  })(RPC2.ControlMessage || (RPC2.ControlMessage = {}));
+  (function(ControlIHave) {
+    let _codec2;
+    ControlIHave.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.topicID != null) {
+            w.uint32(10);
+            w.string(obj.topicID);
+          }
+          if (obj.messageIDs != null) {
+            for (const value2 of obj.messageIDs) {
+              w.uint32(18);
+              w.bytes(value2);
+            }
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          var _a2;
+          const obj = {
+            messageIDs: []
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.topicID = reader.string();
+                break;
+              }
+              case 2: {
+                if (((_a2 = opts.limits) == null ? void 0 : _a2.messageIDs) != null && obj.messageIDs.length === opts.limits.messageIDs) {
+                  throw new MaxLengthError('Decode error - map field "messageIDs" had too many elements');
+                }
+                obj.messageIDs.push(reader.bytes());
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlIHave.encode = (obj) => {
+      return encodeMessage(obj, ControlIHave.codec());
+    };
+    ControlIHave.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlIHave.codec(), opts);
+    };
+  })(RPC2.ControlIHave || (RPC2.ControlIHave = {}));
+  (function(ControlIWant) {
+    let _codec2;
+    ControlIWant.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.messageIDs != null) {
+            for (const value2 of obj.messageIDs) {
+              w.uint32(10);
+              w.bytes(value2);
+            }
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          var _a2;
+          const obj = {
+            messageIDs: []
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                if (((_a2 = opts.limits) == null ? void 0 : _a2.messageIDs) != null && obj.messageIDs.length === opts.limits.messageIDs) {
+                  throw new MaxLengthError('Decode error - map field "messageIDs" had too many elements');
+                }
+                obj.messageIDs.push(reader.bytes());
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlIWant.encode = (obj) => {
+      return encodeMessage(obj, ControlIWant.codec());
+    };
+    ControlIWant.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlIWant.codec(), opts);
+    };
+  })(RPC2.ControlIWant || (RPC2.ControlIWant = {}));
+  (function(ControlGraft) {
+    let _codec2;
+    ControlGraft.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.topicID != null) {
+            w.uint32(10);
+            w.string(obj.topicID);
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          const obj = {};
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.topicID = reader.string();
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlGraft.encode = (obj) => {
+      return encodeMessage(obj, ControlGraft.codec());
+    };
+    ControlGraft.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlGraft.codec(), opts);
+    };
+  })(RPC2.ControlGraft || (RPC2.ControlGraft = {}));
+  (function(ControlPrune) {
+    let _codec2;
+    ControlPrune.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.topicID != null) {
+            w.uint32(10);
+            w.string(obj.topicID);
+          }
+          if (obj.peers != null) {
+            for (const value2 of obj.peers) {
+              w.uint32(18);
+              RPC2.PeerInfo.codec().encode(value2, w);
+            }
+          }
+          if (obj.backoff != null) {
+            w.uint32(24);
+            w.uint64Number(obj.backoff);
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          var _a2, _b2;
+          const obj = {
+            peers: []
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.topicID = reader.string();
+                break;
+              }
+              case 2: {
+                if (((_a2 = opts.limits) == null ? void 0 : _a2.peers) != null && obj.peers.length === opts.limits.peers) {
+                  throw new MaxLengthError('Decode error - map field "peers" had too many elements');
+                }
+                obj.peers.push(RPC2.PeerInfo.codec().decode(reader, reader.uint32(), {
+                  limits: (_b2 = opts.limits) == null ? void 0 : _b2.peers$
+                }));
+                break;
+              }
+              case 3: {
+                obj.backoff = reader.uint64Number();
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlPrune.encode = (obj) => {
+      return encodeMessage(obj, ControlPrune.codec());
+    };
+    ControlPrune.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlPrune.codec(), opts);
+    };
+  })(RPC2.ControlPrune || (RPC2.ControlPrune = {}));
+  (function(PeerInfo) {
+    let _codec2;
+    PeerInfo.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.peerID != null) {
+            w.uint32(10);
+            w.bytes(obj.peerID);
+          }
+          if (obj.signedPeerRecord != null) {
+            w.uint32(18);
+            w.bytes(obj.signedPeerRecord);
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          const obj = {};
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                obj.peerID = reader.bytes();
+                break;
+              }
+              case 2: {
+                obj.signedPeerRecord = reader.bytes();
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    PeerInfo.encode = (obj) => {
+      return encodeMessage(obj, PeerInfo.codec());
+    };
+    PeerInfo.decode = (buf, opts) => {
+      return decodeMessage(buf, PeerInfo.codec(), opts);
+    };
+  })(RPC2.PeerInfo || (RPC2.PeerInfo = {}));
+  (function(ControlIDontWant) {
+    let _codec2;
+    ControlIDontWant.codec = () => {
+      if (_codec2 == null) {
+        _codec2 = message((obj, w, opts = {}) => {
+          if (opts.lengthDelimited !== false) {
+            w.fork();
+          }
+          if (obj.messageIDs != null) {
+            for (const value2 of obj.messageIDs) {
+              w.uint32(10);
+              w.bytes(value2);
+            }
+          }
+          if (opts.lengthDelimited !== false) {
+            w.ldelim();
+          }
+        }, (reader, length3, opts = {}) => {
+          var _a2;
+          const obj = {
+            messageIDs: []
+          };
+          const end = length3 == null ? reader.len : reader.pos + length3;
+          while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+              case 1: {
+                if (((_a2 = opts.limits) == null ? void 0 : _a2.messageIDs) != null && obj.messageIDs.length === opts.limits.messageIDs) {
+                  throw new MaxLengthError('Decode error - map field "messageIDs" had too many elements');
+                }
+                obj.messageIDs.push(reader.bytes());
+                break;
+              }
+              default: {
+                reader.skipType(tag & 7);
+                break;
+              }
+            }
+          }
+          return obj;
+        });
+      }
+      return _codec2;
+    };
+    ControlIDontWant.encode = (obj) => {
+      return encodeMessage(obj, ControlIDontWant.codec());
+    };
+    ControlIDontWant.decode = (buf, opts) => {
+      return decodeMessage(buf, ControlIDontWant.codec(), opts);
+    };
+  })(RPC2.ControlIDontWant || (RPC2.ControlIDontWant = {}));
+  let _codec;
+  RPC2.codec = () => {
+    if (_codec == null) {
+      _codec = message((obj, w, opts = {}) => {
+        if (opts.lengthDelimited !== false) {
+          w.fork();
+        }
+        if (obj.subscriptions != null) {
+          for (const value2 of obj.subscriptions) {
+            w.uint32(10);
+            RPC2.SubOpts.codec().encode(value2, w);
+          }
+        }
+        if (obj.messages != null) {
+          for (const value2 of obj.messages) {
+            w.uint32(18);
+            RPC2.Message.codec().encode(value2, w);
+          }
+        }
+        if (obj.control != null) {
+          w.uint32(26);
+          RPC2.ControlMessage.codec().encode(obj.control, w);
+        }
+        if (opts.lengthDelimited !== false) {
+          w.ldelim();
+        }
+      }, (reader, length3, opts = {}) => {
+        var _a2, _b2, _c2, _d2, _e2;
+        const obj = {
+          subscriptions: [],
+          messages: []
+        };
+        const end = length3 == null ? reader.len : reader.pos + length3;
+        while (reader.pos < end) {
+          const tag = reader.uint32();
+          switch (tag >>> 3) {
+            case 1: {
+              if (((_a2 = opts.limits) == null ? void 0 : _a2.subscriptions) != null && obj.subscriptions.length === opts.limits.subscriptions) {
+                throw new MaxLengthError('Decode error - map field "subscriptions" had too many elements');
+              }
+              obj.subscriptions.push(RPC2.SubOpts.codec().decode(reader, reader.uint32(), {
+                limits: (_b2 = opts.limits) == null ? void 0 : _b2.subscriptions$
+              }));
+              break;
+            }
+            case 2: {
+              if (((_c2 = opts.limits) == null ? void 0 : _c2.messages) != null && obj.messages.length === opts.limits.messages) {
+                throw new MaxLengthError('Decode error - map field "messages" had too many elements');
+              }
+              obj.messages.push(RPC2.Message.codec().decode(reader, reader.uint32(), {
+                limits: (_d2 = opts.limits) == null ? void 0 : _d2.messages$
+              }));
+              break;
+            }
+            case 3: {
+              obj.control = RPC2.ControlMessage.codec().decode(reader, reader.uint32(), {
+                limits: (_e2 = opts.limits) == null ? void 0 : _e2.control
+              });
+              break;
+            }
+            default: {
+              reader.skipType(tag & 7);
+              break;
+            }
+          }
+        }
+        return obj;
+      });
+    }
+    return _codec;
+  };
+  RPC2.encode = (obj) => {
+    return encodeMessage(obj, RPC2.codec());
+  };
+  RPC2.decode = (buf, opts) => {
+    return decodeMessage(buf, RPC2.codec(), opts);
+  };
+})(RPC || (RPC = {}));
+class MessageCache {
+  /**
+   * Holds history of messages in timebounded history arrays
+   */
+  constructor(gossip, historyCapacity, msgIdToStrFn) {
+    __publicField(this, "gossip");
+    __publicField(this, "msgs", /* @__PURE__ */ new Map());
+    __publicField(this, "msgIdToStrFn");
+    __publicField(this, "history", []);
+    /** Track with accounting of messages in the mcache that are not yet validated */
+    __publicField(this, "notValidatedCount", 0);
+    this.gossip = gossip;
+    this.msgIdToStrFn = msgIdToStrFn;
+    for (let i2 = 0; i2 < historyCapacity; i2++) {
+      this.history[i2] = [];
+    }
+  }
+  get size() {
+    return this.msgs.size;
+  }
+  /**
+   * Adds a message to the current window and the cache
+   * Returns true if the message is not known and is inserted in the cache
+   */
+  put(messageId, msg, validated = false) {
+    const { msgIdStr } = messageId;
+    if (this.msgs.has(msgIdStr)) {
+      return false;
+    }
+    this.msgs.set(msgIdStr, {
+      message: msg,
+      validated,
+      originatingPeers: /* @__PURE__ */ new Set(),
+      iwantCounts: /* @__PURE__ */ new Map()
+    });
+    this.history[0].push({ ...messageId, topic: msg.topic });
+    if (!validated) {
+      this.notValidatedCount++;
+    }
+    return true;
+  }
+  observeDuplicate(msgId2, fromPeerIdStr) {
+    const entry = this.msgs.get(msgId2);
+    if (entry != null && // if the message is already validated, we don't need to store extra peers sending us
+    // duplicates as the message has already been forwarded
+    !entry.validated) {
+      entry.originatingPeers.add(fromPeerIdStr);
+    }
+  }
+  /**
+   * Retrieves a message from the cache by its ID, if it is still present
+   */
+  get(msgId2) {
+    var _a2;
+    return (_a2 = this.msgs.get(this.msgIdToStrFn(msgId2))) == null ? void 0 : _a2.message;
+  }
+  /**
+   * Increases the iwant count for the given message by one and returns the message together
+   * with the iwant if the message exists.
+   */
+  getWithIWantCount(msgIdStr, p2) {
+    const msg = this.msgs.get(msgIdStr);
+    if (msg == null) {
+      return null;
+    }
+    const count = (msg.iwantCounts.get(p2) ?? 0) + 1;
+    msg.iwantCounts.set(p2, count);
+    return { msg: msg.message, count };
+  }
+  /**
+   * Retrieves a list of message IDs for a set of topics
+   */
+  getGossipIDs(topics) {
+    const msgIdsByTopic = /* @__PURE__ */ new Map();
+    for (let i2 = 0; i2 < this.gossip; i2++) {
+      this.history[i2].forEach((entry) => {
+        const msg = this.msgs.get(entry.msgIdStr);
+        if (((msg == null ? void 0 : msg.validated) ?? false) && topics.has(entry.topic)) {
+          let msgIds = msgIdsByTopic.get(entry.topic);
+          if (msgIds == null) {
+            msgIds = [];
+            msgIdsByTopic.set(entry.topic, msgIds);
+          }
+          msgIds.push(entry.msgId);
+        }
+      });
+    }
+    return msgIdsByTopic;
+  }
+  /**
+   * Gets a message with msgId and tags it as validated.
+   * This function also returns the known peers that have sent us this message. This is used to
+   * prevent us sending redundant messages to peers who have already propagated it.
+   */
+  validate(msgId2) {
+    const entry = this.msgs.get(msgId2);
+    if (entry == null) {
+      return null;
+    }
+    if (!entry.validated) {
+      this.notValidatedCount--;
+    }
+    const { message: message2, originatingPeers } = entry;
+    entry.validated = true;
+    entry.originatingPeers = /* @__PURE__ */ new Set();
+    return { message: message2, originatingPeers };
+  }
+  /**
+   * Shifts the current window, discarding messages older than this.history.length of the cache
+   */
+  shift() {
+    const lastCacheEntries = this.history[this.history.length - 1];
+    lastCacheEntries.forEach((cacheEntry) => {
+      const entry = this.msgs.get(cacheEntry.msgIdStr);
+      if (entry != null) {
+        this.msgs.delete(cacheEntry.msgIdStr);
+        if (!entry.validated) {
+          this.notValidatedCount--;
+        }
+      }
+    });
+    this.history.pop();
+    this.history.unshift([]);
+  }
+  remove(msgId2) {
+    const entry = this.msgs.get(msgId2);
+    if (entry == null) {
+      return null;
+    }
+    this.msgs.delete(msgId2);
+    return entry;
+  }
+}
+var SignaturePolicy;
+(function(SignaturePolicy2) {
+  SignaturePolicy2["StrictSign"] = "StrictSign";
+  SignaturePolicy2["StrictNoSign"] = "StrictNoSign";
+})(SignaturePolicy || (SignaturePolicy = {}));
+var PublishConfigType;
+(function(PublishConfigType2) {
+  PublishConfigType2[PublishConfigType2["Signing"] = 0] = "Signing";
+  PublishConfigType2[PublishConfigType2["Anonymous"] = 1] = "Anonymous";
+})(PublishConfigType || (PublishConfigType = {}));
+var RejectReason;
+(function(RejectReason2) {
+  RejectReason2["Error"] = "error";
+  RejectReason2["Ignore"] = "ignore";
+  RejectReason2["Reject"] = "reject";
+  RejectReason2["Blacklisted"] = "blacklisted";
+})(RejectReason || (RejectReason = {}));
+var ValidateError;
+(function(ValidateError2) {
+  ValidateError2["InvalidSignature"] = "invalid_signature";
+  ValidateError2["InvalidSeqno"] = "invalid_seqno";
+  ValidateError2["InvalidPeerId"] = "invalid_peerid";
+  ValidateError2["SignaturePresent"] = "signature_present";
+  ValidateError2["SeqnoPresent"] = "seqno_present";
+  ValidateError2["FromPresent"] = "from_present";
+  ValidateError2["TransformFailed"] = "transform_failed";
+})(ValidateError || (ValidateError = {}));
+var MessageStatus;
+(function(MessageStatus2) {
+  MessageStatus2["duplicate"] = "duplicate";
+  MessageStatus2["invalid"] = "invalid";
+  MessageStatus2["valid"] = "valid";
+})(MessageStatus || (MessageStatus = {}));
+function rejectReasonFromAcceptance(acceptance) {
+  switch (acceptance) {
+    case TopicValidatorResult.Ignore:
+      return RejectReason.Ignore;
+    case TopicValidatorResult.Reject:
+      return RejectReason.Reject;
+    default:
+      throw new Error("Unreachable");
+  }
+}
+var MessageSource;
+(function(MessageSource2) {
+  MessageSource2["forward"] = "forward";
+  MessageSource2["publish"] = "publish";
+})(MessageSource || (MessageSource = {}));
+var InclusionReason;
+(function(InclusionReason2) {
+  InclusionReason2["Fanout"] = "fanout";
+  InclusionReason2["Random"] = "random";
+  InclusionReason2["Subscribed"] = "subscribed";
+  InclusionReason2["Outbound"] = "outbound";
+  InclusionReason2["NotEnough"] = "not_enough";
+  InclusionReason2["Opportunistic"] = "opportunistic";
+})(InclusionReason || (InclusionReason = {}));
+var ChurnReason;
+(function(ChurnReason2) {
+  ChurnReason2["Dc"] = "disconnected";
+  ChurnReason2["BadScore"] = "bad_score";
+  ChurnReason2["Prune"] = "prune";
+  ChurnReason2["Excess"] = "excess";
+})(ChurnReason || (ChurnReason = {}));
+var ScorePenalty;
+(function(ScorePenalty2) {
+  ScorePenalty2["GraftBackoff"] = "graft_backoff";
+  ScorePenalty2["BrokenPromise"] = "broken_promise";
+  ScorePenalty2["MessageDeficit"] = "message_deficit";
+  ScorePenalty2["IPColocation"] = "IP_colocation";
+})(ScorePenalty || (ScorePenalty = {}));
+var IHaveIgnoreReason;
+(function(IHaveIgnoreReason2) {
+  IHaveIgnoreReason2["LowScore"] = "low_score";
+  IHaveIgnoreReason2["MaxIhave"] = "max_ihave";
+  IHaveIgnoreReason2["MaxIasked"] = "max_iasked";
+})(IHaveIgnoreReason || (IHaveIgnoreReason = {}));
+var ScoreThreshold;
+(function(ScoreThreshold2) {
+  ScoreThreshold2["graylist"] = "graylist";
+  ScoreThreshold2["publish"] = "publish";
+  ScoreThreshold2["gossip"] = "gossip";
+  ScoreThreshold2["mesh"] = "mesh";
+})(ScoreThreshold || (ScoreThreshold = {}));
+function getMetrics(register, topicStrToLabel, opts) {
+  return {
+    /* Metrics for static config */
+    protocolsEnabled: register.gauge({
+      name: "gossipsub_protocol",
+      help: "Status of enabled protocols",
+      labelNames: ["protocol"]
+    }),
+    /* Metrics per known topic */
+    /**
+     * Status of our subscription to this topic. This metric allows analyzing other topic metrics
+     * filtered by our current subscription status.
+     * = rust-libp2p `topic_subscription_status`
+     */
+    topicSubscriptionStatus: register.gauge({
+      name: "gossipsub_topic_subscription_status",
+      help: "Status of our subscription to this topic",
+      labelNames: ["topicStr"]
+    }),
+    /**
+     * Number of peers subscribed to each topic. This allows us to analyze a topic's behaviour
+     * regardless of our subscription status.
+     */
+    topicPeersCount: register.gauge({
+      name: "gossipsub_topic_peer_count",
+      help: "Number of peers subscribed to each topic",
+      labelNames: ["topicStr"]
+    }),
+    /* Metrics regarding mesh state */
+    /**
+     * Number of peers in our mesh. This metric should be updated with the count of peers for a
+     * topic in the mesh regardless of inclusion and churn events.
+     * = rust-libp2p `mesh_peer_counts`
+     */
+    meshPeerCounts: register.gauge({
+      name: "gossipsub_mesh_peer_count",
+      help: "Number of peers in our mesh",
+      labelNames: ["topicStr"]
+    }),
+    /**
+     * Number of times we include peers in a topic mesh for different reasons.
+     * = rust-libp2p `mesh_peer_inclusion_events`
+     */
+    meshPeerInclusionEventsFanout: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_fanout_total",
+      help: "Number of times we include peers in a topic mesh for fanout reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsRandom: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_random_total",
+      help: "Number of times we include peers in a topic mesh for random reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsSubscribed: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_subscribed_total",
+      help: "Number of times we include peers in a topic mesh for subscribed reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsOutbound: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_outbound_total",
+      help: "Number of times we include peers in a topic mesh for outbound reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsNotEnough: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_not_enough_total",
+      help: "Number of times we include peers in a topic mesh for not_enough reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsOpportunistic: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_opportunistic_total",
+      help: "Number of times we include peers in a topic mesh for opportunistic reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerInclusionEventsUnknown: register.gauge({
+      name: "gossipsub_mesh_peer_inclusion_events_unknown_total",
+      help: "Number of times we include peers in a topic mesh for unknown reasons",
+      labelNames: ["topic"]
+    }),
+    /**
+     * Number of times we remove peers in a topic mesh for different reasons.
+     * = rust-libp2p `mesh_peer_churn_events`
+     */
+    meshPeerChurnEventsDisconnected: register.gauge({
+      name: "gossipsub_peer_churn_events_disconnected_total",
+      help: "Number of times we remove peers in a topic mesh for disconnected reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerChurnEventsBadScore: register.gauge({
+      name: "gossipsub_peer_churn_events_bad_score_total",
+      help: "Number of times we remove peers in a topic mesh for bad_score reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerChurnEventsPrune: register.gauge({
+      name: "gossipsub_peer_churn_events_prune_total",
+      help: "Number of times we remove peers in a topic mesh for prune reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerChurnEventsExcess: register.gauge({
+      name: "gossipsub_peer_churn_events_excess_total",
+      help: "Number of times we remove peers in a topic mesh for excess reasons",
+      labelNames: ["topic"]
+    }),
+    meshPeerChurnEventsUnknown: register.gauge({
+      name: "gossipsub_peer_churn_events_unknown_total",
+      help: "Number of times we remove peers in a topic mesh for unknown reasons",
+      labelNames: ["topic"]
+    }),
+    /* General Metrics */
+    /**
+     * Gossipsub supports floodsub, gossipsub v1.0, v1.1, and v1.2. Peers are classified based
+     * on which protocol they support. This metric keeps track of the number of peers that are
+     * connected of each type.
+     */
+    peersPerProtocol: register.gauge({
+      name: "gossipsub_peers_per_protocol_count",
+      help: "Peers connected for each topic",
+      labelNames: ["protocol"]
+    }),
+    /** The time it takes to complete one iteration of the heartbeat. */
+    heartbeatDuration: register.histogram({
+      name: "gossipsub_heartbeat_duration_seconds",
+      help: "The time it takes to complete one iteration of the heartbeat",
+      // Should take <10ms, over 1s it's a huge issue that needs debugging, since a heartbeat will be cancelled
+      buckets: [0.01, 0.1, 1]
+    }),
+    /** Heartbeat run took longer than heartbeat interval so next is skipped */
+    heartbeatSkipped: register.gauge({
+      name: "gossipsub_heartbeat_skipped",
+      help: "Heartbeat run took longer than heartbeat interval so next is skipped"
+    }),
+    /**
+     * Message validation results for each topic.
+     * Invalid == Reject?
+     * = rust-libp2p `invalid_messages`, `accepted_messages`, `ignored_messages`, `rejected_messages`
+     */
+    acceptedMessagesTotal: register.gauge({
+      name: "gossipsub_accepted_messages_total",
+      help: "Total accepted messages for each topic",
+      labelNames: ["topic"]
+    }),
+    ignoredMessagesTotal: register.gauge({
+      name: "gossipsub_ignored_messages_total",
+      help: "Total ignored messages for each topic",
+      labelNames: ["topic"]
+    }),
+    rejectedMessagesTotal: register.gauge({
+      name: "gossipsub_rejected_messages_total",
+      help: "Total rejected messages for each topic",
+      labelNames: ["topic"]
+    }),
+    unknownValidationResultsTotal: register.gauge({
+      name: "gossipsub_unknown_validation_results_total",
+      help: "Total unknown validation results for each topic",
+      labelNames: ["topic"]
+    }),
+    /**
+     * When the user validates a message, it tries to re propagate it to its mesh peers. If the
+     * message expires from the memcache before it can be validated, we count this a cache miss
+     * and it is an indicator that the memcache size should be increased.
+     * = rust-libp2p `mcache_misses`
+     */
+    asyncValidationMcacheHit: register.gauge({
+      name: "gossipsub_async_validation_mcache_hit_total",
+      help: "Async validation result reported by the user layer",
+      labelNames: ["hit"]
+    }),
+    asyncValidationDelayFromFirstSeenSec: register.histogram({
+      name: "gossipsub_async_validation_delay_from_first_seen",
+      help: "Async validation report delay from first seen in second",
+      buckets: [0.01, 0.03, 0.1, 0.3, 1, 3, 10]
+    }),
+    asyncValidationUnknownFirstSeen: register.gauge({
+      name: "gossipsub_async_validation_unknown_first_seen_count_total",
+      help: "Async validation report unknown first seen value for message"
+    }),
+    // peer stream
+    peerReadStreamError: register.gauge({
+      name: "gossipsub_peer_read_stream_err_count_total",
+      help: "Peer read stream error"
+    }),
+    // RPC outgoing. Track byte length + data structure sizes
+    rpcRecvBytes: register.gauge({ name: "gossipsub_rpc_recv_bytes_total", help: "RPC recv" }),
+    rpcRecvCount: register.gauge({ name: "gossipsub_rpc_recv_count_total", help: "RPC recv" }),
+    rpcRecvSubscription: register.gauge({ name: "gossipsub_rpc_recv_subscription_total", help: "RPC recv" }),
+    rpcRecvMessage: register.gauge({ name: "gossipsub_rpc_recv_message_total", help: "RPC recv" }),
+    rpcRecvControl: register.gauge({ name: "gossipsub_rpc_recv_control_total", help: "RPC recv" }),
+    rpcRecvIHave: register.gauge({ name: "gossipsub_rpc_recv_ihave_total", help: "RPC recv" }),
+    rpcRecvIWant: register.gauge({ name: "gossipsub_rpc_recv_iwant_total", help: "RPC recv" }),
+    rpcRecvGraft: register.gauge({ name: "gossipsub_rpc_recv_graft_total", help: "RPC recv" }),
+    rpcRecvPrune: register.gauge({ name: "gossipsub_rpc_recv_prune_total", help: "RPC recv" }),
+    rpcDataError: register.gauge({ name: "gossipsub_rpc_data_err_count_total", help: "RPC data error" }),
+    rpcRecvError: register.gauge({ name: "gossipsub_rpc_recv_err_count_total", help: "RPC recv error" }),
+    /** Total count of RPC dropped because acceptFrom() == false */
+    rpcRecvNotAccepted: register.gauge({
+      name: "gossipsub_rpc_rcv_not_accepted_total",
+      help: "Total count of RPC dropped because acceptFrom() == false"
+    }),
+    // RPC incoming. Track byte length + data structure sizes
+    rpcSentBytes: register.gauge({ name: "gossipsub_rpc_sent_bytes_total", help: "RPC sent" }),
+    rpcSentCount: register.gauge({ name: "gossipsub_rpc_sent_count_total", help: "RPC sent" }),
+    rpcSentSubscription: register.gauge({ name: "gossipsub_rpc_sent_subscription_total", help: "RPC sent" }),
+    rpcSentMessage: register.gauge({ name: "gossipsub_rpc_sent_message_total", help: "RPC sent" }),
+    rpcSentControl: register.gauge({ name: "gossipsub_rpc_sent_control_total", help: "RPC sent" }),
+    rpcSentIHave: register.gauge({ name: "gossipsub_rpc_sent_ihave_total", help: "RPC sent" }),
+    rpcSentIWant: register.gauge({ name: "gossipsub_rpc_sent_iwant_total", help: "RPC sent" }),
+    rpcSentGraft: register.gauge({ name: "gossipsub_rpc_sent_graft_total", help: "RPC sent" }),
+    rpcSentPrune: register.gauge({ name: "gossipsub_rpc_sent_prune_total", help: "RPC sent" }),
+    rpcSentIDontWant: register.gauge({ name: "gossipsub_rpc_sent_idontwant_total", help: "RPC sent" }),
+    // publish message. Track peers sent to and bytes
+    /** Total count of msg published by topic */
+    msgPublishCount: register.gauge({
+      name: "gossipsub_msg_publish_count_total",
+      help: "Total count of msg published by topic",
+      labelNames: ["topic"]
+    }),
+    /** Total count of peers that we publish a msg to */
+    msgPublishPeersByTopic: register.gauge({
+      name: "gossipsub_msg_publish_peers_total",
+      help: "Total count of peers that we publish a msg to",
+      labelNames: ["topic"]
+    }),
+    /** Total count of peers (by group) that we publish a msg to */
+    directPeersPublishedTotal: register.gauge({
+      name: "gossipsub_direct_peers_published_total",
+      help: "Total direct peers that we publish a msg to",
+      labelNames: ["topic"]
+    }),
+    floodsubPeersPublishedTotal: register.gauge({
+      name: "gossipsub_floodsub_peers_published_total",
+      help: "Total floodsub peers that we publish a msg to",
+      labelNames: ["topic"]
+    }),
+    meshPeersPublishedTotal: register.gauge({
+      name: "gossipsub_mesh_peers_published_total",
+      help: "Total mesh peers that we publish a msg to",
+      labelNames: ["topic"]
+    }),
+    fanoutPeersPublishedTotal: register.gauge({
+      name: "gossipsub_fanout_peers_published_total",
+      help: "Total fanout peers that we publish a msg to",
+      labelNames: ["topic"]
+    }),
+    /** Total count of msg publish data.length bytes */
+    msgPublishBytes: register.gauge({
+      name: "gossipsub_msg_publish_bytes_total",
+      help: "Total count of msg publish data.length bytes",
+      labelNames: ["topic"]
+    }),
+    /** Total time in seconds to publish a message */
+    msgPublishTime: register.histogram({
+      name: "gossipsub_msg_publish_seconds",
+      help: "Total time in seconds to publish a message",
+      buckets: [1e-3, 2e-3, 5e-3, 0.01, 0.1, 0.5, 1],
+      labelNames: ["topic"]
+    }),
+    /** Total count of msg forwarded by topic */
+    msgForwardCount: register.gauge({
+      name: "gossipsub_msg_forward_count_total",
+      help: "Total count of msg forwarded by topic",
+      labelNames: ["topic"]
+    }),
+    /** Total count of peers that we forward a msg to */
+    msgForwardPeers: register.gauge({
+      name: "gossipsub_msg_forward_peers_total",
+      help: "Total count of peers that we forward a msg to",
+      labelNames: ["topic"]
+    }),
+    /** Total count of recv msgs before any validation */
+    msgReceivedPreValidation: register.gauge({
+      name: "gossipsub_msg_received_prevalidation_total",
+      help: "Total count of recv msgs before any validation",
+      labelNames: ["topic"]
+    }),
+    /** Total count of recv msgs error */
+    msgReceivedError: register.gauge({
+      name: "gossipsub_msg_received_error_total",
+      help: "Total count of recv msgs error",
+      labelNames: ["topic"]
+    }),
+    /** Tracks distribution of recv msgs by duplicate, invalid, valid */
+    prevalidationInvalidTotal: register.gauge({
+      name: "gossipsub_pre_validation_invalid_total",
+      help: "Total count of invalid messages received",
+      labelNames: ["topic"]
+    }),
+    prevalidationValidTotal: register.gauge({
+      name: "gossipsub_pre_validation_valid_total",
+      help: "Total count of valid messages received",
+      labelNames: ["topic"]
+    }),
+    prevalidationDuplicateTotal: register.gauge({
+      name: "gossipsub_pre_validation_duplicate_total",
+      help: "Total count of duplicate messages received",
+      labelNames: ["topic"]
+    }),
+    prevalidationUnknownTotal: register.gauge({
+      name: "gossipsub_pre_validation_unknown_status_total",
+      help: "Total count of unknown_status messages received",
+      labelNames: ["topic"]
+    }),
+    /** Tracks specific reason of invalid */
+    msgReceivedInvalid: register.gauge({
+      name: "gossipsub_msg_received_invalid_total",
+      help: "Tracks specific reason of invalid",
+      labelNames: ["error"]
+    }),
+    msgReceivedInvalidByTopic: register.gauge({
+      name: "gossipsub_msg_received_invalid_by_topic_total",
+      help: "Tracks specific invalid message by topic",
+      labelNames: ["topic"]
+    }),
+    /** Track duplicate message delivery time */
+    duplicateMsgDeliveryDelay: register.histogram({
+      name: "gossisub_duplicate_msg_delivery_delay_seconds",
+      help: "Time since the 1st duplicated message validated",
+      labelNames: ["topic"],
+      buckets: [
+        0.25 * opts.maxMeshMessageDeliveriesWindowSec,
+        0.5 * opts.maxMeshMessageDeliveriesWindowSec,
+        Number(opts.maxMeshMessageDeliveriesWindowSec),
+        2 * opts.maxMeshMessageDeliveriesWindowSec,
+        4 * opts.maxMeshMessageDeliveriesWindowSec
+      ]
+    }),
+    /** Total count of late msg delivery total by topic */
+    duplicateMsgLateDelivery: register.gauge({
+      name: "gossisub_duplicate_msg_late_delivery_total",
+      help: "Total count of late duplicate message delivery by topic, which triggers P3 penalty",
+      labelNames: ["topic"]
+    }),
+    duplicateMsgIgnored: register.gauge({
+      name: "gossisub_ignored_published_duplicate_msgs_total",
+      help: "Total count of published duplicate message ignored by topic",
+      labelNames: ["topic"]
+    }),
+    /* Metrics related to scoring */
+    /** Total times score() is called */
+    scoreFnCalls: register.gauge({
+      name: "gossipsub_score_fn_calls_total",
+      help: "Total times score() is called"
+    }),
+    /** Total times score() call actually computed computeScore(), no cache */
+    scoreFnRuns: register.gauge({
+      name: "gossipsub_score_fn_runs_total",
+      help: "Total times score() call actually computed computeScore(), no cache"
+    }),
+    scoreCachedDelta: register.histogram({
+      name: "gossipsub_score_cache_delta",
+      help: "Delta of score between cached values that expired",
+      buckets: [10, 100, 1e3]
+    }),
+    /** Current count of peers by score threshold */
+    peersByScoreThreshold: register.gauge({
+      name: "gossipsub_peers_by_score_threshold_count",
+      help: "Current count of peers by score threshold",
+      labelNames: ["threshold"]
+    }),
+    score: register.avgMinMax({
+      name: "gossipsub_score",
+      help: "Avg min max of gossip scores"
+    }),
+    /**
+     * Separate score weights
+     * Need to use 2-label metrics in this case to debug the score weights
+     */
+    scoreWeights: register.avgMinMax({
+      name: "gossipsub_score_weights",
+      help: "Separate score weights",
+      labelNames: ["topic", "p"]
+    }),
+    /** Histogram of the scores for each mesh topic. */
+    // TODO: Not implemented
+    scorePerMesh: register.avgMinMax({
+      name: "gossipsub_score_per_mesh",
+      help: "Histogram of the scores for each mesh topic",
+      labelNames: ["topic"]
+    }),
+    /** A counter of the kind of penalties being applied to peers. */
+    // TODO: Not fully implemented
+    scoringPenalties: register.gauge({
+      name: "gossipsub_scoring_penalties_total",
+      help: "A counter of the kind of penalties being applied to peers",
+      labelNames: ["penalty"]
+    }),
+    behaviourPenalty: register.histogram({
+      name: "gossipsub_peer_stat_behaviour_penalty",
+      help: "Current peer stat behaviour_penalty at each scrape",
+      buckets: [
+        0.25 * opts.behaviourPenaltyThreshold,
+        0.5 * opts.behaviourPenaltyThreshold,
+        Number(opts.behaviourPenaltyThreshold),
+        2 * opts.behaviourPenaltyThreshold,
+        4 * opts.behaviourPenaltyThreshold
+      ]
+    }),
+    // TODO:
+    // - iasked per peer (on heartbeat)
+    // - when promise is resolved, track messages from promises
+    /** Total received IHAVE messages that we ignore for some reason */
+    ihaveRcvIgnored: register.gauge({
+      name: "gossipsub_ihave_rcv_ignored_total",
+      help: "Total received IHAVE messages that we ignore for some reason",
+      labelNames: ["reason"]
+    }),
+    /** Total received IHAVE messages by topic */
+    ihaveRcvMsgids: register.gauge({
+      name: "gossipsub_ihave_rcv_msgids_total",
+      help: "Total received IHAVE messages by topic",
+      labelNames: ["topic"]
+    }),
+    /**
+     * Total messages per topic we don't have. Not actual requests.
+     * The number of times we have decided that an IWANT control message is required for this
+     * topic. A very high metric might indicate an underperforming network.
+     * = rust-libp2p `topic_iwant_msgs`
+     */
+    ihaveRcvNotSeenMsgids: register.gauge({
+      name: "gossipsub_ihave_rcv_not_seen_msgids_total",
+      help: "Total messages per topic we do not have, not actual requests",
+      labelNames: ["topic"]
+    }),
+    /** Total received IWANT messages by topic */
+    iwantRcvMsgids: register.gauge({
+      name: "gossipsub_iwant_rcv_msgids_total",
+      help: "Total received IWANT messages by topic",
+      labelNames: ["topic"]
+    }),
+    /** Total requested messageIDs that we don't have */
+    iwantRcvDonthaveMsgids: register.gauge({
+      name: "gossipsub_iwant_rcv_dont_have_msgids_total",
+      help: "Total requested messageIDs that we do not have"
+    }),
+    /** Total received IDONTWANT messages */
+    idontwantRcvMsgids: register.gauge({
+      name: "gossipsub_idontwant_rcv_msgids_total",
+      help: "Total received IDONTWANT messages"
+    }),
+    /** Total received IDONTWANT messageIDs that we don't have */
+    idontwantRcvDonthaveMsgids: register.gauge({
+      name: "gossipsub_idontwant_rcv_dont_have_msgids_total",
+      help: "Total received IDONTWANT messageIDs that we do not have in mcache"
+    }),
+    iwantPromiseStarted: register.gauge({
+      name: "gossipsub_iwant_promise_sent_total",
+      help: "Total count of started IWANT promises"
+    }),
+    /** Total count of resolved IWANT promises */
+    iwantPromiseResolved: register.gauge({
+      name: "gossipsub_iwant_promise_resolved_total",
+      help: "Total count of resolved IWANT promises"
+    }),
+    /** Total count of resolved IWANT promises from duplicate messages */
+    iwantPromiseResolvedFromDuplicate: register.gauge({
+      name: "gossipsub_iwant_promise_resolved_from_duplicate_total",
+      help: "Total count of resolved IWANT promises from duplicate messages"
+    }),
+    /** Total count of peers we have asked IWANT promises that are resolved */
+    iwantPromiseResolvedPeers: register.gauge({
+      name: "gossipsub_iwant_promise_resolved_peers",
+      help: "Total count of peers we have asked IWANT promises that are resolved"
+    }),
+    iwantPromiseBroken: register.gauge({
+      name: "gossipsub_iwant_promise_broken",
+      help: "Total count of broken IWANT promises"
+    }),
+    iwantMessagePruned: register.gauge({
+      name: "gossipsub_iwant_message_pruned",
+      help: "Total count of pruned IWANT messages"
+    }),
+    /** Histogram of delivery time of resolved IWANT promises */
+    iwantPromiseDeliveryTime: register.histogram({
+      name: "gossipsub_iwant_promise_delivery_seconds",
+      help: "Histogram of delivery time of resolved IWANT promises",
+      buckets: [
+        0.5 * opts.gossipPromiseExpireSec,
+        Number(opts.gossipPromiseExpireSec),
+        2 * opts.gossipPromiseExpireSec,
+        4 * opts.gossipPromiseExpireSec
+      ]
+    }),
+    iwantPromiseUntracked: register.gauge({
+      name: "gossip_iwant_promise_untracked",
+      help: "Total count of untracked IWANT promise"
+    }),
+    /** Backoff time */
+    connectedPeersBackoffSec: register.histogram({
+      name: "gossipsub_connected_peers_backoff_seconds",
+      help: "Backoff time in seconds",
+      // Using 1 seconds as minimum as that's close to the heartbeat duration, no need for more resolution.
+      // As per spec, backoff times are 10 seconds for UnsubscribeBackoff and 60 seconds for PruneBackoff.
+      // Higher values of 60 seconds should not occur, but we add 120 seconds just in case
+      // https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters
+      buckets: [1, 2, 4, 10, 20, 60, 120]
+    }),
+    /* Data structure sizes */
+    /** Unbounded cache sizes */
+    cacheSize: register.gauge({
+      name: "gossipsub_cache_size",
+      help: "Unbounded cache sizes",
+      labelNames: ["cache"]
+    }),
+    /** Current mcache msg count */
+    mcacheSize: register.gauge({
+      name: "gossipsub_mcache_size",
+      help: "Current mcache msg count"
+    }),
+    mcacheNotValidatedCount: register.gauge({
+      name: "gossipsub_mcache_not_validated_count",
+      help: "Current mcache msg count not validated"
+    }),
+    fastMsgIdCacheCollision: register.gauge({
+      name: "gossipsub_fastmsgid_cache_collision_total",
+      help: "Total count of key collisions on fastmsgid cache put"
+    }),
+    newConnectionCount: register.gauge({
+      name: "gossipsub_new_connection_total",
+      help: "Total new connection by status",
+      labelNames: ["status"]
+    }),
+    topicStrToLabel,
+    toTopic(topicStr) {
+      return this.topicStrToLabel.get(topicStr) ?? topicStr;
+    },
+    /** We joined a topic */
+    onJoin(topicStr) {
+      this.topicSubscriptionStatus.set({ topicStr }, 1);
+      this.meshPeerCounts.set({ topicStr }, 0);
+    },
+    /** We left a topic */
+    onLeave(topicStr) {
+      this.topicSubscriptionStatus.set({ topicStr }, 0);
+      this.meshPeerCounts.set({ topicStr }, 0);
+    },
+    /** Register the inclusion of peers in our mesh due to some reason. */
+    onAddToMesh(topicStr, reason, count) {
+      const topic = this.toTopic(topicStr);
+      switch (reason) {
+        case InclusionReason.Fanout:
+          this.meshPeerInclusionEventsFanout.inc({ topic }, count);
+          break;
+        case InclusionReason.Random:
+          this.meshPeerInclusionEventsRandom.inc({ topic }, count);
+          break;
+        case InclusionReason.Subscribed:
+          this.meshPeerInclusionEventsSubscribed.inc({ topic }, count);
+          break;
+        case InclusionReason.Outbound:
+          this.meshPeerInclusionEventsOutbound.inc({ topic }, count);
+          break;
+        case InclusionReason.NotEnough:
+          this.meshPeerInclusionEventsNotEnough.inc({ topic }, count);
+          break;
+        case InclusionReason.Opportunistic:
+          this.meshPeerInclusionEventsOpportunistic.inc({ topic }, count);
+          break;
+        default:
+          this.meshPeerInclusionEventsUnknown.inc({ topic }, count);
+          break;
+      }
+    },
+    /** Register the removal of peers in our mesh due to some reason */
+    // - remove_peer_from_mesh()
+    // - heartbeat() Churn::BadScore
+    // - heartbeat() Churn::Excess
+    // - on_disconnect() Churn::Ds
+    onRemoveFromMesh(topicStr, reason, count) {
+      const topic = this.toTopic(topicStr);
+      switch (reason) {
+        case ChurnReason.Dc:
+          this.meshPeerChurnEventsDisconnected.inc({ topic }, count);
+          break;
+        case ChurnReason.BadScore:
+          this.meshPeerChurnEventsBadScore.inc({ topic }, count);
+          break;
+        case ChurnReason.Prune:
+          this.meshPeerChurnEventsPrune.inc({ topic }, count);
+          break;
+        case ChurnReason.Excess:
+          this.meshPeerChurnEventsExcess.inc({ topic }, count);
+          break;
+        default:
+          this.meshPeerChurnEventsUnknown.inc({ topic }, count);
+          break;
+      }
+    },
+    /**
+     * Update validation result to metrics
+     *
+     * @param messageRecord - null means the message's mcache record was not known at the time of acceptance report
+     */
+    onReportValidation(messageRecord, acceptance, firstSeenTimestampMs) {
+      this.asyncValidationMcacheHit.inc({ hit: messageRecord != null ? "hit" : "miss" });
+      if (messageRecord != null) {
+        const topic = this.toTopic(messageRecord.message.topic);
+        switch (acceptance) {
+          case TopicValidatorResult.Accept:
+            this.acceptedMessagesTotal.inc({ topic });
+            break;
+          case TopicValidatorResult.Ignore:
+            this.ignoredMessagesTotal.inc({ topic });
+            break;
+          case TopicValidatorResult.Reject:
+            this.rejectedMessagesTotal.inc({ topic });
+            break;
+          default:
+            this.unknownValidationResultsTotal.inc({ topic });
+            break;
+        }
+      }
+      if (firstSeenTimestampMs != null) {
+        this.asyncValidationDelayFromFirstSeenSec.observe((Date.now() - firstSeenTimestampMs) / 1e3);
+      } else {
+        this.asyncValidationUnknownFirstSeen.inc();
+      }
+    },
+    /**
+     * - in handle_graft() Penalty::GraftBackoff
+     * - in apply_iwant_penalties() Penalty::BrokenPromise
+     * - in metric_score() P3 Penalty::MessageDeficit
+     * - in metric_score() P6 Penalty::IPColocation
+     */
+    onScorePenalty(penalty) {
+      this.scoringPenalties.inc({ penalty }, 1);
+    },
+    onIhaveRcv(topicStr, ihave, idonthave) {
+      const topic = this.toTopic(topicStr);
+      this.ihaveRcvMsgids.inc({ topic }, ihave);
+      this.ihaveRcvNotSeenMsgids.inc({ topic }, idonthave);
+    },
+    onIwantRcv(iwantByTopic, iwantDonthave) {
+      for (const [topicStr, iwant] of iwantByTopic) {
+        const topic = this.toTopic(topicStr);
+        this.iwantRcvMsgids.inc({ topic }, iwant);
+      }
+      this.iwantRcvDonthaveMsgids.inc(iwantDonthave);
+    },
+    onIdontwantRcv(idontwant, idontwantDonthave) {
+      this.idontwantRcvMsgids.inc(idontwant);
+      this.idontwantRcvDonthaveMsgids.inc(idontwantDonthave);
+    },
+    onForwardMsg(topicStr, tosendCount) {
+      const topic = this.toTopic(topicStr);
+      this.msgForwardCount.inc({ topic }, 1);
+      this.msgForwardPeers.inc({ topic }, tosendCount);
+    },
+    onPublishMsg(topicStr, tosendGroupCount, tosendCount, dataLen, ms) {
+      const topic = this.toTopic(topicStr);
+      this.msgPublishCount.inc({ topic }, 1);
+      this.msgPublishBytes.inc({ topic }, tosendCount * dataLen);
+      this.msgPublishPeersByTopic.inc({ topic }, tosendCount);
+      this.directPeersPublishedTotal.inc({ topic }, tosendGroupCount.direct);
+      this.floodsubPeersPublishedTotal.inc({ topic }, tosendGroupCount.floodsub);
+      this.meshPeersPublishedTotal.inc({ topic }, tosendGroupCount.mesh);
+      this.fanoutPeersPublishedTotal.inc({ topic }, tosendGroupCount.fanout);
+      this.msgPublishTime.observe({ topic }, ms / 1e3);
+    },
+    onMsgRecvPreValidation(topicStr) {
+      const topic = this.toTopic(topicStr);
+      this.msgReceivedPreValidation.inc({ topic }, 1);
+    },
+    onMsgRecvError(topicStr) {
+      const topic = this.toTopic(topicStr);
+      this.msgReceivedError.inc({ topic }, 1);
+    },
+    onPrevalidationResult(topicStr, status) {
+      const topic = this.toTopic(topicStr);
+      switch (status) {
+        case MessageStatus.duplicate:
+          this.prevalidationDuplicateTotal.inc({ topic });
+          break;
+        case MessageStatus.invalid:
+          this.prevalidationInvalidTotal.inc({ topic });
+          break;
+        case MessageStatus.valid:
+          this.prevalidationValidTotal.inc({ topic });
+          break;
+        default:
+          this.prevalidationUnknownTotal.inc({ topic });
+          break;
+      }
+    },
+    onMsgRecvInvalid(topicStr, reason) {
+      const topic = this.toTopic(topicStr);
+      const error = reason.reason === RejectReason.Error ? reason.error : reason.reason;
+      this.msgReceivedInvalid.inc({ error }, 1);
+      this.msgReceivedInvalidByTopic.inc({ topic }, 1);
+    },
+    onDuplicateMsgDelivery(topicStr, deliveryDelayMs, isLateDelivery) {
+      const topic = this.toTopic(topicStr);
+      this.duplicateMsgDeliveryDelay.observe({ topic }, deliveryDelayMs / 1e3);
+      if (isLateDelivery) {
+        this.duplicateMsgLateDelivery.inc({ topic }, 1);
+      }
+    },
+    onPublishDuplicateMsg(topicStr) {
+      const topic = this.toTopic(topicStr);
+      this.duplicateMsgIgnored.inc({ topic }, 1);
+    },
+    onPeerReadStreamError() {
+      this.peerReadStreamError.inc(1);
+    },
+    onRpcRecvError() {
+      this.rpcRecvError.inc(1);
+    },
+    onRpcDataError() {
+      this.rpcDataError.inc(1);
+    },
+    onRpcRecv(rpc, rpcBytes) {
+      this.rpcRecvBytes.inc(rpcBytes);
+      this.rpcRecvCount.inc(1);
+      if (rpc.subscriptions != null) {
+        this.rpcRecvSubscription.inc(rpc.subscriptions.length);
+      }
+      if (rpc.messages != null) {
+        this.rpcRecvMessage.inc(rpc.messages.length);
+      }
+      if (rpc.control != null) {
+        this.rpcRecvControl.inc(1);
+        if (rpc.control.ihave != null) {
+          this.rpcRecvIHave.inc(rpc.control.ihave.length);
+        }
+        if (rpc.control.iwant != null) {
+          this.rpcRecvIWant.inc(rpc.control.iwant.length);
+        }
+        if (rpc.control.graft != null) {
+          this.rpcRecvGraft.inc(rpc.control.graft.length);
+        }
+        if (rpc.control.prune != null) {
+          this.rpcRecvPrune.inc(rpc.control.prune.length);
+        }
+      }
+    },
+    onRpcSent(rpc, rpcBytes) {
+      var _a2, _b2, _c2, _d2, _e2;
+      this.rpcSentBytes.inc(rpcBytes);
+      this.rpcSentCount.inc(1);
+      if (rpc.subscriptions != null) {
+        this.rpcSentSubscription.inc(rpc.subscriptions.length);
+      }
+      if (rpc.messages != null) {
+        this.rpcSentMessage.inc(rpc.messages.length);
+      }
+      if (rpc.control != null) {
+        const ihave = ((_a2 = rpc.control.ihave) == null ? void 0 : _a2.length) ?? 0;
+        const iwant = ((_b2 = rpc.control.iwant) == null ? void 0 : _b2.length) ?? 0;
+        const graft = ((_c2 = rpc.control.graft) == null ? void 0 : _c2.length) ?? 0;
+        const prune = ((_d2 = rpc.control.prune) == null ? void 0 : _d2.length) ?? 0;
+        const idontwant = ((_e2 = rpc.control.idontwant) == null ? void 0 : _e2.length) ?? 0;
+        if (ihave > 0) {
+          this.rpcSentIHave.inc(ihave);
+        }
+        if (iwant > 0) {
+          this.rpcSentIWant.inc(iwant);
+        }
+        if (graft > 0) {
+          this.rpcSentGraft.inc(graft);
+        }
+        if (prune > 0) {
+          this.rpcSentPrune.inc(prune);
+        }
+        if (idontwant > 0) {
+          this.rpcSentIDontWant.inc(idontwant);
+        }
+        if (ihave > 0 || iwant > 0 || graft > 0 || prune > 0 || idontwant > 0) {
+          this.rpcSentControl.inc(1);
+        }
+      }
+    },
+    registerScores(scores, scoreThresholds) {
+      let graylist = 0;
+      let publish = 0;
+      let gossip = 0;
+      let mesh = 0;
+      for (const score of scores) {
+        if (score >= scoreThresholds.graylistThreshold) {
+          graylist++;
+        }
+        if (score >= scoreThresholds.publishThreshold) {
+          publish++;
+        }
+        if (score >= scoreThresholds.gossipThreshold) {
+          gossip++;
+        }
+        if (score >= 0) {
+          mesh++;
+        }
+      }
+      this.peersByScoreThreshold.set({ threshold: ScoreThreshold.graylist }, graylist);
+      this.peersByScoreThreshold.set({ threshold: ScoreThreshold.publish }, publish);
+      this.peersByScoreThreshold.set({ threshold: ScoreThreshold.gossip }, gossip);
+      this.peersByScoreThreshold.set({ threshold: ScoreThreshold.mesh }, mesh);
+      this.score.set(scores);
+    },
+    registerScoreWeights(sw) {
+      for (const [topic, wsTopic] of sw.byTopic) {
+        this.scoreWeights.set({ topic, p: "p1" }, wsTopic.p1w);
+        this.scoreWeights.set({ topic, p: "p2" }, wsTopic.p2w);
+        this.scoreWeights.set({ topic, p: "p3" }, wsTopic.p3w);
+        this.scoreWeights.set({ topic, p: "p3b" }, wsTopic.p3bw);
+        this.scoreWeights.set({ topic, p: "p4" }, wsTopic.p4w);
+      }
+      this.scoreWeights.set({ p: "p5" }, sw.p5w);
+      this.scoreWeights.set({ p: "p6" }, sw.p6w);
+      this.scoreWeights.set({ p: "p7" }, sw.p7w);
+    },
+    registerScorePerMesh(mesh, scoreByPeer) {
+      const peersPerTopicLabel = /* @__PURE__ */ new Map();
+      mesh.forEach((peers, topicStr) => {
+        const topicLabel = this.topicStrToLabel.get(topicStr) ?? "unknown";
+        let peersInMesh = peersPerTopicLabel.get(topicLabel);
+        if (peersInMesh == null) {
+          peersInMesh = /* @__PURE__ */ new Set();
+          peersPerTopicLabel.set(topicLabel, peersInMesh);
+        }
+        peers.forEach((p2) => peersInMesh == null ? void 0 : peersInMesh.add(p2));
+      });
+      for (const [topic, peers] of peersPerTopicLabel) {
+        const meshScores = [];
+        peers.forEach((peer) => {
+          meshScores.push(scoreByPeer.get(peer) ?? 0);
+        });
+        this.scorePerMesh.set({ topic }, meshScores);
+      }
+    }
+  };
+}
+class InvalidPeerScoreParamsError extends Error {
+  constructor(message2 = "Invalid peer score params") {
+    super(message2);
+    this.name = "InvalidPeerScoreParamsError";
+  }
+}
+__publicField(InvalidPeerScoreParamsError, "name", "InvalidPeerScoreParamsError");
+const defaultPeerScoreParams = {
+  topics: {},
+  topicScoreCap: 10,
+  appSpecificScore: () => 0,
+  appSpecificWeight: 10,
+  IPColocationFactorWeight: -5,
+  IPColocationFactorThreshold: 10,
+  IPColocationFactorWhitelist: /* @__PURE__ */ new Set(),
+  behaviourPenaltyWeight: -10,
+  behaviourPenaltyThreshold: 0,
+  behaviourPenaltyDecay: 0.2,
+  decayInterval: 1e3,
+  decayToZero: 0.1,
+  retainScore: 3600 * 1e3
+};
+const defaultTopicScoreParams = {
+  topicWeight: 0.5,
+  timeInMeshWeight: 1,
+  timeInMeshQuantum: 1,
+  timeInMeshCap: 3600,
+  firstMessageDeliveriesWeight: 1,
+  firstMessageDeliveriesDecay: 0.5,
+  firstMessageDeliveriesCap: 2e3,
+  meshMessageDeliveriesWeight: -1,
+  meshMessageDeliveriesDecay: 0.5,
+  meshMessageDeliveriesCap: 100,
+  meshMessageDeliveriesThreshold: 20,
+  meshMessageDeliveriesWindow: 10,
+  meshMessageDeliveriesActivation: 5e3,
+  meshFailurePenaltyWeight: -1,
+  meshFailurePenaltyDecay: 0.5,
+  invalidMessageDeliveriesWeight: -1,
+  invalidMessageDeliveriesDecay: 0.3
+};
+function createPeerScoreParams(p2 = {}) {
+  return {
+    ...defaultPeerScoreParams,
+    ...p2,
+    topics: p2.topics != null ? Object.entries(p2.topics).reduce((topics, [topic, topicScoreParams]) => {
+      topics[topic] = createTopicScoreParams(topicScoreParams);
+      return topics;
+    }, {}) : {}
+  };
+}
+function createTopicScoreParams(p2 = {}) {
+  return {
+    ...defaultTopicScoreParams,
+    ...p2
+  };
+}
+function validatePeerScoreParams(p2) {
+  for (const [topic, params] of Object.entries(p2.topics)) {
+    try {
+      validateTopicScoreParams(params);
+    } catch (e2) {
+      throw new InvalidPeerScoreParamsError(`invalid score parameters for topic ${topic}: ${e2.message}`);
+    }
+  }
+  if (p2.topicScoreCap < 0) {
+    throw new InvalidPeerScoreParamsError("invalid topic score cap; must be positive (or 0 for no cap)");
+  }
+  if (p2.appSpecificScore === null || p2.appSpecificScore === void 0) {
+    throw new InvalidPeerScoreParamsError("missing application specific score function");
+  }
+  if (p2.IPColocationFactorWeight > 0) {
+    throw new InvalidPeerScoreParamsError("invalid IPColocationFactorWeight; must be negative (or 0 to disable)");
+  }
+  if (p2.IPColocationFactorWeight !== 0 && p2.IPColocationFactorThreshold < 1) {
+    throw new InvalidPeerScoreParamsError("invalid IPColocationFactorThreshold; must be at least 1");
+  }
+  if (p2.behaviourPenaltyWeight > 0) {
+    throw new InvalidPeerScoreParamsError("invalid BehaviourPenaltyWeight; must be negative (or 0 to disable)");
+  }
+  if (p2.behaviourPenaltyWeight !== 0 && (p2.behaviourPenaltyDecay <= 0 || p2.behaviourPenaltyDecay >= 1)) {
+    throw new InvalidPeerScoreParamsError("invalid BehaviourPenaltyDecay; must be between 0 and 1");
+  }
+  if (p2.decayInterval < 1e3) {
+    throw new InvalidPeerScoreParamsError("invalid DecayInterval; must be at least 1s");
+  }
+  if (p2.decayToZero <= 0 || p2.decayToZero >= 1) {
+    throw new InvalidPeerScoreParamsError("invalid DecayToZero; must be between 0 and 1");
+  }
+}
+function validateTopicScoreParams(p2) {
+  if (p2.topicWeight < 0) {
+    throw new InvalidPeerScoreParamsError("invalid topic weight; must be >= 0");
+  }
+  if (p2.timeInMeshQuantum === 0) {
+    throw new InvalidPeerScoreParamsError("invalid TimeInMeshQuantum; must be non zero");
+  }
+  if (p2.timeInMeshWeight < 0) {
+    throw new InvalidPeerScoreParamsError("invalid TimeInMeshWeight; must be positive (or 0 to disable)");
+  }
+  if (p2.timeInMeshWeight !== 0 && p2.timeInMeshQuantum <= 0) {
+    throw new InvalidPeerScoreParamsError("invalid TimeInMeshQuantum; must be positive");
+  }
+  if (p2.timeInMeshWeight !== 0 && p2.timeInMeshCap <= 0) {
+    throw new InvalidPeerScoreParamsError("invalid TimeInMeshCap; must be positive");
+  }
+  if (p2.firstMessageDeliveriesWeight < 0) {
+    throw new InvalidPeerScoreParamsError("invallid FirstMessageDeliveriesWeight; must be positive (or 0 to disable)");
+  }
+  if (p2.firstMessageDeliveriesWeight !== 0 && (p2.firstMessageDeliveriesDecay <= 0 || p2.firstMessageDeliveriesDecay >= 1)) {
+    throw new InvalidPeerScoreParamsError("invalid FirstMessageDeliveriesDecay; must be between 0 and 1");
+  }
+  if (p2.firstMessageDeliveriesWeight !== 0 && p2.firstMessageDeliveriesCap <= 0) {
+    throw new InvalidPeerScoreParamsError("invalid FirstMessageDeliveriesCap; must be positive");
+  }
+  if (p2.meshMessageDeliveriesWeight > 0) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesWeight; must be negative (or 0 to disable)");
+  }
+  if (p2.meshMessageDeliveriesWeight !== 0 && (p2.meshMessageDeliveriesDecay <= 0 || p2.meshMessageDeliveriesDecay >= 1)) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesDecay; must be between 0 and 1");
+  }
+  if (p2.meshMessageDeliveriesWeight !== 0 && p2.meshMessageDeliveriesCap <= 0) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesCap; must be positive");
+  }
+  if (p2.meshMessageDeliveriesWeight !== 0 && p2.meshMessageDeliveriesThreshold <= 0) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesThreshold; must be positive");
+  }
+  if (p2.meshMessageDeliveriesWindow < 0) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesWindow; must be non-negative");
+  }
+  if (p2.meshMessageDeliveriesWeight !== 0 && p2.meshMessageDeliveriesActivation < 1e3) {
+    throw new InvalidPeerScoreParamsError("invalid MeshMessageDeliveriesActivation; must be at least 1s");
+  }
+  if (p2.meshFailurePenaltyWeight > 0) {
+    throw new InvalidPeerScoreParamsError("invalid MeshFailurePenaltyWeight; must be negative (or 0 to disable)");
+  }
+  if (p2.meshFailurePenaltyWeight !== 0 && (p2.meshFailurePenaltyDecay <= 0 || p2.meshFailurePenaltyDecay >= 1)) {
+    throw new InvalidPeerScoreParamsError("invalid MeshFailurePenaltyDecay; must be between 0 and 1");
+  }
+  if (p2.invalidMessageDeliveriesWeight > 0) {
+    throw new InvalidPeerScoreParamsError("invalid InvalidMessageDeliveriesWeight; must be negative (or 0 to disable)");
+  }
+  if (p2.invalidMessageDeliveriesDecay <= 0 || p2.invalidMessageDeliveriesDecay >= 1) {
+    throw new InvalidPeerScoreParamsError("invalid InvalidMessageDeliveriesDecay; must be between 0 and 1");
+  }
+}
+const defaultPeerScoreThresholds = {
+  gossipThreshold: -10,
+  publishThreshold: -50,
+  graylistThreshold: -80,
+  acceptPXThreshold: 10,
+  opportunisticGraftThreshold: 20
+};
+function createPeerScoreThresholds(p2 = {}) {
+  return {
+    ...defaultPeerScoreThresholds,
+    ...p2
+  };
+}
+function removeItemsFromSet(superSet, ineed, cond = () => true) {
+  const subset = /* @__PURE__ */ new Set();
+  if (ineed <= 0) {
+    return subset;
+  }
+  for (const id of superSet) {
+    if (subset.size >= ineed) {
+      break;
+    }
+    if (cond(id)) {
+      subset.add(id);
+      superSet.delete(id);
+    }
+  }
+  return subset;
+}
+function removeFirstNItemsFromSet(superSet, ineed) {
+  return removeItemsFromSet(superSet, ineed, () => true);
+}
+class MapDef extends Map {
+  constructor(getDefault) {
+    super();
+    __publicField(this, "getDefault");
+    this.getDefault = getDefault;
+  }
+  getOrDefault(key) {
+    let value2 = super.get(key);
+    if (value2 === void 0) {
+      value2 = this.getDefault();
+      this.set(key, value2);
+    }
+    return value2;
+  }
+}
+function computeScore(peer, pstats, params, peerIPs) {
+  let score = 0;
+  Object.entries(pstats.topics).forEach(([topic, tstats]) => {
+    const topicParams = params.topics[topic];
+    if (topicParams === void 0) {
+      return;
+    }
+    let topicScore = 0;
+    if (tstats.inMesh) {
+      let p1 = tstats.meshTime / topicParams.timeInMeshQuantum;
+      if (p1 > topicParams.timeInMeshCap) {
+        p1 = topicParams.timeInMeshCap;
+      }
+      topicScore += p1 * topicParams.timeInMeshWeight;
+    }
+    let p2 = tstats.firstMessageDeliveries;
+    if (p2 > topicParams.firstMessageDeliveriesCap) {
+      p2 = topicParams.firstMessageDeliveriesCap;
+    }
+    topicScore += p2 * topicParams.firstMessageDeliveriesWeight;
+    if (tstats.meshMessageDeliveriesActive && tstats.meshMessageDeliveries < topicParams.meshMessageDeliveriesThreshold) {
+      const deficit = topicParams.meshMessageDeliveriesThreshold - tstats.meshMessageDeliveries;
+      const p3 = deficit * deficit;
+      topicScore += p3 * topicParams.meshMessageDeliveriesWeight;
+    }
+    const p3b = tstats.meshFailurePenalty;
+    topicScore += p3b * topicParams.meshFailurePenaltyWeight;
+    const p4 = tstats.invalidMessageDeliveries * tstats.invalidMessageDeliveries;
+    topicScore += p4 * topicParams.invalidMessageDeliveriesWeight;
+    score += topicScore * topicParams.topicWeight;
+  });
+  if (params.topicScoreCap > 0 && score > params.topicScoreCap) {
+    score = params.topicScoreCap;
+  }
+  const p5 = params.appSpecificScore(peer);
+  score += p5 * params.appSpecificWeight;
+  pstats.knownIPs.forEach((ip) => {
+    if (params.IPColocationFactorWhitelist.has(ip)) {
+      return;
+    }
+    const peersInIP = peerIPs.get(ip);
+    const numPeersInIP = peersInIP != null ? peersInIP.size : 0;
+    if (numPeersInIP > params.IPColocationFactorThreshold) {
+      const surplus = numPeersInIP - params.IPColocationFactorThreshold;
+      const p6 = surplus * surplus;
+      score += p6 * params.IPColocationFactorWeight;
+    }
+  });
+  if (pstats.behaviourPenalty > params.behaviourPenaltyThreshold) {
+    const excess = pstats.behaviourPenalty - params.behaviourPenaltyThreshold;
+    const p7 = excess * excess;
+    score += p7 * params.behaviourPenaltyWeight;
+  }
+  return score;
+}
+function Denque(array, options) {
+  var options = options || {};
+  this._capacity = options.capacity;
+  this._head = 0;
+  this._tail = 0;
+  if (Array.isArray(array)) {
+    this._fromArray(array);
+  } else {
+    this._capacityMask = 3;
+    this._list = new Array(4);
+  }
+}
+Denque.prototype.peekAt = function peekAt(index) {
+  var i2 = index;
+  if (i2 !== (i2 | 0)) {
+    return void 0;
+  }
+  var len = this.size();
+  if (i2 >= len || i2 < -len) return void 0;
+  if (i2 < 0) i2 += len;
+  i2 = this._head + i2 & this._capacityMask;
+  return this._list[i2];
+};
+Denque.prototype.get = function get(i2) {
+  return this.peekAt(i2);
+};
+Denque.prototype.peek = function peek() {
+  if (this._head === this._tail) return void 0;
+  return this._list[this._head];
+};
+Denque.prototype.peekFront = function peekFront() {
+  return this.peek();
+};
+Denque.prototype.peekBack = function peekBack() {
+  return this.peekAt(-1);
+};
+Object.defineProperty(Denque.prototype, "length", {
+  get: function length2() {
+    return this.size();
+  }
+});
+Denque.prototype.size = function size() {
+  if (this._head === this._tail) return 0;
+  if (this._head < this._tail) return this._tail - this._head;
+  else return this._capacityMask + 1 - (this._head - this._tail);
+};
+Denque.prototype.unshift = function unshift(item) {
+  if (arguments.length === 0) return this.size();
+  var len = this._list.length;
+  this._head = this._head - 1 + len & this._capacityMask;
+  this._list[this._head] = item;
+  if (this._tail === this._head) this._growArray();
+  if (this._capacity && this.size() > this._capacity) this.pop();
+  if (this._head < this._tail) return this._tail - this._head;
+  else return this._capacityMask + 1 - (this._head - this._tail);
+};
+Denque.prototype.shift = function shift() {
+  var head = this._head;
+  if (head === this._tail) return void 0;
+  var item = this._list[head];
+  this._list[head] = void 0;
+  this._head = head + 1 & this._capacityMask;
+  if (head < 2 && this._tail > 1e4 && this._tail <= this._list.length >>> 2) this._shrinkArray();
+  return item;
+};
+Denque.prototype.push = function push(item) {
+  if (arguments.length === 0) return this.size();
+  var tail = this._tail;
+  this._list[tail] = item;
+  this._tail = tail + 1 & this._capacityMask;
+  if (this._tail === this._head) {
+    this._growArray();
+  }
+  if (this._capacity && this.size() > this._capacity) {
+    this.shift();
+  }
+  if (this._head < this._tail) return this._tail - this._head;
+  else return this._capacityMask + 1 - (this._head - this._tail);
+};
+Denque.prototype.pop = function pop() {
+  var tail = this._tail;
+  if (tail === this._head) return void 0;
+  var len = this._list.length;
+  this._tail = tail - 1 + len & this._capacityMask;
+  var item = this._list[this._tail];
+  this._list[this._tail] = void 0;
+  if (this._head < 2 && tail > 1e4 && tail <= len >>> 2) this._shrinkArray();
+  return item;
+};
+Denque.prototype.removeOne = function removeOne(index) {
+  var i2 = index;
+  if (i2 !== (i2 | 0)) {
+    return void 0;
+  }
+  if (this._head === this._tail) return void 0;
+  var size2 = this.size();
+  var len = this._list.length;
+  if (i2 >= size2 || i2 < -size2) return void 0;
+  if (i2 < 0) i2 += size2;
+  i2 = this._head + i2 & this._capacityMask;
+  var item = this._list[i2];
+  var k;
+  if (index < size2 / 2) {
+    for (k = index; k > 0; k--) {
+      this._list[i2] = this._list[i2 = i2 - 1 + len & this._capacityMask];
+    }
+    this._list[i2] = void 0;
+    this._head = this._head + 1 + len & this._capacityMask;
+  } else {
+    for (k = size2 - 1 - index; k > 0; k--) {
+      this._list[i2] = this._list[i2 = i2 + 1 + len & this._capacityMask];
+    }
+    this._list[i2] = void 0;
+    this._tail = this._tail - 1 + len & this._capacityMask;
+  }
+  return item;
+};
+Denque.prototype.remove = function remove(index, count) {
+  var i2 = index;
+  var removed;
+  var del_count = count;
+  if (i2 !== (i2 | 0)) {
+    return void 0;
+  }
+  if (this._head === this._tail) return void 0;
+  var size2 = this.size();
+  var len = this._list.length;
+  if (i2 >= size2 || i2 < -size2 || count < 1) return void 0;
+  if (i2 < 0) i2 += size2;
+  if (count === 1 || !count) {
+    removed = new Array(1);
+    removed[0] = this.removeOne(i2);
+    return removed;
+  }
+  if (i2 === 0 && i2 + count >= size2) {
+    removed = this.toArray();
+    this.clear();
+    return removed;
+  }
+  if (i2 + count > size2) count = size2 - i2;
+  var k;
+  removed = new Array(count);
+  for (k = 0; k < count; k++) {
+    removed[k] = this._list[this._head + i2 + k & this._capacityMask];
+  }
+  i2 = this._head + i2 & this._capacityMask;
+  if (index + count === size2) {
+    this._tail = this._tail - count + len & this._capacityMask;
+    for (k = count; k > 0; k--) {
+      this._list[i2 = i2 + 1 + len & this._capacityMask] = void 0;
+    }
+    return removed;
+  }
+  if (index === 0) {
+    this._head = this._head + count + len & this._capacityMask;
+    for (k = count - 1; k > 0; k--) {
+      this._list[i2 = i2 + 1 + len & this._capacityMask] = void 0;
+    }
+    return removed;
+  }
+  if (i2 < size2 / 2) {
+    this._head = this._head + index + count + len & this._capacityMask;
+    for (k = index; k > 0; k--) {
+      this.unshift(this._list[i2 = i2 - 1 + len & this._capacityMask]);
+    }
+    i2 = this._head - 1 + len & this._capacityMask;
+    while (del_count > 0) {
+      this._list[i2 = i2 - 1 + len & this._capacityMask] = void 0;
+      del_count--;
+    }
+    if (index < 0) this._tail = i2;
+  } else {
+    this._tail = i2;
+    i2 = i2 + count + len & this._capacityMask;
+    for (k = size2 - (count + index); k > 0; k--) {
+      this.push(this._list[i2++]);
+    }
+    i2 = this._tail;
+    while (del_count > 0) {
+      this._list[i2 = i2 + 1 + len & this._capacityMask] = void 0;
+      del_count--;
+    }
+  }
+  if (this._head < 2 && this._tail > 1e4 && this._tail <= len >>> 2) this._shrinkArray();
+  return removed;
+};
+Denque.prototype.splice = function splice(index, count) {
+  var i2 = index;
+  if (i2 !== (i2 | 0)) {
+    return void 0;
+  }
+  var size2 = this.size();
+  if (i2 < 0) i2 += size2;
+  if (i2 > size2) return void 0;
+  if (arguments.length > 2) {
+    var k;
+    var temp;
+    var removed;
+    var arg_len = arguments.length;
+    var len = this._list.length;
+    var arguments_index = 2;
+    if (!size2 || i2 < size2 / 2) {
+      temp = new Array(i2);
+      for (k = 0; k < i2; k++) {
+        temp[k] = this._list[this._head + k & this._capacityMask];
+      }
+      if (count === 0) {
+        removed = [];
+        if (i2 > 0) {
+          this._head = this._head + i2 + len & this._capacityMask;
+        }
+      } else {
+        removed = this.remove(i2, count);
+        this._head = this._head + i2 + len & this._capacityMask;
+      }
+      while (arg_len > arguments_index) {
+        this.unshift(arguments[--arg_len]);
+      }
+      for (k = i2; k > 0; k--) {
+        this.unshift(temp[k - 1]);
+      }
+    } else {
+      temp = new Array(size2 - (i2 + count));
+      var leng = temp.length;
+      for (k = 0; k < leng; k++) {
+        temp[k] = this._list[this._head + i2 + count + k & this._capacityMask];
+      }
+      if (count === 0) {
+        removed = [];
+        if (i2 != size2) {
+          this._tail = this._head + i2 + len & this._capacityMask;
+        }
+      } else {
+        removed = this.remove(i2, count);
+        this._tail = this._tail - leng + len & this._capacityMask;
+      }
+      while (arguments_index < arg_len) {
+        this.push(arguments[arguments_index++]);
+      }
+      for (k = 0; k < leng; k++) {
+        this.push(temp[k]);
+      }
+    }
+    return removed;
+  } else {
+    return this.remove(i2, count);
+  }
+};
+Denque.prototype.clear = function clear() {
+  this._list = new Array(this._list.length);
+  this._head = 0;
+  this._tail = 0;
+};
+Denque.prototype.isEmpty = function isEmpty() {
+  return this._head === this._tail;
+};
+Denque.prototype.toArray = function toArray() {
+  return this._copyArray(false);
+};
+Denque.prototype._fromArray = function _fromArray(array) {
+  var length3 = array.length;
+  var capacity = this._nextPowerOf2(length3);
+  this._list = new Array(capacity);
+  this._capacityMask = capacity - 1;
+  this._tail = length3;
+  for (var i2 = 0; i2 < length3; i2++) this._list[i2] = array[i2];
+};
+Denque.prototype._copyArray = function _copyArray(fullCopy, size2) {
+  var src2 = this._list;
+  var capacity = src2.length;
+  var length3 = this.length;
+  size2 = size2 | length3;
+  if (size2 == length3 && this._head < this._tail) {
+    return this._list.slice(this._head, this._tail);
+  }
+  var dest = new Array(size2);
+  var k = 0;
+  var i2;
+  if (fullCopy || this._head > this._tail) {
+    for (i2 = this._head; i2 < capacity; i2++) dest[k++] = src2[i2];
+    for (i2 = 0; i2 < this._tail; i2++) dest[k++] = src2[i2];
+  } else {
+    for (i2 = this._head; i2 < this._tail; i2++) dest[k++] = src2[i2];
+  }
+  return dest;
+};
+Denque.prototype._growArray = function _growArray() {
+  if (this._head != 0) {
+    var newList = this._copyArray(true, this._list.length << 1);
+    this._tail = this._list.length;
+    this._head = 0;
+    this._list = newList;
+  } else {
+    this._tail = this._list.length;
+    this._list.length <<= 1;
+  }
+  this._capacityMask = this._capacityMask << 1 | 1;
+};
+Denque.prototype._shrinkArray = function _shrinkArray() {
+  this._list.length >>>= 1;
+  this._capacityMask >>>= 1;
+};
+Denque.prototype._nextPowerOf2 = function _nextPowerOf2(num) {
+  var log2 = Math.log(num) / Math.log(2);
+  var nextPow2 = 1 << log2 + 1;
+  return Math.max(nextPow2, 4);
+};
+var denque = Denque;
+const Denque$1 = /* @__PURE__ */ getDefaultExportFromCjs(denque);
+var DeliveryRecordStatus;
+(function(DeliveryRecordStatus2) {
+  DeliveryRecordStatus2[DeliveryRecordStatus2["unknown"] = 0] = "unknown";
+  DeliveryRecordStatus2[DeliveryRecordStatus2["valid"] = 1] = "valid";
+  DeliveryRecordStatus2[DeliveryRecordStatus2["invalid"] = 2] = "invalid";
+  DeliveryRecordStatus2[DeliveryRecordStatus2["ignored"] = 3] = "ignored";
+})(DeliveryRecordStatus || (DeliveryRecordStatus = {}));
+class MessageDeliveries {
+  constructor() {
+    __publicField(this, "records");
+    __publicField(this, "queue");
+    this.records = /* @__PURE__ */ new Map();
+    this.queue = new Denque$1();
+  }
+  getRecord(msgIdStr) {
+    return this.records.get(msgIdStr);
+  }
+  ensureRecord(msgIdStr) {
+    let drec = this.records.get(msgIdStr);
+    if (drec != null) {
+      return drec;
+    }
+    drec = {
+      status: DeliveryRecordStatus.unknown,
+      firstSeenTsMs: Date.now(),
+      validated: 0,
+      peers: /* @__PURE__ */ new Set()
+    };
+    this.records.set(msgIdStr, drec);
+    const entry = {
+      msgId: msgIdStr,
+      expire: Date.now() + TimeCacheDuration
+    };
+    this.queue.push(entry);
+    return drec;
+  }
+  gc() {
+    const now = Date.now();
+    let head = this.queue.peekFront();
+    while (head != null && head.expire < now) {
+      this.records.delete(head.msgId);
+      this.queue.shift();
+      head = this.queue.peekFront();
+    }
+  }
+  clear() {
+    this.records.clear();
+    this.queue.clear();
+  }
+}
+class PeerScore {
+  constructor(params, metrics, componentLogger, opts) {
+    __publicField(this, "params");
+    __publicField(this, "metrics");
+    /**
+     * Per-peer stats for score calculation
+     */
+    __publicField(this, "peerStats", /* @__PURE__ */ new Map());
+    /**
+     * IP colocation tracking; maps IP => set of peers.
+     */
+    __publicField(this, "peerIPs", new MapDef(() => /* @__PURE__ */ new Set()));
+    /**
+     * Cache score up to decayInterval if topic stats are unchanged.
+     */
+    __publicField(this, "scoreCache", /* @__PURE__ */ new Map());
+    /**
+     * Recent message delivery timing/participants
+     */
+    __publicField(this, "deliveryRecords", new MessageDeliveries());
+    __publicField(this, "_backgroundInterval");
+    __publicField(this, "scoreCacheValidityMs");
+    __publicField(this, "computeScore");
+    __publicField(this, "log");
+    this.params = params;
+    this.metrics = metrics;
+    validatePeerScoreParams(params);
+    this.scoreCacheValidityMs = opts.scoreCacheValidityMs;
+    this.computeScore = opts.computeScore ?? computeScore;
+    this.log = componentLogger.forComponent("libp2p:gossipsub:score");
+  }
+  get size() {
+    return this.peerStats.size;
+  }
+  /**
+   * Start PeerScore instance
+   */
+  start() {
+    if (this._backgroundInterval != null) {
+      this.log("Peer score already running");
+      return;
+    }
+    this._backgroundInterval = setInterval(() => {
+      this.background();
+    }, this.params.decayInterval);
+    this.log("started");
+  }
+  /**
+   * Stop PeerScore instance
+   */
+  stop() {
+    if (this._backgroundInterval == null) {
+      this.log("Peer score already stopped");
+      return;
+    }
+    clearInterval(this._backgroundInterval);
+    delete this._backgroundInterval;
+    this.peerIPs.clear();
+    this.peerStats.clear();
+    this.deliveryRecords.clear();
+    this.log("stopped");
+  }
+  /**
+   * Periodic maintenance
+   */
+  background() {
+    this.refreshScores();
+    this.deliveryRecords.gc();
+  }
+  dumpPeerScoreStats() {
+    return Object.fromEntries(Array.from(this.peerStats.entries()).map(([peer, stats]) => [peer, stats]));
+  }
+  messageFirstSeenTimestampMs(msgIdStr) {
+    const drec = this.deliveryRecords.getRecord(msgIdStr);
+    return drec != null ? drec.firstSeenTsMs : null;
+  }
+  /**
+   * Decays scores, and purges score records for disconnected peers once their expiry has elapsed.
+   */
+  refreshScores() {
+    const now = Date.now();
+    const decayToZero = this.params.decayToZero;
+    this.peerStats.forEach((pstats, id) => {
+      if (!pstats.connected) {
+        if (now > pstats.expire) {
+          this.removeIPsForPeer(id, pstats.knownIPs);
+          this.peerStats.delete(id);
+          this.scoreCache.delete(id);
+        }
+        return;
+      }
+      Object.entries(pstats.topics).forEach(([topic, tstats]) => {
+        const tparams = this.params.topics[topic];
+        if (tparams === void 0) {
+          return;
+        }
+        tstats.firstMessageDeliveries *= tparams.firstMessageDeliveriesDecay;
+        if (tstats.firstMessageDeliveries < decayToZero) {
+          tstats.firstMessageDeliveries = 0;
+        }
+        tstats.meshMessageDeliveries *= tparams.meshMessageDeliveriesDecay;
+        if (tstats.meshMessageDeliveries < decayToZero) {
+          tstats.meshMessageDeliveries = 0;
+        }
+        tstats.meshFailurePenalty *= tparams.meshFailurePenaltyDecay;
+        if (tstats.meshFailurePenalty < decayToZero) {
+          tstats.meshFailurePenalty = 0;
+        }
+        tstats.invalidMessageDeliveries *= tparams.invalidMessageDeliveriesDecay;
+        if (tstats.invalidMessageDeliveries < decayToZero) {
+          tstats.invalidMessageDeliveries = 0;
+        }
+        if (tstats.inMesh) {
+          tstats.meshTime = now - tstats.graftTime;
+          if (tstats.meshTime > tparams.meshMessageDeliveriesActivation) {
+            tstats.meshMessageDeliveriesActive = true;
+          }
+        }
+      });
+      pstats.behaviourPenalty *= this.params.behaviourPenaltyDecay;
+      if (pstats.behaviourPenalty < decayToZero) {
+        pstats.behaviourPenalty = 0;
+      }
+    });
+  }
+  /**
+   * Return the score for a peer
+   */
+  score(id) {
+    var _a2, _b2, _c2;
+    (_a2 = this.metrics) == null ? void 0 : _a2.scoreFnCalls.inc();
+    const pstats = this.peerStats.get(id);
+    if (pstats == null) {
+      return 0;
+    }
+    const now = Date.now();
+    const cacheEntry = this.scoreCache.get(id);
+    if (cacheEntry != null && cacheEntry.cacheUntil > now) {
+      return cacheEntry.score;
+    }
+    (_b2 = this.metrics) == null ? void 0 : _b2.scoreFnRuns.inc();
+    const score = this.computeScore(id, pstats, this.params, this.peerIPs);
+    const cacheUntil = now + this.scoreCacheValidityMs;
+    if (cacheEntry != null) {
+      (_c2 = this.metrics) == null ? void 0 : _c2.scoreCachedDelta.observe(Math.abs(score - cacheEntry.score));
+      cacheEntry.score = score;
+      cacheEntry.cacheUntil = cacheUntil;
+    } else {
+      this.scoreCache.set(id, { score, cacheUntil });
+    }
+    return score;
+  }
+  /**
+   * Apply a behavioural penalty to a peer
+   */
+  addPenalty(id, penalty, penaltyLabel) {
+    var _a2;
+    const pstats = this.peerStats.get(id);
+    if (pstats != null) {
+      pstats.behaviourPenalty += penalty;
+      (_a2 = this.metrics) == null ? void 0 : _a2.onScorePenalty(penaltyLabel);
+    }
+  }
+  addPeer(id) {
+    const pstats = {
+      connected: true,
+      expire: 0,
+      topics: {},
+      knownIPs: /* @__PURE__ */ new Set(),
+      behaviourPenalty: 0
+    };
+    this.peerStats.set(id, pstats);
+  }
+  /** Adds a new IP to a peer, if the peer is not known the update is ignored */
+  addIP(id, ip) {
+    const pstats = this.peerStats.get(id);
+    if (pstats != null) {
+      pstats.knownIPs.add(ip);
+    }
+    this.peerIPs.getOrDefault(ip).add(id);
+  }
+  /** Remove peer association with IP */
+  removeIP(id, ip) {
+    const pstats = this.peerStats.get(id);
+    if (pstats != null) {
+      pstats.knownIPs.delete(ip);
+    }
+    const peersWithIP = this.peerIPs.get(ip);
+    if (peersWithIP != null) {
+      peersWithIP.delete(id);
+      if (peersWithIP.size === 0) {
+        this.peerIPs.delete(ip);
+      }
+    }
+  }
+  removePeer(id) {
+    const pstats = this.peerStats.get(id);
+    if (pstats == null) {
+      return;
+    }
+    if (this.score(id) > 0) {
+      this.removeIPsForPeer(id, pstats.knownIPs);
+      this.peerStats.delete(id);
+      return;
+    }
+    Object.entries(pstats.topics).forEach(([topic, tstats]) => {
+      tstats.firstMessageDeliveries = 0;
+      const threshold = this.params.topics[topic].meshMessageDeliveriesThreshold;
+      if (tstats.inMesh && tstats.meshMessageDeliveriesActive && tstats.meshMessageDeliveries < threshold) {
+        const deficit = threshold - tstats.meshMessageDeliveries;
+        tstats.meshFailurePenalty += deficit * deficit;
+      }
+      tstats.inMesh = false;
+      tstats.meshMessageDeliveriesActive = false;
+    });
+    pstats.connected = false;
+    pstats.expire = Date.now() + this.params.retainScore;
+  }
+  /** Handles scoring functionality as a peer GRAFTs to a topic. */
+  graft(id, topic) {
+    const pstats = this.peerStats.get(id);
+    if (pstats != null) {
+      const tstats = this.getPtopicStats(pstats, topic);
+      if (tstats != null) {
+        tstats.inMesh = true;
+        tstats.graftTime = Date.now();
+        tstats.meshTime = 0;
+        tstats.meshMessageDeliveriesActive = false;
+      }
+    }
+  }
+  /** Handles scoring functionality as a peer PRUNEs from a topic. */
+  prune(id, topic) {
+    const pstats = this.peerStats.get(id);
+    if (pstats != null) {
+      const tstats = this.getPtopicStats(pstats, topic);
+      if (tstats != null) {
+        const threshold = this.params.topics[topic].meshMessageDeliveriesThreshold;
+        if (tstats.meshMessageDeliveriesActive && tstats.meshMessageDeliveries < threshold) {
+          const deficit = threshold - tstats.meshMessageDeliveries;
+          tstats.meshFailurePenalty += deficit * deficit;
+        }
+        tstats.meshMessageDeliveriesActive = false;
+        tstats.inMesh = false;
+      }
+    }
+  }
+  validateMessage(msgIdStr) {
+    this.deliveryRecords.ensureRecord(msgIdStr);
+  }
+  deliverMessage(from2, msgIdStr, topic) {
+    this.markFirstMessageDelivery(from2, topic);
+    const drec = this.deliveryRecords.ensureRecord(msgIdStr);
+    const now = Date.now();
+    if (drec.status !== DeliveryRecordStatus.unknown) {
+      this.log("unexpected delivery: message from %s was first seen %s ago and has delivery status %s", from2, now - drec.firstSeenTsMs, DeliveryRecordStatus[drec.status]);
+      return;
+    }
+    drec.status = DeliveryRecordStatus.valid;
+    drec.validated = now;
+    drec.peers.forEach((p2) => {
+      if (p2 !== from2.toString()) {
+        this.markDuplicateMessageDelivery(p2, topic);
+      }
+    });
+  }
+  /**
+   * Similar to `rejectMessage` except does not require the message id or reason for an invalid message.
+   */
+  rejectInvalidMessage(from2, topic) {
+    this.markInvalidMessageDelivery(from2, topic);
+  }
+  rejectMessage(from2, msgIdStr, topic, reason) {
+    switch (reason) {
+      case RejectReason.Error:
+        this.markInvalidMessageDelivery(from2, topic);
+        return;
+      case RejectReason.Blacklisted:
+        return;
+    }
+    const drec = this.deliveryRecords.ensureRecord(msgIdStr);
+    if (drec.status !== DeliveryRecordStatus.unknown) {
+      this.log("unexpected rejection: message from %s was first seen %s ago and has delivery status %d", from2, Date.now() - drec.firstSeenTsMs, DeliveryRecordStatus[drec.status]);
+      return;
+    }
+    if (reason === RejectReason.Ignore) {
+      drec.status = DeliveryRecordStatus.ignored;
+      drec.peers.clear();
+      return;
+    }
+    drec.status = DeliveryRecordStatus.invalid;
+    this.markInvalidMessageDelivery(from2, topic);
+    drec.peers.forEach((p2) => {
+      this.markInvalidMessageDelivery(p2, topic);
+    });
+    drec.peers.clear();
+  }
+  duplicateMessage(from2, msgIdStr, topic) {
+    const drec = this.deliveryRecords.ensureRecord(msgIdStr);
+    if (drec.peers.has(from2)) {
+      return;
+    }
+    switch (drec.status) {
+      case DeliveryRecordStatus.unknown:
+        drec.peers.add(from2);
+        break;
+      case DeliveryRecordStatus.valid:
+        drec.peers.add(from2);
+        this.markDuplicateMessageDelivery(from2, topic, drec.validated);
+        break;
+      case DeliveryRecordStatus.invalid:
+        this.markInvalidMessageDelivery(from2, topic);
+        break;
+      case DeliveryRecordStatus.ignored:
+        break;
+    }
+  }
+  /**
+   * Increments the "invalid message deliveries" counter for all scored topics the message is published in.
+   */
+  markInvalidMessageDelivery(from2, topic) {
+    const pstats = this.peerStats.get(from2);
+    if (pstats != null) {
+      const tstats = this.getPtopicStats(pstats, topic);
+      if (tstats != null) {
+        tstats.invalidMessageDeliveries += 1;
+      }
+    }
+  }
+  /**
+   * Increments the "first message deliveries" counter for all scored topics the message is published in,
+   * as well as the "mesh message deliveries" counter, if the peer is in the mesh for the topic.
+   * Messages already known (with the seenCache) are counted with markDuplicateMessageDelivery()
+   */
+  markFirstMessageDelivery(from2, topic) {
+    const pstats = this.peerStats.get(from2);
+    if (pstats != null) {
+      const tstats = this.getPtopicStats(pstats, topic);
+      if (tstats != null) {
+        let cap = this.params.topics[topic].firstMessageDeliveriesCap;
+        tstats.firstMessageDeliveries = Math.min(cap, tstats.firstMessageDeliveries + 1);
+        if (tstats.inMesh) {
+          cap = this.params.topics[topic].meshMessageDeliveriesCap;
+          tstats.meshMessageDeliveries = Math.min(cap, tstats.meshMessageDeliveries + 1);
+        }
+      }
+    }
+  }
+  /**
+   * Increments the "mesh message deliveries" counter for messages we've seen before,
+   * as long the message was received within the P3 window.
+   */
+  markDuplicateMessageDelivery(from2, topic, validatedTime) {
+    var _a2;
+    const pstats = this.peerStats.get(from2);
+    if (pstats != null) {
+      const now = validatedTime !== void 0 ? Date.now() : 0;
+      const tstats = this.getPtopicStats(pstats, topic);
+      if (tstats != null && tstats.inMesh) {
+        const tparams = this.params.topics[topic];
+        if (validatedTime !== void 0) {
+          const deliveryDelayMs = now - validatedTime;
+          const isLateDelivery = deliveryDelayMs > tparams.meshMessageDeliveriesWindow;
+          (_a2 = this.metrics) == null ? void 0 : _a2.onDuplicateMsgDelivery(topic, deliveryDelayMs, isLateDelivery);
+          if (isLateDelivery) {
+            return;
+          }
+        }
+        const cap = tparams.meshMessageDeliveriesCap;
+        tstats.meshMessageDeliveries = Math.min(cap, tstats.meshMessageDeliveries + 1);
+      }
+    }
+  }
+  /**
+   * Removes an IP list from the tracking list for a peer.
+   */
+  removeIPsForPeer(id, ipsToRemove) {
+    for (const ipToRemove of ipsToRemove) {
+      const peerSet = this.peerIPs.get(ipToRemove);
+      if (peerSet != null) {
+        peerSet.delete(id);
+        if (peerSet.size === 0) {
+          this.peerIPs.delete(ipToRemove);
+        }
+      }
+    }
+  }
+  /**
+   * Returns topic stats if they exist, otherwise if the supplied parameters score the
+   * topic, inserts the default stats and returns a reference to those. If neither apply, returns None.
+   */
+  getPtopicStats(pstats, topic) {
+    let topicStats = pstats.topics[topic];
+    if (topicStats !== void 0) {
+      return topicStats;
+    }
+    if (this.params.topics[topic] !== void 0) {
+      topicStats = {
+        inMesh: false,
+        graftTime: 0,
+        meshTime: 0,
+        firstMessageDeliveries: 0,
+        meshMessageDeliveries: 0,
+        meshMessageDeliveriesActive: false,
+        meshFailurePenalty: 0,
+        invalidMessageDeliveries: 0
+      };
+      pstats.topics[topic] = topicStats;
+      return topicStats;
+    }
+    return null;
+  }
+}
+function computeScoreWeights(peer, pstats, params, peerIPs, topicStrToLabel) {
+  let score = 0;
+  const byTopic = /* @__PURE__ */ new Map();
+  Object.entries(pstats.topics).forEach(([topic, tstats]) => {
+    const topicLabel = topicStrToLabel.get(topic) ?? "unknown";
+    const topicParams = params.topics[topic];
+    if (topicParams === void 0) {
+      return;
+    }
+    let topicScores = byTopic.get(topicLabel);
+    if (topicScores == null) {
+      topicScores = {
+        p1w: 0,
+        p2w: 0,
+        p3w: 0,
+        p3bw: 0,
+        p4w: 0
+      };
+      byTopic.set(topicLabel, topicScores);
+    }
+    let p1w = 0;
+    let p2w = 0;
+    let p3w = 0;
+    let p3bw = 0;
+    let p4w = 0;
+    if (tstats.inMesh) {
+      const p1 = Math.max(tstats.meshTime / topicParams.timeInMeshQuantum, topicParams.timeInMeshCap);
+      p1w += p1 * topicParams.timeInMeshWeight;
+    }
+    let p2 = tstats.firstMessageDeliveries;
+    if (p2 > topicParams.firstMessageDeliveriesCap) {
+      p2 = topicParams.firstMessageDeliveriesCap;
+    }
+    p2w += p2 * topicParams.firstMessageDeliveriesWeight;
+    if (tstats.meshMessageDeliveriesActive && tstats.meshMessageDeliveries < topicParams.meshMessageDeliveriesThreshold) {
+      const deficit = topicParams.meshMessageDeliveriesThreshold - tstats.meshMessageDeliveries;
+      const p3 = deficit * deficit;
+      p3w += p3 * topicParams.meshMessageDeliveriesWeight;
+    }
+    const p3b = tstats.meshFailurePenalty;
+    p3bw += p3b * topicParams.meshFailurePenaltyWeight;
+    const p4 = tstats.invalidMessageDeliveries * tstats.invalidMessageDeliveries;
+    p4w += p4 * topicParams.invalidMessageDeliveriesWeight;
+    score += (p1w + p2w + p3w + p3bw + p4w) * topicParams.topicWeight;
+    topicScores.p1w += p1w;
+    topicScores.p2w += p2w;
+    topicScores.p3w += p3w;
+    topicScores.p3bw += p3bw;
+    topicScores.p4w += p4w;
+  });
+  if (params.topicScoreCap > 0 && score > params.topicScoreCap) {
+    score = params.topicScoreCap;
+    const capF = params.topicScoreCap / score;
+    for (const ws of byTopic.values()) {
+      ws.p1w *= capF;
+      ws.p2w *= capF;
+      ws.p3w *= capF;
+      ws.p3bw *= capF;
+      ws.p4w *= capF;
+    }
+  }
+  let p5w = 0;
+  let p6w = 0;
+  let p7w = 0;
+  const p5 = params.appSpecificScore(peer);
+  p5w += p5 * params.appSpecificWeight;
+  pstats.knownIPs.forEach((ip) => {
+    if (params.IPColocationFactorWhitelist.has(ip)) {
+      return;
+    }
+    const peersInIP = peerIPs.get(ip);
+    const numPeersInIP = peersInIP != null ? peersInIP.size : 0;
+    if (numPeersInIP > params.IPColocationFactorThreshold) {
+      const surplus = numPeersInIP - params.IPColocationFactorThreshold;
+      const p6 = surplus * surplus;
+      p6w += p6 * params.IPColocationFactorWeight;
+    }
+  });
+  const p7 = pstats.behaviourPenalty * pstats.behaviourPenalty;
+  p7w += p7 * params.behaviourPenaltyWeight;
+  score += p5w + p6w + p7w;
+  return {
+    byTopic,
+    p5w,
+    p6w,
+    p7w,
+    score
+  };
+}
+function computeAllPeersScoreWeights(peerIdStrs, peerStats, params, peerIPs, topicStrToLabel) {
+  const sw = {
+    byTopic: /* @__PURE__ */ new Map(),
+    p5w: [],
+    p6w: [],
+    p7w: [],
+    score: []
+  };
+  for (const peerIdStr of peerIdStrs) {
+    const pstats = peerStats.get(peerIdStr);
+    if (pstats != null) {
+      const swPeer = computeScoreWeights(peerIdStr, pstats, params, peerIPs, topicStrToLabel);
+      for (const [topic, swPeerTopic] of swPeer.byTopic) {
+        let swTopic = sw.byTopic.get(topic);
+        if (swTopic == null) {
+          swTopic = {
+            p1w: [],
+            p2w: [],
+            p3w: [],
+            p3bw: [],
+            p4w: []
+          };
+          sw.byTopic.set(topic, swTopic);
+        }
+        swTopic.p1w.push(swPeerTopic.p1w);
+        swTopic.p2w.push(swPeerTopic.p2w);
+        swTopic.p3w.push(swPeerTopic.p3w);
+        swTopic.p3bw.push(swPeerTopic.p3bw);
+        swTopic.p4w.push(swPeerTopic.p4w);
+      }
+      sw.p5w.push(swPeer.p5w);
+      sw.p6w.push(swPeer.p6w);
+      sw.p7w.push(swPeer.p7w);
+      sw.score.push(swPeer.score);
+    } else {
+      sw.p5w.push(0);
+      sw.p6w.push(0);
+      sw.p7w.push(0);
+      sw.score.push(0);
+    }
+  }
+  return sw;
+}
+class OutboundStream {
+  constructor(rawStream, errCallback, opts) {
+    __publicField(this, "rawStream");
+    this.rawStream = rawStream;
+    if (opts.maxBufferSize != null) {
+      rawStream.maxWriteBufferLength = opts.maxBufferSize;
+    }
+    rawStream.addEventListener("close", (evt) => {
+      if (evt.error != null) {
+        errCallback(evt.error);
+      }
+    });
+  }
+  get protocol() {
+    return this.rawStream.protocol;
+  }
+  async push(data) {
+    return this.pushPrefixed(encode.single(data));
+  }
+  /**
+   * Same to push() but this is prefixed data so no need to encode length prefixed again
+   */
+  pushPrefixed(data) {
+    this.rawStream.send(data);
+  }
+  async close(options) {
+    await this.rawStream.close(options).catch((err) => {
+      this.rawStream.abort(err);
+    });
+  }
+}
+class InboundStream {
+  constructor(rawStream, opts = {}) {
+    __publicField(this, "source");
+    __publicField(this, "rawStream");
+    __publicField(this, "closeController");
+    this.rawStream = rawStream;
+    this.closeController = new AbortController();
+    this.closeController.signal.addEventListener("abort", () => {
+      rawStream.close().catch((err) => {
+        rawStream.abort(err);
+      });
+    });
+    this.source = pipe(this.rawStream, (source) => decode(source, opts));
+  }
+  async close() {
+    this.closeController.abort();
+  }
+}
+class IWantTracer {
+  constructor(gossipsubIWantFollowupMs, msgIdToStrFn, metrics) {
+    __publicField(this, "gossipsubIWantFollowupMs");
+    __publicField(this, "msgIdToStrFn");
+    __publicField(this, "metrics");
+    /**
+     * Promises to deliver a message
+     * Map per message id, per peer, promise expiration time
+     */
+    __publicField(this, "promises", /* @__PURE__ */ new Map());
+    /**
+     * First request time by msgId. Used for metrics to track expire times.
+     * Necessary to know if peers are actually breaking promises or simply sending them a bit later
+     */
+    __publicField(this, "requestMsByMsg", /* @__PURE__ */ new Map());
+    __publicField(this, "requestMsByMsgExpire");
+    this.gossipsubIWantFollowupMs = gossipsubIWantFollowupMs;
+    this.msgIdToStrFn = msgIdToStrFn;
+    this.metrics = metrics;
+    this.requestMsByMsgExpire = 10 * gossipsubIWantFollowupMs;
+  }
+  get size() {
+    return this.promises.size;
+  }
+  get requestMsByMsgSize() {
+    return this.requestMsByMsg.size;
+  }
+  /**
+   * Track a promise to deliver a message from a list of msgIds we are requesting
+   */
+  addPromise(from2, msgIds) {
+    const ix = Math.floor(Math.random() * msgIds.length);
+    const msgId2 = msgIds[ix];
+    const msgIdStr = this.msgIdToStrFn(msgId2);
+    let expireByPeer = this.promises.get(msgIdStr);
+    if (expireByPeer == null) {
+      expireByPeer = /* @__PURE__ */ new Map();
+      this.promises.set(msgIdStr, expireByPeer);
+    }
+    const now = Date.now();
+    if (!expireByPeer.has(from2)) {
+      expireByPeer.set(from2, now + this.gossipsubIWantFollowupMs);
+      if (this.metrics != null) {
+        this.metrics.iwantPromiseStarted.inc(1);
+        if (!this.requestMsByMsg.has(msgIdStr)) {
+          this.requestMsByMsg.set(msgIdStr, now);
+        }
+      }
+    }
+  }
+  /**
+   * Returns the number of broken promises for each peer who didn't follow up on an IWANT request.
+   *
+   * This should be called not too often relative to the expire times, since it iterates over the whole data.
+   */
+  getBrokenPromises() {
+    var _a2;
+    const now = Date.now();
+    const result = /* @__PURE__ */ new Map();
+    let brokenPromises = 0;
+    this.promises.forEach((expireByPeer, msgId2) => {
+      expireByPeer.forEach((expire, p2) => {
+        if (expire < now) {
+          result.set(p2, (result.get(p2) ?? 0) + 1);
+          expireByPeer.delete(p2);
+          brokenPromises++;
+        }
+      });
+      if (expireByPeer.size === 0) {
+        this.promises.delete(msgId2);
+      }
+    });
+    (_a2 = this.metrics) == null ? void 0 : _a2.iwantPromiseBroken.inc(brokenPromises);
+    return result;
+  }
+  /**
+   * Someone delivered a message, stop tracking promises for it
+   */
+  deliverMessage(msgIdStr, isDuplicate = false) {
+    this.trackMessage(msgIdStr);
+    const expireByPeer = this.promises.get(msgIdStr);
+    if (expireByPeer != null) {
+      this.promises.delete(msgIdStr);
+      if (this.metrics != null) {
+        this.metrics.iwantPromiseResolved.inc(1);
+        if (isDuplicate) {
+          this.metrics.iwantPromiseResolvedFromDuplicate.inc(1);
+        }
+        this.metrics.iwantPromiseResolvedPeers.inc(expireByPeer.size);
+      }
+    }
+  }
+  /**
+   * A message got rejected, so we can stop tracking promises and let the score penalty apply from invalid message delivery,
+   * unless its an obviously invalid message.
+   */
+  rejectMessage(msgIdStr, reason) {
+    this.trackMessage(msgIdStr);
+    switch (reason) {
+      case RejectReason.Error:
+        return;
+    }
+    this.promises.delete(msgIdStr);
+  }
+  clear() {
+    this.promises.clear();
+  }
+  prune() {
+    var _a2;
+    const maxMs = Date.now() - this.requestMsByMsgExpire;
+    let count = 0;
+    for (const [k, v] of this.requestMsByMsg.entries()) {
+      if (v < maxMs) {
+        this.requestMsByMsg.delete(k);
+        count++;
+      } else {
+        break;
+      }
+    }
+    (_a2 = this.metrics) == null ? void 0 : _a2.iwantMessagePruned.inc(count);
+  }
+  trackMessage(msgIdStr) {
+    if (this.metrics != null) {
+      const requestMs = this.requestMsByMsg.get(msgIdStr);
+      if (requestMs !== void 0) {
+        this.metrics.iwantPromiseDeliveryTime.observe((Date.now() - requestMs) / 1e3);
+        this.requestMsByMsg.delete(msgIdStr);
+      }
+    }
+  }
+}
+const SignPrefix = fromString("libp2p-pubsub:");
+async function buildRawMessage(publishConfig, topic, originalData, transformedData) {
+  switch (publishConfig.type) {
+    case PublishConfigType.Signing: {
+      const rpcMsg = {
+        from: publishConfig.author.toMultihash().bytes,
+        data: transformedData,
+        seqno: randomBytes(8),
+        topic,
+        signature: void 0,
+        // Exclude signature field for signing
+        key: void 0
+        // Exclude key field for signing
+      };
+      const bytes = concat([SignPrefix, RPC.Message.encode(rpcMsg)]);
+      rpcMsg.signature = await publishConfig.privateKey.sign(bytes);
+      rpcMsg.key = publishConfig.key;
+      const msg = {
+        type: "signed",
+        from: publishConfig.author,
+        data: originalData,
+        sequenceNumber: BigInt(`0x${toString(rpcMsg.seqno ?? new Uint8Array(0), "base16")}`),
+        topic,
+        signature: rpcMsg.signature,
+        key: publicKeyFromProtobuf(rpcMsg.key)
+      };
+      return {
+        raw: rpcMsg,
+        msg
+      };
+    }
+    case PublishConfigType.Anonymous: {
+      return {
+        raw: {
+          from: void 0,
+          data: transformedData,
+          seqno: void 0,
+          topic,
+          signature: void 0,
+          key: void 0
+        },
+        msg: {
+          type: "unsigned",
+          data: originalData,
+          topic
+        }
+      };
+    }
+    default:
+      throw new Error("Unreachable");
+  }
+}
+async function validateToRawMessage(signaturePolicy, msg) {
+  switch (signaturePolicy) {
+    case StrictNoSign:
+      if (msg.signature != null) {
+        return { valid: false, error: ValidateError.SignaturePresent };
+      }
+      if (msg.seqno != null) {
+        return { valid: false, error: ValidateError.SeqnoPresent };
+      }
+      if (msg.key != null) {
+        return { valid: false, error: ValidateError.FromPresent };
+      }
+      return { valid: true, message: { type: "unsigned", topic: msg.topic, data: msg.data ?? new Uint8Array(0) } };
+    case StrictSign: {
+      if (msg.seqno == null) {
+        return { valid: false, error: ValidateError.InvalidSeqno };
+      }
+      if (msg.seqno.length !== 8) {
+        return { valid: false, error: ValidateError.InvalidSeqno };
+      }
+      if (msg.signature == null) {
+        return { valid: false, error: ValidateError.InvalidSignature };
+      }
+      if (msg.from == null) {
+        return { valid: false, error: ValidateError.InvalidPeerId };
+      }
+      let fromPeerId;
+      try {
+        fromPeerId = peerIdFromMultihash(decode$3(msg.from));
+      } catch (e2) {
+        return { valid: false, error: ValidateError.InvalidPeerId };
+      }
+      let publicKey;
+      if (msg.key != null) {
+        publicKey = publicKeyFromProtobuf(msg.key);
+        if (fromPeerId.publicKey !== void 0 && !publicKey.equals(fromPeerId.publicKey)) {
+          return { valid: false, error: ValidateError.InvalidPeerId };
+        }
+      } else {
+        if (fromPeerId.publicKey == null) {
+          return { valid: false, error: ValidateError.InvalidPeerId };
+        }
+        publicKey = fromPeerId.publicKey;
+      }
+      const rpcMsgPreSign = {
+        from: msg.from,
+        data: msg.data,
+        seqno: msg.seqno,
+        topic: msg.topic,
+        signature: void 0,
+        // Exclude signature field for signing
+        key: void 0
+        // Exclude key field for signing
+      };
+      const bytes = concat([SignPrefix, RPC.Message.encode(rpcMsgPreSign)]);
+      if (!await publicKey.verify(bytes, msg.signature)) {
+        return { valid: false, error: ValidateError.InvalidSignature };
+      }
+      return {
+        valid: true,
+        message: {
+          type: "signed",
+          from: fromPeerId,
+          data: msg.data ?? new Uint8Array(0),
+          sequenceNumber: BigInt(`0x${toString(msg.seqno, "base16")}`),
+          topic: msg.topic,
+          signature: msg.signature,
+          key: msg.key != null ? publicKeyFromProtobuf(msg.key) : publicKey
+        }
+      };
+    }
+    default:
+      throw new Error("Unreachable");
+  }
+}
+function createGossipRpc(messages2 = [], control) {
+  return {
+    subscriptions: [],
+    messages: messages2,
+    control: control !== void 0 ? {
+      graft: control.graft ?? [],
+      prune: control.prune ?? [],
+      ihave: control.ihave ?? [],
+      iwant: control.iwant ?? [],
+      idontwant: control.idontwant ?? []
+    } : void 0
+  };
+}
+function ensureControl(rpc) {
+  if (rpc.control === void 0) {
+    rpc.control = {
+      graft: [],
+      prune: [],
+      ihave: [],
+      iwant: [],
+      idontwant: []
+    };
+  }
+  return rpc;
+}
+function shuffle(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  const randInt = () => {
+    return Math.floor(Math.random() * Math.floor(arr.length));
+  };
+  for (let i2 = 0; i2 < arr.length; i2++) {
+    const j = randInt();
+    const tmp = arr[i2];
+    arr[i2] = arr[j];
+    arr[j] = tmp;
+  }
+  return arr;
+}
+function messageIdToString(msgId2) {
+  return toString(msgId2, "base64");
+}
+function getPublishConfigFromPeerId(signaturePolicy, peerId, privateKey) {
+  switch (signaturePolicy) {
+    case StrictSign: {
+      return {
+        type: PublishConfigType.Signing,
+        author: peerId,
+        key: publicKeyToProtobuf(privateKey.publicKey),
+        privateKey
+      };
+    }
+    case StrictNoSign:
+      return {
+        type: PublishConfigType.Anonymous
+      };
+    default:
+      throw new Error(`Unknown signature policy "${signaturePolicy}"`);
+  }
+}
+const msgId = (key, seqno) => {
+  const seqnoBytes = fromString(seqno.toString(16).padStart(16, "0"), "base16");
+  const keyBytes = publicKeyToProtobuf(key);
+  const msgId2 = new Uint8Array(keyBytes.byteLength + seqnoBytes.length);
+  msgId2.set(keyBytes, 0);
+  msgId2.set(seqnoBytes, keyBytes.byteLength);
+  return msgId2;
+};
+function msgIdFnStrictSign(msg) {
+  if (msg.type !== "signed") {
+    throw new Error("expected signed message type");
+  }
+  if (msg.sequenceNumber == null) {
+    throw Error("missing seqno field");
+  }
+  return msgId(msg.from.publicKey ?? msg.key, msg.sequenceNumber);
+}
+async function msgIdFnStrictNoSign(msg) {
+  return sha256$1.encode(msg.data);
+}
+function multiaddrToIPStr(multiaddr2) {
+  if (isNetworkAddress(multiaddr2)) {
+    const config = getNetConfig(multiaddr2);
+    switch (config.type) {
+      case "ip4":
+      case "ip6":
+        return config.host;
+    }
+  }
+  return null;
+}
+class SimpleTimeCache {
+  constructor(opts) {
+    __publicField(this, "entries", /* @__PURE__ */ new Map());
+    __publicField(this, "validityMs");
+    this.validityMs = opts.validityMs;
+  }
+  get size() {
+    return this.entries.size;
+  }
+  /** Returns true if there was a key collision and the entry is dropped */
+  put(key, value2) {
+    if (this.entries.has(key)) {
+      return true;
+    }
+    this.entries.set(key, { value: value2, validUntilMs: Date.now() + this.validityMs });
+    return false;
+  }
+  prune() {
+    const now = Date.now();
+    for (const [k, v] of this.entries.entries()) {
+      if (v.validUntilMs < now) {
+        this.entries.delete(k);
+      } else {
+        break;
+      }
+    }
+  }
+  has(key) {
+    return this.entries.has(key);
+  }
+  get(key) {
+    const value2 = this.entries.get(key);
+    return value2 != null && value2.validUntilMs >= Date.now() ? value2.value : void 0;
+  }
+  clear() {
+    this.entries.clear();
+  }
+}
+var GossipStatusCode;
+(function(GossipStatusCode2) {
+  GossipStatusCode2[GossipStatusCode2["started"] = 0] = "started";
+  GossipStatusCode2[GossipStatusCode2["stopped"] = 1] = "stopped";
+})(GossipStatusCode || (GossipStatusCode = {}));
+class GossipSub extends (_$ = TypedEventEmitter, __ = Symbol.toStringTag, _Z = serviceCapabilities, _Y = serviceDependencies, _$) {
+  constructor(components, options = {}) {
+    super();
+    /**
+     * The signature policy to follow by default
+     */
+    __publicField(this, "globalSignaturePolicy");
+    __publicField(this, "protocols", [GossipsubIDv12, GossipsubIDv11, GossipsubIDv10]);
+    __publicField(this, "publishConfig");
+    __publicField(this, "dataTransform");
+    // State
+    __publicField(this, "peers", /* @__PURE__ */ new Map());
+    __publicField(this, "streamsInbound", /* @__PURE__ */ new Map());
+    __publicField(this, "streamsOutbound", /* @__PURE__ */ new Map());
+    /** Ensures outbound streams are created sequentially */
+    __publicField(this, "outboundInflightQueue", pushable({ objectMode: true }));
+    /** Direct peers */
+    __publicField(this, "direct", /* @__PURE__ */ new Set());
+    /** Floodsub peers */
+    __publicField(this, "floodsubPeers", /* @__PURE__ */ new Set());
+    /** Cache of seen messages */
+    __publicField(this, "seenCache");
+    /**
+     * Map of peer id and AcceptRequestWhileListEntry
+     */
+    __publicField(this, "acceptFromWhitelist", /* @__PURE__ */ new Map());
+    /**
+     * Map of topics to which peers are subscribed to
+     */
+    __publicField(this, "topics", /* @__PURE__ */ new Map());
+    /**
+     * List of our subscriptions
+     */
+    __publicField(this, "subscriptions", /* @__PURE__ */ new Set());
+    /**
+     * Map of topic meshes
+     * topic => peer id set
+     */
+    __publicField(this, "mesh", /* @__PURE__ */ new Map());
+    /**
+     * Map of topics to set of peers. These mesh peers are the ones to which we are publishing without a topic membership
+     * topic => peer id set
+     */
+    __publicField(this, "fanout", /* @__PURE__ */ new Map());
+    /**
+     * Map of last publish time for fanout topics
+     * topic => last publish time
+     */
+    __publicField(this, "fanoutLastpub", /* @__PURE__ */ new Map());
+    /**
+     * Map of pending messages to gossip
+     * peer id => control messages
+     */
+    __publicField(this, "gossip", /* @__PURE__ */ new Map());
+    /**
+     * Map of control messages
+     * peer id => control message
+     */
+    __publicField(this, "control", /* @__PURE__ */ new Map());
+    /**
+     * Number of IHAVEs received from peer in the last heartbeat
+     */
+    __publicField(this, "peerhave", /* @__PURE__ */ new Map());
+    /** Number of messages we have asked from peer in the last heartbeat */
+    __publicField(this, "iasked", /* @__PURE__ */ new Map());
+    /** Prune backoff map */
+    __publicField(this, "backoff", /* @__PURE__ */ new Map());
+    /**
+     * Connection direction cache, marks peers with outbound connections
+     * peer id => direction
+     */
+    __publicField(this, "outbound", /* @__PURE__ */ new Map());
+    __publicField(this, "msgIdFn");
+    /**
+     * A fast message id function used for internal message de-duplication
+     */
+    __publicField(this, "fastMsgIdFn");
+    __publicField(this, "msgIdToStrFn");
+    /** Maps fast message-id to canonical message-id */
+    __publicField(this, "fastMsgIdCache");
+    /**
+     * Short term cache for published message ids. This is used for penalizing peers sending
+     * our own messages back if the messages are anonymous or use a random author.
+     */
+    __publicField(this, "publishedMessageIds");
+    /**
+     * A message cache that contains the messages for last few heartbeat ticks
+     */
+    __publicField(this, "mcache");
+    /** Peer score tracking */
+    __publicField(this, "score");
+    /**
+     * Custom validator function per topic.
+     * Must return or resolve quickly (< 100ms) to prevent causing penalties for late messages.
+     * If you need to apply validation that may require longer times use `asyncValidation` option and callback the
+     * validation result through `Gossipsub.reportValidationResult`
+     */
+    __publicField(this, "topicValidators", /* @__PURE__ */ new Map());
+    /**
+     * Make this protected so child class may want to redirect to its own log.
+     */
+    __publicField(this, "log");
+    /**
+     * Number of heartbeats since the beginning of time
+     * This allows us to amortize some resource cleanup -- eg: backoff cleanup
+     */
+    __publicField(this, "heartbeatTicks", 0);
+    /**
+     * Tracks IHAVE/IWANT promises broken by peers
+     */
+    __publicField(this, "gossipTracer");
+    /**
+     * Tracks IDONTWANT messages received by peers in the current heartbeat
+     */
+    __publicField(this, "idontwantCounts", /* @__PURE__ */ new Map());
+    /**
+     * Tracks IDONTWANT messages received by peers and the heartbeat they were received in
+     *
+     * idontwants are stored for `mcacheLength` heartbeats before being pruned,
+     * so this map is bounded by peerCount * idontwantMaxMessages * mcacheLength
+     */
+    __publicField(this, "idontwants", /* @__PURE__ */ new Map());
+    __publicField(this, "components");
+    __publicField(this, "directPeerInitial", null);
+    // Options
+    __publicField(this, "opts");
+    __publicField(this, "decodeRpcLimits");
+    __publicField(this, "metrics");
+    __publicField(this, "status", { code: GossipStatusCode.stopped });
+    __publicField(this, "maxInboundStreams");
+    __publicField(this, "maxOutboundStreams");
+    __publicField(this, "runOnLimitedConnection");
+    __publicField(this, "allowedTopics");
+    __publicField(this, "heartbeatTimer", null);
+    __publicField(this, __, "@chainsafe/libp2p-gossipsub");
+    __publicField(this, _Z, [
+      "@libp2p/pubsub"
+    ]);
+    __publicField(this, _Y, [
+      "@libp2p/identify"
+    ]);
+    __publicField(this, "runHeartbeat", () => {
+      var _a2;
+      const timer = (_a2 = this.metrics) == null ? void 0 : _a2.heartbeatDuration.startTimer();
+      this.heartbeat().catch((err) => {
+        this.log("Error running heartbeat", err);
+      }).finally(() => {
+        var _a3;
+        if (timer != null) {
+          timer();
+        }
+        if (this.status.code === GossipStatusCode.started) {
+          clearTimeout(this.status.heartbeatTimeout);
+          let msToNextHeartbeat = this.opts.heartbeatInterval - (Date.now() - this.status.hearbeatStartMs) % this.opts.heartbeatInterval;
+          if (msToNextHeartbeat < this.opts.heartbeatInterval * 0.25) {
+            msToNextHeartbeat += this.opts.heartbeatInterval;
+            (_a3 = this.metrics) == null ? void 0 : _a3.heartbeatSkipped.inc();
+          }
+          this.status.heartbeatTimeout = setTimeout(this.runHeartbeat, msToNextHeartbeat);
+        }
+      });
+    });
+    __publicField(this, "tagMeshPeer", (evt) => {
+      const { peerId, topic } = evt.detail;
+      this.components.peerStore.merge(this.peers.get(peerId) ?? peerIdFromString$1(peerId), {
+        tags: {
+          [topic]: {
+            value: 100
+          }
+        }
+      }).catch((err) => {
+        this.log.error("Error tagging peer %s with topic %s", peerId, topic, err);
+      });
+    });
+    __publicField(this, "untagMeshPeer", (evt) => {
+      const { peerId, topic } = evt.detail;
+      this.components.peerStore.merge(this.peers.get(peerId) ?? peerIdFromString$1(peerId), {
+        tags: {
+          [topic]: void 0
+        }
+      }).catch((err) => {
+        this.log.error("Error untagging peer %s with topic %s", peerId, topic, err);
+      });
+    });
+    const opts = {
+      fallbackToFloodsub: true,
+      floodPublish: true,
+      batchPublish: false,
+      tagMeshPeers: true,
+      doPX: false,
+      directPeers: [],
+      D: GossipsubD,
+      Dlo: GossipsubDlo,
+      Dhi: GossipsubDhi,
+      Dscore: GossipsubDscore,
+      Dout: GossipsubDout,
+      Dlazy: GossipsubDlazy,
+      heartbeatInterval: GossipsubHeartbeatInterval,
+      fanoutTTL: GossipsubFanoutTTL,
+      mcacheLength: GossipsubHistoryLength,
+      mcacheGossip: GossipsubHistoryGossip,
+      seenTTL: GossipsubSeenTTL,
+      gossipsubIWantFollowupMs: GossipsubIWantFollowupTime,
+      prunePeers: GossipsubPrunePeers,
+      pruneBackoff: GossipsubPruneBackoff,
+      unsubcribeBackoff: GossipsubUnsubscribeBackoff,
+      graftFloodThreshold: GossipsubGraftFloodThreshold,
+      opportunisticGraftPeers: GossipsubOpportunisticGraftPeers,
+      opportunisticGraftTicks: GossipsubOpportunisticGraftTicks,
+      directConnectTicks: GossipsubDirectConnectTicks,
+      gossipFactor: GossipsubGossipFactor,
+      idontwantMinDataSize: GossipsubIdontwantMinDataSize,
+      idontwantMaxMessages: GossipsubIdontwantMaxMessages,
+      ...options,
+      scoreParams: createPeerScoreParams(options.scoreParams),
+      scoreThresholds: createPeerScoreThresholds(options.scoreThresholds)
+    };
+    this.components = components;
+    this.decodeRpcLimits = opts.decodeRpcLimits ?? defaultDecodeRpcLimits;
+    this.globalSignaturePolicy = opts.globalSignaturePolicy ?? StrictSign;
+    if (opts.fallbackToFloodsub) {
+      this.protocols.push(FloodsubID);
+    }
+    this.log = components.logger.forComponent(opts.debugName ?? "libp2p:gossipsub");
+    this.opts = opts;
+    this.direct = new Set(opts.directPeers.map((p2) => p2.id.toString()));
+    this.seenCache = new SimpleTimeCache({ validityMs: opts.seenTTL });
+    this.publishedMessageIds = new SimpleTimeCache({ validityMs: opts.seenTTL });
+    if (options.msgIdFn != null) {
+      this.msgIdFn = options.msgIdFn;
+    } else {
+      switch (this.globalSignaturePolicy) {
+        case StrictSign:
+          this.msgIdFn = msgIdFnStrictSign;
+          break;
+        case StrictNoSign:
+          this.msgIdFn = msgIdFnStrictNoSign;
+          break;
+        default:
+          throw new Error(`Invalid globalSignaturePolicy: ${this.globalSignaturePolicy}`);
+      }
+    }
+    if (options.fastMsgIdFn != null) {
+      this.fastMsgIdFn = options.fastMsgIdFn;
+      this.fastMsgIdCache = new SimpleTimeCache({ validityMs: opts.seenTTL });
+    }
+    this.msgIdToStrFn = options.msgIdToStrFn ?? messageIdToString;
+    this.mcache = options.messageCache ?? new MessageCache(opts.mcacheGossip, opts.mcacheLength, this.msgIdToStrFn);
+    if (options.dataTransform != null) {
+      this.dataTransform = options.dataTransform;
+    }
+    if (options.metricsRegister != null) {
+      if (options.metricsTopicStrToLabel == null) {
+        throw Error("Must set metricsTopicStrToLabel with metrics");
+      }
+      const maxMeshMessageDeliveriesWindowMs = Math.max(...Object.values(opts.scoreParams.topics).map((topicParam) => topicParam.meshMessageDeliveriesWindow), DEFAULT_METRIC_MESH_MESSAGE_DELIVERIES_WINDOWS);
+      const metrics = getMetrics(options.metricsRegister, options.metricsTopicStrToLabel, {
+        gossipPromiseExpireSec: this.opts.gossipsubIWantFollowupMs / 1e3,
+        behaviourPenaltyThreshold: opts.scoreParams.behaviourPenaltyThreshold,
+        maxMeshMessageDeliveriesWindowSec: maxMeshMessageDeliveriesWindowMs / 1e3
+      });
+      metrics.mcacheSize.addCollect(() => {
+        this.onScrapeMetrics(metrics);
+      });
+      for (const protocol of this.protocols) {
+        metrics.protocolsEnabled.set({ protocol }, 1);
+      }
+      this.metrics = metrics;
+    } else {
+      this.metrics = null;
+    }
+    this.gossipTracer = new IWantTracer(this.opts.gossipsubIWantFollowupMs, this.msgIdToStrFn, this.metrics);
+    this.score = new PeerScore(this.opts.scoreParams, this.metrics, this.components.logger, {
+      scoreCacheValidityMs: opts.heartbeatInterval
+    });
+    this.maxInboundStreams = options.maxInboundStreams;
+    this.maxOutboundStreams = options.maxOutboundStreams;
+    this.runOnLimitedConnection = options.runOnLimitedConnection;
+    this.allowedTopics = opts.allowedTopics != null ? new Set(opts.allowedTopics) : null;
+  }
+  getPeers() {
+    return [...this.peers.values()];
+  }
+  isStarted() {
+    return this.status.code === GossipStatusCode.started;
+  }
+  // LIFECYCLE METHODS
+  /**
+   * Mounts the gossipsub protocol onto the libp2p node and sends our
+   * our subscriptions to every peer connected
+   */
+  async start() {
+    if (this.isStarted()) {
+      return;
+    }
+    this.log("starting");
+    this.publishConfig = getPublishConfigFromPeerId(this.globalSignaturePolicy, this.components.peerId, this.components.privateKey);
+    this.outboundInflightQueue = pushable({ objectMode: true });
+    pipe$1(this.outboundInflightQueue, async (source) => {
+      for await (const { peerId, connection } of source) {
+        await this.createOutboundStream(peerId, connection);
+      }
+    }).catch((e2) => {
+      this.log.error("outbound inflight queue error", e2);
+    });
+    await Promise.all(this.opts.directPeers.map(async (p2) => {
+      await this.components.peerStore.merge(p2.id, {
+        multiaddrs: p2.addrs
+      });
+    }));
+    const registrar = this.components.registrar;
+    await Promise.all(this.protocols.map(async (protocol) => registrar.handle(protocol, this.onIncomingStream.bind(this), {
+      maxInboundStreams: this.maxInboundStreams,
+      maxOutboundStreams: this.maxOutboundStreams,
+      runOnLimitedConnection: this.runOnLimitedConnection
+    })));
+    const topology = {
+      onConnect: this.onPeerConnected.bind(this),
+      onDisconnect: this.onPeerDisconnected.bind(this),
+      notifyOnLimitedConnection: this.runOnLimitedConnection
+    };
+    const registrarTopologyIds = await Promise.all(this.protocols.map(async (protocol) => registrar.register(protocol, topology)));
+    const heartbeatTimeout = setTimeout(this.runHeartbeat, GossipsubHeartbeatInitialDelay);
+    this.status = {
+      code: GossipStatusCode.started,
+      registrarTopologyIds,
+      heartbeatTimeout,
+      hearbeatStartMs: Date.now() + GossipsubHeartbeatInitialDelay
+    };
+    this.score.start();
+    this.directPeerInitial = setTimeout(() => {
+      Promise.resolve().then(async () => {
+        await Promise.all(Array.from(this.direct).map(async (id) => this.connect(id)));
+      }).catch((err) => {
+        this.log(err);
+      });
+    }, GossipsubDirectConnectInitialDelay);
+    if (this.opts.tagMeshPeers) {
+      this.addEventListener("gossipsub:graft", this.tagMeshPeer);
+      this.addEventListener("gossipsub:prune", this.untagMeshPeer);
+    }
+    this.log("started");
+  }
+  /**
+   * Unmounts the gossipsub protocol and shuts down every connection
+   */
+  async stop() {
+    this.log("stopping");
+    if (this.status.code !== GossipStatusCode.started) {
+      return;
+    }
+    const { registrarTopologyIds } = this.status;
+    this.status = { code: GossipStatusCode.stopped };
+    if (this.opts.tagMeshPeers) {
+      this.removeEventListener("gossipsub:graft", this.tagMeshPeer);
+      this.removeEventListener("gossipsub:prune", this.untagMeshPeer);
+    }
+    const registrar = this.components.registrar;
+    await Promise.all(this.protocols.map(async (protocol) => registrar.unhandle(protocol)));
+    registrarTopologyIds.forEach((id) => {
+      registrar.unregister(id);
+    });
+    this.outboundInflightQueue.end();
+    const closePromises = [];
+    for (const outboundStream of this.streamsOutbound.values()) {
+      closePromises.push(outboundStream.close());
+    }
+    this.streamsOutbound.clear();
+    for (const inboundStream of this.streamsInbound.values()) {
+      closePromises.push(inboundStream.close());
+    }
+    this.streamsInbound.clear();
+    await Promise.all(closePromises);
+    this.peers.clear();
+    this.subscriptions.clear();
+    if (this.heartbeatTimer != null) {
+      this.heartbeatTimer.cancel();
+      this.heartbeatTimer = null;
+    }
+    this.score.stop();
+    this.mesh.clear();
+    this.fanout.clear();
+    this.fanoutLastpub.clear();
+    this.gossip.clear();
+    this.control.clear();
+    this.peerhave.clear();
+    this.iasked.clear();
+    this.backoff.clear();
+    this.outbound.clear();
+    this.gossipTracer.clear();
+    this.seenCache.clear();
+    if (this.fastMsgIdCache != null) {
+      this.fastMsgIdCache.clear();
+    }
+    if (this.directPeerInitial != null) {
+      clearTimeout(this.directPeerInitial);
+    }
+    this.idontwantCounts.clear();
+    this.idontwants.clear();
+    this.log("stopped");
+  }
+  /** FOR DEBUG ONLY - Dump peer stats for all peers. Data is cloned, safe to mutate */
+  dumpPeerScoreStats() {
+    return this.score.dumpPeerScoreStats();
+  }
+  /**
+   * On an inbound stream opened
+   */
+  onIncomingStream(stream, connection) {
+    if (!this.isStarted()) {
+      return;
+    }
+    const peerId = connection.remotePeer;
+    this.addPeer(peerId, connection.direction, connection.remoteAddr);
+    this.createInboundStream(peerId, stream);
+    this.outboundInflightQueue.push({ peerId, connection });
+  }
+  /**
+   * Registrar notifies an established connection with pubsub protocol
+   */
+  onPeerConnected(peerId, connection) {
+    var _a2;
+    (_a2 = this.metrics) == null ? void 0 : _a2.newConnectionCount.inc({ status: connection.status });
+    if (!this.isStarted() || connection.status !== "open") {
+      return;
+    }
+    this.addPeer(peerId, connection.direction, connection.remoteAddr);
+    this.outboundInflightQueue.push({ peerId, connection });
+  }
+  /**
+   * Registrar notifies a closing connection with pubsub protocol
+   */
+  onPeerDisconnected(peerId) {
+    this.log("connection ended %p", peerId);
+    this.removePeer(peerId);
+  }
+  async createOutboundStream(peerId, connection) {
+    var _a2;
+    if (!this.isStarted()) {
+      return;
+    }
+    const id = peerId.toString();
+    if (!this.peers.has(id)) {
+      return;
+    }
+    if (this.streamsOutbound.has(id)) {
+      return;
+    }
+    try {
+      const stream = new OutboundStream(await connection.newStream(this.protocols, {
+        runOnLimitedConnection: this.runOnLimitedConnection
+      }), (e2) => {
+        this.log.error("outbound pipe error", e2);
+      }, { maxBufferSize: this.opts.maxOutboundBufferSize });
+      this.log("create outbound stream %p", peerId);
+      this.streamsOutbound.set(id, stream);
+      const protocol = stream.protocol;
+      if (protocol === FloodsubID) {
+        this.floodsubPeers.add(id);
+      }
+      (_a2 = this.metrics) == null ? void 0 : _a2.peersPerProtocol.inc({ protocol }, 1);
+      if (this.subscriptions.size > 0) {
+        this.log("send subscriptions to", id);
+        this.sendSubscriptions(id, Array.from(this.subscriptions), true);
+      }
+    } catch (e2) {
+      this.log.error("createOutboundStream error", e2);
+    }
+  }
+  createInboundStream(peerId, stream) {
+    if (!this.isStarted()) {
+      return;
+    }
+    const id = peerId.toString();
+    if (!this.peers.has(id)) {
+      return;
+    }
+    const priorInboundStream = this.streamsInbound.get(id);
+    if (priorInboundStream !== void 0) {
+      this.log("replacing existing inbound steam %s", id);
+      priorInboundStream.close().catch((err) => {
+        this.log.error(err);
+      });
+    }
+    this.log("create inbound stream %s", id);
+    const inboundStream = new InboundStream(stream, { maxDataLength: this.opts.maxInboundDataLength });
+    this.streamsInbound.set(id, inboundStream);
+    this.pipePeerReadStream(peerId, inboundStream.source).catch((err) => {
+      this.log(err);
+    });
+  }
+  /**
+   * Add a peer to the router
+   */
+  addPeer(peerId, direction, addr) {
+    const id = peerId.toString();
+    if (!this.peers.has(id)) {
+      this.peers.set(id, peerId);
+      this.score.addPeer(id);
+      const currentIP = multiaddrToIPStr(addr);
+      if (currentIP !== null) {
+        this.score.addIP(id, currentIP);
+      } else {
+        this.log("Added peer has no IP in current address %s %s", id, addr.toString());
+      }
+      if (!this.outbound.has(id)) {
+        this.outbound.set(id, direction === "outbound");
+      }
+    }
+  }
+  /**
+   * Removes a peer from the router
+   */
+  removePeer(peerId) {
+    var _a2, _b2;
+    const id = peerId.toString();
+    if (!this.peers.has(id)) {
+      return;
+    }
+    this.log("delete peer %p", peerId);
+    this.peers.delete(id);
+    const outboundStream = this.streamsOutbound.get(id);
+    const inboundStream = this.streamsInbound.get(id);
+    if (outboundStream != null) {
+      (_a2 = this.metrics) == null ? void 0 : _a2.peersPerProtocol.inc({ protocol: outboundStream.protocol }, -1);
+    }
+    outboundStream == null ? void 0 : outboundStream.close().catch((err) => {
+      this.log.error(err);
+    });
+    inboundStream == null ? void 0 : inboundStream.close().catch((err) => {
+      this.log.error(err);
+    });
+    this.streamsOutbound.delete(id);
+    this.streamsInbound.delete(id);
+    for (const peers of this.topics.values()) {
+      peers.delete(id);
+    }
+    for (const [topicStr, peers] of this.mesh) {
+      if (peers.delete(id)) {
+        (_b2 = this.metrics) == null ? void 0 : _b2.onRemoveFromMesh(topicStr, ChurnReason.Dc, 1);
+      }
+    }
+    for (const peers of this.fanout.values()) {
+      peers.delete(id);
+    }
+    this.floodsubPeers.delete(id);
+    this.gossip.delete(id);
+    this.control.delete(id);
+    this.outbound.delete(id);
+    this.idontwantCounts.delete(id);
+    this.idontwants.delete(id);
+    this.score.removePeer(id);
+    this.acceptFromWhitelist.delete(id);
+  }
+  // API METHODS
+  get started() {
+    return this.status.code === GossipStatusCode.started;
+  }
+  /**
+   * Get a the peer-ids in a topic mesh
+   */
+  getMeshPeers(topic) {
+    const peersInTopic = this.mesh.get(topic);
+    return peersInTopic != null ? Array.from(peersInTopic) : [];
+  }
+  /**
+   * Get a list of the peer-ids that are subscribed to one topic.
+   */
+  getSubscribers(topic) {
+    const peersInTopic = this.topics.get(topic);
+    return (peersInTopic != null ? Array.from(peersInTopic) : []).map((str) => this.peers.get(str) ?? peerIdFromString$1(str));
+  }
+  /**
+   * Get the list of topics which the peer is subscribed to.
+   */
+  getTopics() {
+    return Array.from(this.subscriptions);
+  }
+  // TODO: Reviewing Pubsub API
+  // MESSAGE METHODS
+  /**
+   * Responsible for processing each RPC message received by other peers.
+   */
+  async pipePeerReadStream(peerId, stream) {
+    var _a2;
+    try {
+      await pipe$1(stream, async (source) => {
+        var _a3, _b2, _c2;
+        for await (const data of source) {
+          try {
+            const rpcBytes = data.subarray();
+            const rpc = RPC.decode(rpcBytes, {
+              limits: {
+                subscriptions: this.decodeRpcLimits.maxSubscriptions,
+                messages: this.decodeRpcLimits.maxMessages,
+                control$: {
+                  ihave: this.decodeRpcLimits.maxIhaveMessageIDs,
+                  iwant: this.decodeRpcLimits.maxIwantMessageIDs,
+                  graft: this.decodeRpcLimits.maxControlMessages,
+                  prune: this.decodeRpcLimits.maxControlMessages,
+                  prune$: {
+                    peers: this.decodeRpcLimits.maxPeerInfos
+                  },
+                  idontwant: this.decodeRpcLimits.maxControlMessages,
+                  idontwant$: {
+                    messageIDs: this.decodeRpcLimits.maxIdontwantMessageIDs
+                  }
+                }
+              }
+            });
+            (_a3 = this.metrics) == null ? void 0 : _a3.onRpcRecv(rpc, rpcBytes.length);
+            if (this.opts.awaitRpcHandler) {
+              try {
+                await this.handleReceivedRpc(peerId, rpc);
+              } catch (err) {
+                (_b2 = this.metrics) == null ? void 0 : _b2.onRpcRecvError();
+                this.log(err);
+              }
+            } else {
+              this.handleReceivedRpc(peerId, rpc).catch((err) => {
+                var _a4;
+                (_a4 = this.metrics) == null ? void 0 : _a4.onRpcRecvError();
+                this.log(err);
+              });
+            }
+          } catch (e2) {
+            (_c2 = this.metrics) == null ? void 0 : _c2.onRpcDataError();
+            this.log(e2);
+          }
+        }
+      });
+    } catch (err) {
+      (_a2 = this.metrics) == null ? void 0 : _a2.onPeerReadStreamError();
+      this.handlePeerReadStreamError(err, peerId);
+    }
+  }
+  /**
+   * Handle error when read stream pipe throws, less of the functional use but more
+   * to for testing purposes to spy on the error handling
+   */
+  handlePeerReadStreamError(err, peerId) {
+    this.log.error(err);
+    this.onPeerDisconnected(peerId);
+  }
+  /**
+   * Handles an rpc request from a peer
+   */
+  async handleReceivedRpc(from2, rpc) {
+    var _a2;
+    if (!this.acceptFrom(from2.toString())) {
+      this.log("received message from unacceptable peer %p", from2);
+      (_a2 = this.metrics) == null ? void 0 : _a2.rpcRecvNotAccepted.inc();
+      return;
+    }
+    const subscriptions = rpc.subscriptions != null ? rpc.subscriptions.length : 0;
+    const messages2 = rpc.messages != null ? rpc.messages.length : 0;
+    let ihave = 0;
+    let iwant = 0;
+    let graft = 0;
+    let prune = 0;
+    if (rpc.control != null) {
+      if (rpc.control.ihave != null) {
+        ihave = rpc.control.ihave.length;
+      }
+      if (rpc.control.iwant != null) {
+        iwant = rpc.control.iwant.length;
+      }
+      if (rpc.control.graft != null) {
+        graft = rpc.control.graft.length;
+      }
+      if (rpc.control.prune != null) {
+        prune = rpc.control.prune.length;
+      }
+    }
+    this.log(`rpc.from ${from2.toString()} subscriptions ${subscriptions} messages ${messages2} ihave ${ihave} iwant ${iwant} graft ${graft} prune ${prune}`);
+    if (rpc.subscriptions != null && rpc.subscriptions.length > 0) {
+      const subscriptions2 = [];
+      rpc.subscriptions.forEach((subOpt) => {
+        const topic = subOpt.topic;
+        const subscribe = subOpt.subscribe === true;
+        if (topic != null) {
+          if (this.allowedTopics != null && !this.allowedTopics.has(topic)) {
+            return;
+          }
+          this.handleReceivedSubscription(from2, topic, subscribe);
+          subscriptions2.push({ topic, subscribe });
+        }
+      });
+      this.safeDispatchEvent("subscription-change", {
+        detail: { peerId: from2, subscriptions: subscriptions2 }
+      });
+    }
+    for (const message2 of rpc.messages) {
+      if (this.allowedTopics != null && !this.allowedTopics.has(message2.topic)) {
+        continue;
+      }
+      const handleReceivedMessagePromise = this.handleReceivedMessage(from2, message2).catch((err) => {
+        var _a3;
+        (_a3 = this.metrics) == null ? void 0 : _a3.onMsgRecvError(message2.topic);
+        this.log(err);
+      });
+      if (this.opts.awaitRpcMessageHandler) {
+        await handleReceivedMessagePromise;
+      }
+    }
+    if (rpc.control != null) {
+      await this.handleControlMessage(from2.toString(), rpc.control);
+    }
+  }
+  /**
+   * Handles a subscription change from a peer
+   */
+  handleReceivedSubscription(from2, topic, subscribe) {
+    this.log("subscription update from %p topic %s", from2, topic);
+    let topicSet = this.topics.get(topic);
+    if (topicSet == null) {
+      topicSet = /* @__PURE__ */ new Set();
+      this.topics.set(topic, topicSet);
+    }
+    if (subscribe) {
+      topicSet.add(from2.toString());
+    } else {
+      topicSet.delete(from2.toString());
+    }
+  }
+  /**
+   * Handles a newly received message from an RPC.
+   * May forward to all peers in the mesh.
+   */
+  async handleReceivedMessage(from2, rpcMsg) {
+    var _a2, _b2, _c2;
+    (_a2 = this.metrics) == null ? void 0 : _a2.onMsgRecvPreValidation(rpcMsg.topic);
+    const validationResult = await this.validateReceivedMessage(from2, rpcMsg);
+    (_b2 = this.metrics) == null ? void 0 : _b2.onPrevalidationResult(rpcMsg.topic, validationResult.code);
+    const validationCode = validationResult.code;
+    switch (validationCode) {
+      case MessageStatus.duplicate:
+        this.score.duplicateMessage(from2.toString(), validationResult.msgIdStr, rpcMsg.topic);
+        this.gossipTracer.deliverMessage(validationResult.msgIdStr, true);
+        this.mcache.observeDuplicate(validationResult.msgIdStr, from2.toString());
+        return;
+      case MessageStatus.invalid:
+        if (validationResult.msgIdStr != null) {
+          const msgIdStr = validationResult.msgIdStr;
+          this.score.rejectMessage(from2.toString(), msgIdStr, rpcMsg.topic, validationResult.reason);
+          this.gossipTracer.rejectMessage(msgIdStr, validationResult.reason);
+        } else {
+          this.score.rejectInvalidMessage(from2.toString(), rpcMsg.topic);
+        }
+        (_c2 = this.metrics) == null ? void 0 : _c2.onMsgRecvInvalid(rpcMsg.topic, validationResult);
+        return;
+      case MessageStatus.valid:
+        this.score.validateMessage(validationResult.messageId.msgIdStr);
+        this.gossipTracer.deliverMessage(validationResult.messageId.msgIdStr);
+        this.mcache.put(validationResult.messageId, rpcMsg, !this.opts.asyncValidation);
+        if (this.subscriptions.has(rpcMsg.topic)) {
+          const isFromSelf = this.components.peerId.equals(from2);
+          if (!isFromSelf || this.opts.emitSelf) {
+            super.dispatchEvent(new CustomEvent("gossipsub:message", {
+              detail: {
+                propagationSource: from2,
+                msgId: validationResult.messageId.msgIdStr,
+                msg: validationResult.msg
+              }
+            }));
+            super.dispatchEvent(new CustomEvent("message", { detail: validationResult.msg }));
+          }
+        }
+        if (!this.opts.asyncValidation) {
+          this.forwardMessage(validationResult.messageId.msgIdStr, rpcMsg, from2.toString());
+        }
+        break;
+      default:
+        throw new Error(`Invalid validation result: ${validationCode}`);
+    }
+  }
+  /**
+   * Handles a newly received message from an RPC.
+   * May forward to all peers in the mesh.
+   */
+  async validateReceivedMessage(propagationSource, rpcMsg) {
+    var _a2, _b2, _c2, _d2;
+    const fastMsgIdStr = (_a2 = this.fastMsgIdFn) == null ? void 0 : _a2.call(this, rpcMsg);
+    const msgIdCached = fastMsgIdStr !== void 0 ? (_b2 = this.fastMsgIdCache) == null ? void 0 : _b2.get(fastMsgIdStr) : void 0;
+    if (msgIdCached != null) {
+      return { code: MessageStatus.duplicate, msgIdStr: msgIdCached };
+    }
+    const validationResult = await validateToRawMessage(this.globalSignaturePolicy, rpcMsg);
+    if (!validationResult.valid) {
+      return { code: MessageStatus.invalid, reason: RejectReason.Error, error: validationResult.error };
+    }
+    const msg = validationResult.message;
+    try {
+      if (this.dataTransform != null) {
+        msg.data = this.dataTransform.inboundTransform(rpcMsg.topic, msg.data);
+      }
+    } catch (e2) {
+      this.log("Invalid message, transform failed", e2);
+      return { code: MessageStatus.invalid, reason: RejectReason.Error, error: ValidateError.TransformFailed };
+    }
+    const msgId2 = await this.msgIdFn(msg);
+    const msgIdStr = this.msgIdToStrFn(msgId2);
+    const messageId = { msgId: msgId2, msgIdStr };
+    if (fastMsgIdStr !== void 0 && this.fastMsgIdCache != null) {
+      const collision = this.fastMsgIdCache.put(fastMsgIdStr, msgIdStr);
+      if (collision) {
+        (_c2 = this.metrics) == null ? void 0 : _c2.fastMsgIdCacheCollision.inc();
+      }
+    }
+    if (this.seenCache.has(msgIdStr)) {
+      return { code: MessageStatus.duplicate, msgIdStr };
+    } else {
+      this.seenCache.put(msgIdStr);
+    }
+    if ((((_d2 = rpcMsg.data) == null ? void 0 : _d2.length) ?? 0) >= this.opts.idontwantMinDataSize) {
+      this.sendIDontWants(msgId2, rpcMsg.topic, propagationSource.toString());
+    }
+    const topicValidator = this.topicValidators.get(rpcMsg.topic);
+    if (topicValidator != null) {
+      let acceptance;
+      try {
+        acceptance = await topicValidator(propagationSource, msg);
+      } catch (e2) {
+        const errCode = e2.code;
+        if (errCode === ERR_TOPIC_VALIDATOR_IGNORE) {
+          acceptance = TopicValidatorResult.Ignore;
+        }
+        if (errCode === ERR_TOPIC_VALIDATOR_REJECT) {
+          acceptance = TopicValidatorResult.Reject;
+        } else {
+          acceptance = TopicValidatorResult.Ignore;
+        }
+      }
+      if (acceptance !== TopicValidatorResult.Accept) {
+        return { code: MessageStatus.invalid, reason: rejectReasonFromAcceptance(acceptance), msgIdStr };
+      }
+    }
+    return { code: MessageStatus.valid, messageId, msg };
+  }
+  /**
+   * Return score of a peer.
+   */
+  getScore(peerId) {
+    return this.score.score(peerId);
+  }
+  /**
+   * Send an rpc object to a peer with subscriptions
+   */
+  sendSubscriptions(toPeer, topics, subscribe) {
+    this.sendRpc(toPeer, {
+      subscriptions: topics.map((topic) => ({ topic, subscribe })),
+      messages: []
+    });
+  }
+  /**
+   * Handles an rpc control message from a peer
+   */
+  async handleControlMessage(id, controlMsg) {
+    var _a2, _b2, _c2, _d2, _e2, _f2, _g2;
+    if (controlMsg === void 0) {
+      return;
+    }
+    const iwant = ((_a2 = controlMsg.ihave) == null ? void 0 : _a2.length) > 0 ? this.handleIHave(id, controlMsg.ihave) : [];
+    const ihave = ((_b2 = controlMsg.iwant) == null ? void 0 : _b2.length) > 0 ? this.handleIWant(id, controlMsg.iwant) : [];
+    const prune = ((_c2 = controlMsg.graft) == null ? void 0 : _c2.length) > 0 ? await this.handleGraft(id, controlMsg.graft) : [];
+    ((_d2 = controlMsg.prune) == null ? void 0 : _d2.length) > 0 && await this.handlePrune(id, controlMsg.prune);
+    ((_e2 = controlMsg.idontwant) == null ? void 0 : _e2.length) > 0 && this.handleIdontwant(id, controlMsg.idontwant);
+    if (iwant.length === 0 && ihave.length === 0 && prune.length === 0) {
+      return;
+    }
+    const sent = this.sendRpc(id, createGossipRpc(ihave, { iwant, prune }));
+    const iwantMessageIds = (_f2 = iwant[0]) == null ? void 0 : _f2.messageIDs;
+    if (iwantMessageIds != null) {
+      if (sent) {
+        this.gossipTracer.addPromise(id, iwantMessageIds);
+      } else {
+        (_g2 = this.metrics) == null ? void 0 : _g2.iwantPromiseUntracked.inc(1);
+      }
+    }
+  }
+  /**
+   * Whether to accept a message from a peer
+   */
+  acceptFrom(id) {
+    if (this.direct.has(id)) {
+      return true;
+    }
+    const now = Date.now();
+    const entry = this.acceptFromWhitelist.get(id);
+    if (entry != null && entry.messagesAccepted < ACCEPT_FROM_WHITELIST_MAX_MESSAGES && entry.acceptUntil >= now) {
+      entry.messagesAccepted += 1;
+      return true;
+    }
+    const score = this.score.score(id);
+    if (score >= ACCEPT_FROM_WHITELIST_THRESHOLD_SCORE) {
+      this.acceptFromWhitelist.set(id, {
+        messagesAccepted: 0,
+        acceptUntil: now + ACCEPT_FROM_WHITELIST_DURATION_MS
+      });
+    } else {
+      this.acceptFromWhitelist.delete(id);
+    }
+    return score >= this.opts.scoreThresholds.graylistThreshold;
+  }
+  /**
+   * Handles IHAVE messages
+   */
+  handleIHave(id, ihave) {
+    var _a2, _b2, _c2;
+    if (ihave.length === 0) {
+      return [];
+    }
+    const score = this.score.score(id);
+    if (score < this.opts.scoreThresholds.gossipThreshold) {
+      this.log("IHAVE: ignoring peer %s with score below threshold [ score = %d ]", id, score);
+      (_a2 = this.metrics) == null ? void 0 : _a2.ihaveRcvIgnored.inc({ reason: IHaveIgnoreReason.LowScore });
+      return [];
+    }
+    const peerhave = (this.peerhave.get(id) ?? 0) + 1;
+    this.peerhave.set(id, peerhave);
+    if (peerhave > GossipsubMaxIHaveMessages) {
+      this.log("IHAVE: peer %s has advertised too many times (%d) within this heartbeat interval; ignoring", id, peerhave);
+      (_b2 = this.metrics) == null ? void 0 : _b2.ihaveRcvIgnored.inc({ reason: IHaveIgnoreReason.MaxIhave });
+      return [];
+    }
+    const iasked = this.iasked.get(id) ?? 0;
+    if (iasked >= GossipsubMaxIHaveLength) {
+      this.log("IHAVE: peer %s has already advertised too many messages (%d); ignoring", id, iasked);
+      (_c2 = this.metrics) == null ? void 0 : _c2.ihaveRcvIgnored.inc({ reason: IHaveIgnoreReason.MaxIasked });
+      return [];
+    }
+    const iwant = /* @__PURE__ */ new Map();
+    ihave.forEach(({ topicID, messageIDs }) => {
+      var _a3;
+      if (topicID == null || messageIDs == null || !this.mesh.has(topicID)) {
+        return;
+      }
+      let idonthave = 0;
+      messageIDs.forEach((msgId2) => {
+        const msgIdStr = this.msgIdToStrFn(msgId2);
+        if (!this.seenCache.has(msgIdStr)) {
+          iwant.set(msgIdStr, msgId2);
+          idonthave++;
+        }
+      });
+      (_a3 = this.metrics) == null ? void 0 : _a3.onIhaveRcv(topicID, messageIDs.length, idonthave);
+    });
+    if (iwant.size === 0) {
+      return [];
+    }
+    let iask = iwant.size;
+    if (iask + iasked > GossipsubMaxIHaveLength) {
+      iask = GossipsubMaxIHaveLength - iasked;
+    }
+    this.log("IHAVE: Asking for %d out of %d messages from %s", iask, iwant.size, id);
+    let iwantList = Array.from(iwant.values());
+    shuffle(iwantList);
+    iwantList = iwantList.slice(0, iask);
+    this.iasked.set(id, iasked + iask);
+    return [
+      {
+        messageIDs: iwantList
+      }
+    ];
+  }
+  /**
+   * Handles IWANT messages
+   * Returns messages to send back to peer
+   */
+  handleIWant(id, iwant) {
+    var _a2;
+    if (iwant.length === 0) {
+      return [];
+    }
+    const score = this.score.score(id);
+    if (score < this.opts.scoreThresholds.gossipThreshold) {
+      this.log("IWANT: ignoring peer %s with score below threshold [score = %d]", id, score);
+      return [];
+    }
+    const ihave = /* @__PURE__ */ new Map();
+    const iwantByTopic = /* @__PURE__ */ new Map();
+    let iwantDonthave = 0;
+    iwant.forEach(({ messageIDs }) => {
+      messageIDs == null ? void 0 : messageIDs.forEach((msgId2) => {
+        const msgIdStr = this.msgIdToStrFn(msgId2);
+        const entry = this.mcache.getWithIWantCount(msgIdStr, id);
+        if (entry == null) {
+          iwantDonthave++;
+          return;
+        }
+        iwantByTopic.set(entry.msg.topic, 1 + (iwantByTopic.get(entry.msg.topic) ?? 0));
+        if (entry.count > GossipsubGossipRetransmission) {
+          this.log("IWANT: Peer %s has asked for message %s too many times: ignoring request", id, msgId2);
+          return;
+        }
+        ihave.set(msgIdStr, entry.msg);
+      });
+    });
+    (_a2 = this.metrics) == null ? void 0 : _a2.onIwantRcv(iwantByTopic, iwantDonthave);
+    if (ihave.size === 0) {
+      this.log("IWANT: Could not provide any wanted messages to %s", id);
+      return [];
+    }
+    this.log("IWANT: Sending %d messages to %s", ihave.size, id);
+    return Array.from(ihave.values());
+  }
+  /**
+   * Handles Graft messages
+   */
+  async handleGraft(id, graft) {
+    const prune = [];
+    const score = this.score.score(id);
+    const now = Date.now();
+    let doPX = this.opts.doPX;
+    graft.forEach(({ topicID }) => {
+      var _a2, _b2;
+      if (topicID == null) {
+        return;
+      }
+      const peersInMesh = this.mesh.get(topicID);
+      if (peersInMesh == null) {
+        doPX = false;
+        return;
+      }
+      if (peersInMesh.has(id)) {
+        return;
+      }
+      const backoffExpiry = (_a2 = this.backoff.get(topicID)) == null ? void 0 : _a2.get(id);
+      if (this.direct.has(id)) {
+        this.log("GRAFT: ignoring request from direct peer %s", id);
+        prune.push(topicID);
+        doPX = false;
+      } else if (typeof backoffExpiry === "number" && now < backoffExpiry) {
+        this.log("GRAFT: ignoring backed off peer %s", id);
+        this.score.addPenalty(id, 1, ScorePenalty.GraftBackoff);
+        doPX = false;
+        const floodCutoff = backoffExpiry + this.opts.graftFloodThreshold - this.opts.pruneBackoff;
+        if (now < floodCutoff) {
+          this.score.addPenalty(id, 1, ScorePenalty.GraftBackoff);
+        }
+        this.addBackoff(id, topicID);
+        prune.push(topicID);
+      } else if (score < 0) {
+        this.log("GRAFT: ignoring peer %s with negative score: score=%d, topic=%s", id, score, topicID);
+        prune.push(topicID);
+        doPX = false;
+        this.addBackoff(id, topicID);
+      } else if (peersInMesh.size >= this.opts.Dhi && !(this.outbound.get(id) ?? false)) {
+        prune.push(topicID);
+        this.addBackoff(id, topicID);
+      } else {
+        this.log("GRAFT: Add mesh link from %s in %s", id, topicID);
+        this.score.graft(id, topicID);
+        peersInMesh.add(id);
+        (_b2 = this.metrics) == null ? void 0 : _b2.onAddToMesh(topicID, InclusionReason.Subscribed, 1);
+      }
+      this.safeDispatchEvent("gossipsub:graft", { detail: { peerId: id, topic: topicID, direction: "inbound" } });
+    });
+    if (prune.length === 0) {
+      return [];
+    }
+    const onUnsubscribe = false;
+    return Promise.all(prune.map(async (topic) => this.makePrune(id, topic, doPX, onUnsubscribe)));
+  }
+  /**
+   * Handles Prune messages
+   */
+  async handlePrune(id, prune) {
+    var _a2;
+    const score = this.score.score(id);
+    for (const { topicID, backoff, peers } of prune) {
+      if (topicID == null) {
+        continue;
+      }
+      const peersInMesh = this.mesh.get(topicID);
+      if (peersInMesh == null) {
+        return;
+      }
+      this.log("PRUNE: Remove mesh link to %s in %s", id, topicID);
+      this.score.prune(id, topicID);
+      if (peersInMesh.has(id)) {
+        peersInMesh.delete(id);
+        (_a2 = this.metrics) == null ? void 0 : _a2.onRemoveFromMesh(topicID, ChurnReason.Prune, 1);
+      }
+      if (typeof backoff === "number" && backoff > 0) {
+        this.doAddBackoff(id, topicID, backoff * 1e3);
+      } else {
+        this.addBackoff(id, topicID);
+      }
+      if (peers != null && peers.length > 0) {
+        if (score < this.opts.scoreThresholds.acceptPXThreshold) {
+          this.log("PRUNE: ignoring PX from peer %s with insufficient score [score = %d, topic = %s]", id, score, topicID);
+        } else {
+          await this.pxConnect(peers);
+        }
+      }
+      this.safeDispatchEvent("gossipsub:prune", { detail: { peerId: id, topic: topicID, direction: "inbound" } });
+    }
+  }
+  handleIdontwant(id, idontwant) {
+    var _a2;
+    let idontwantCount = this.idontwantCounts.get(id) ?? 0;
+    if (idontwantCount >= this.opts.idontwantMaxMessages) {
+      return;
+    }
+    const startIdontwantCount = idontwantCount;
+    let idontwants = this.idontwants.get(id);
+    if (idontwants == null) {
+      idontwants = /* @__PURE__ */ new Map();
+      this.idontwants.set(id, idontwants);
+    }
+    let idonthave = 0;
+    out: for (const { messageIDs } of idontwant) {
+      for (const msgId2 of messageIDs) {
+        if (idontwantCount >= this.opts.idontwantMaxMessages) {
+          break out;
+        }
+        idontwantCount++;
+        const msgIdStr = this.msgIdToStrFn(msgId2);
+        idontwants.set(msgIdStr, this.heartbeatTicks);
+        if (!this.mcache.msgs.has(msgIdStr)) {
+          idonthave++;
+        }
+      }
+    }
+    this.idontwantCounts.set(id, idontwantCount);
+    const total = idontwantCount - startIdontwantCount;
+    (_a2 = this.metrics) == null ? void 0 : _a2.onIdontwantRcv(total, idonthave);
+  }
+  /**
+   * Add standard backoff log for a peer in a topic
+   */
+  addBackoff(id, topic) {
+    this.doAddBackoff(id, topic, this.opts.pruneBackoff);
+  }
+  /**
+   * Add backoff expiry interval for a peer in a topic
+   *
+   * @param id
+   * @param topic
+   * @param intervalMs - backoff duration in milliseconds
+   */
+  doAddBackoff(id, topic, intervalMs) {
+    let backoff = this.backoff.get(topic);
+    if (backoff == null) {
+      backoff = /* @__PURE__ */ new Map();
+      this.backoff.set(topic, backoff);
+    }
+    const expire = Date.now() + intervalMs;
+    const existingExpire = backoff.get(id) ?? 0;
+    if (existingExpire < expire) {
+      backoff.set(id, expire);
+    }
+  }
+  /**
+   * Apply penalties from broken IHAVE/IWANT promises
+   */
+  applyIwantPenalties() {
+    this.gossipTracer.getBrokenPromises().forEach((count, p2) => {
+      this.log("peer %s didn't follow up in %d IWANT requests; adding penalty", p2, count);
+      this.score.addPenalty(p2, count, ScorePenalty.BrokenPromise);
+    });
+  }
+  /**
+   * Clear expired backoff expiries
+   */
+  clearBackoff() {
+    if (this.heartbeatTicks % GossipsubPruneBackoffTicks !== 0) {
+      return;
+    }
+    const now = Date.now();
+    this.backoff.forEach((backoff, topic) => {
+      backoff.forEach((expire, id) => {
+        if (expire + BACKOFF_SLACK * this.opts.heartbeatInterval < now) {
+          backoff.delete(id);
+        }
+      });
+      if (backoff.size === 0) {
+        this.backoff.delete(topic);
+      }
+    });
+  }
+  /**
+   * Maybe reconnect to direct peers
+   */
+  async directConnect() {
+    const toconnect = [];
+    this.direct.forEach((id) => {
+      if (!this.streamsOutbound.has(id)) {
+        toconnect.push(id);
+      }
+    });
+    await Promise.all(toconnect.map(async (id) => this.connect(id)));
+  }
+  /**
+   * Maybe attempt connection given signed peer records
+   */
+  async pxConnect(peers) {
+    if (peers.length > this.opts.prunePeers) {
+      shuffle(peers);
+      peers = peers.slice(0, this.opts.prunePeers);
+    }
+    const toconnect = [];
+    await Promise.all(peers.map(async (pi) => {
+      if (pi.peerID == null) {
+        return;
+      }
+      const peer = peerIdFromMultihash(decode$3(pi.peerID));
+      const p2 = peer.toString();
+      if (this.peers.has(p2)) {
+        return;
+      }
+      if (pi.signedPeerRecord == null) {
+        toconnect.push(p2);
+        return;
+      }
+      try {
+        if (!await this.components.peerStore.consumePeerRecord(pi.signedPeerRecord, {
+          expectedPeer: peer
+        })) {
+          this.log("bogus peer record obtained through px: could not add peer record to address book");
+          return;
+        }
+        toconnect.push(p2);
+      } catch (e2) {
+        this.log("bogus peer record obtained through px: invalid signature or not a peer record");
+      }
+    }));
+    if (toconnect.length === 0) {
+      return;
+    }
+    await Promise.all(toconnect.map(async (id) => this.connect(id)));
+  }
+  /**
+   * Connect to a peer using the gossipsub protocol
+   */
+  async connect(id) {
+    var _a2;
+    this.log("Initiating connection with %s", id);
+    const peerId = peerIdFromString$1(id);
+    const connection = await this.components.connectionManager.openConnection(peerId);
+    for (const protocol of this.protocols) {
+      for (const topology of this.components.registrar.getTopologies(protocol)) {
+        (_a2 = topology.onConnect) == null ? void 0 : _a2.call(topology, peerId, connection);
+      }
+    }
+  }
+  /**
+   * Subscribes to a topic
+   */
+  subscribe(topic) {
+    if (this.status.code !== GossipStatusCode.started) {
+      throw new Error("Pubsub has not started");
+    }
+    if (!this.subscriptions.has(topic)) {
+      this.subscriptions.add(topic);
+      for (const peerId of this.peers.keys()) {
+        this.sendSubscriptions(peerId, [topic], true);
+      }
+    }
+    this.join(topic);
+  }
+  /**
+   * Unsubscribe to a topic
+   */
+  unsubscribe(topic) {
+    if (this.status.code !== GossipStatusCode.started) {
+      throw new Error("Pubsub is not started");
+    }
+    const wasSubscribed = this.subscriptions.delete(topic);
+    this.log("unsubscribe from %s - am subscribed %s", topic, wasSubscribed);
+    if (wasSubscribed) {
+      for (const peerId of this.peers.keys()) {
+        this.sendSubscriptions(peerId, [topic], false);
+      }
+    }
+    this.leave(topic);
+  }
+  /**
+   * Join topic
+   */
+  join(topic) {
+    var _a2, _b2, _c2;
+    if (this.status.code !== GossipStatusCode.started) {
+      throw new Error("Gossipsub has not started");
+    }
+    if (this.mesh.has(topic)) {
+      return;
+    }
+    this.log("JOIN %s", topic);
+    (_a2 = this.metrics) == null ? void 0 : _a2.onJoin(topic);
+    const toAdd = /* @__PURE__ */ new Set();
+    const backoff = this.backoff.get(topic);
+    const fanoutPeers = this.fanout.get(topic);
+    if (fanoutPeers != null) {
+      this.fanout.delete(topic);
+      this.fanoutLastpub.delete(topic);
+      fanoutPeers.forEach((id) => {
+        if (!this.direct.has(id) && this.score.score(id) >= 0 && (backoff == null ? void 0 : backoff.has(id)) !== true) {
+          toAdd.add(id);
+        }
+      });
+      (_b2 = this.metrics) == null ? void 0 : _b2.onAddToMesh(topic, InclusionReason.Fanout, toAdd.size);
+    }
+    if (toAdd.size < this.opts.D) {
+      const fanoutCount = toAdd.size;
+      const newPeers = this.getRandomGossipPeers(topic, this.opts.D, (id) => (
+        // filter direct peers and peers with negative score
+        !toAdd.has(id) && !this.direct.has(id) && this.score.score(id) >= 0 && (backoff == null ? void 0 : backoff.has(id)) !== true
+      ));
+      newPeers.forEach((peer) => {
+        toAdd.add(peer);
+      });
+      (_c2 = this.metrics) == null ? void 0 : _c2.onAddToMesh(topic, InclusionReason.Random, toAdd.size - fanoutCount);
+    }
+    this.mesh.set(topic, toAdd);
+    toAdd.forEach((id) => {
+      this.log("JOIN: Add mesh link to %s in %s", id, topic);
+      this.sendGraft(id, topic);
+    });
+  }
+  /**
+   * Leave topic
+   */
+  leave(topic) {
+    var _a2;
+    if (this.status.code !== GossipStatusCode.started) {
+      throw new Error("Gossipsub has not started");
+    }
+    this.log("LEAVE %s", topic);
+    (_a2 = this.metrics) == null ? void 0 : _a2.onLeave(topic);
+    const meshPeers = this.mesh.get(topic);
+    if (meshPeers != null) {
+      Promise.all(Array.from(meshPeers).map(async (id) => {
+        this.log("LEAVE: Remove mesh link to %s in %s", id, topic);
+        await this.sendPrune(id, topic);
+      })).catch((err) => {
+        this.log("Error sending prunes to mesh peers", err);
+      });
+      this.mesh.delete(topic);
+    }
+  }
+  selectPeersToForward(topic, propagationSource, excludePeers) {
+    const tosend = /* @__PURE__ */ new Set();
+    const peersInTopic = this.topics.get(topic);
+    if (peersInTopic != null) {
+      this.direct.forEach((peer) => {
+        if (peersInTopic.has(peer) && propagationSource !== peer && !((excludePeers == null ? void 0 : excludePeers.has(peer)) ?? false)) {
+          tosend.add(peer);
+        }
+      });
+      this.floodsubPeers.forEach((peer) => {
+        if (peersInTopic.has(peer) && propagationSource !== peer && !((excludePeers == null ? void 0 : excludePeers.has(peer)) ?? false) && this.score.score(peer) >= this.opts.scoreThresholds.publishThreshold) {
+          tosend.add(peer);
+        }
+      });
+    }
+    const meshPeers = this.mesh.get(topic);
+    if (meshPeers != null && meshPeers.size > 0) {
+      meshPeers.forEach((peer) => {
+        if (propagationSource !== peer && !((excludePeers == null ? void 0 : excludePeers.has(peer)) ?? false)) {
+          tosend.add(peer);
+        }
+      });
+    }
+    return tosend;
+  }
+  selectPeersToPublish(topic) {
+    const tosend = /* @__PURE__ */ new Set();
+    const tosendCount = {
+      direct: 0,
+      floodsub: 0,
+      mesh: 0,
+      fanout: 0
+    };
+    const peersInTopic = this.topics.get(topic);
+    if (peersInTopic != null) {
+      if (this.opts.floodPublish) {
+        peersInTopic.forEach((id) => {
+          if (this.direct.has(id)) {
+            tosend.add(id);
+            tosendCount.direct++;
+          } else if (this.score.score(id) >= this.opts.scoreThresholds.publishThreshold) {
+            tosend.add(id);
+            tosendCount.floodsub++;
+          }
+        });
+      } else {
+        this.direct.forEach((id) => {
+          if (peersInTopic.has(id)) {
+            tosend.add(id);
+            tosendCount.direct++;
+          }
+        });
+        this.floodsubPeers.forEach((id) => {
+          if (peersInTopic.has(id) && this.score.score(id) >= this.opts.scoreThresholds.publishThreshold) {
+            tosend.add(id);
+            tosendCount.floodsub++;
+          }
+        });
+        const meshPeers = this.mesh.get(topic);
+        if (meshPeers != null && meshPeers.size > 0) {
+          meshPeers.forEach((peer) => {
+            tosend.add(peer);
+            tosendCount.mesh++;
+          });
+          if (meshPeers.size < this.opts.D) {
+            const topicPeers = this.getRandomGossipPeers(topic, this.opts.D - meshPeers.size, (id) => {
+              return !meshPeers.has(id) && !this.direct.has(id) && !this.floodsubPeers.has(id) && this.score.score(id) >= this.opts.scoreThresholds.publishThreshold;
+            });
+            topicPeers.forEach((peer) => {
+              tosend.add(peer);
+              tosendCount.mesh++;
+            });
+          }
+        } else {
+          const fanoutPeers = this.fanout.get(topic);
+          if (fanoutPeers != null && fanoutPeers.size > 0) {
+            fanoutPeers.forEach((peer) => {
+              tosend.add(peer);
+              tosendCount.fanout++;
+            });
+          } else {
+            const newFanoutPeers = this.getRandomGossipPeers(topic, this.opts.D, (id) => {
+              return this.score.score(id) >= this.opts.scoreThresholds.publishThreshold;
+            });
+            if (newFanoutPeers.size > 0) {
+              this.fanout.set(topic, newFanoutPeers);
+              newFanoutPeers.forEach((peer) => {
+                tosend.add(peer);
+                tosendCount.fanout++;
+              });
+            }
+          }
+          this.fanoutLastpub.set(topic, Date.now());
+        }
+      }
+    }
+    return { tosend, tosendCount };
+  }
+  /**
+   * Forwards a message from our peers.
+   *
+   * For messages published by us (the app layer), this class uses `publish`
+   */
+  forwardMessage(msgIdStr, rawMsg, propagationSource, excludePeers) {
+    var _a2;
+    if (propagationSource != null) {
+      this.score.deliverMessage(propagationSource, msgIdStr, rawMsg.topic);
+    }
+    const tosend = this.selectPeersToForward(rawMsg.topic, propagationSource, excludePeers);
+    tosend.forEach((id) => {
+      this.sendRpc(id, createGossipRpc([rawMsg]));
+    });
+    (_a2 = this.metrics) == null ? void 0 : _a2.onForwardMsg(rawMsg.topic, tosend.size);
+  }
+  /**
+   * App layer publishes a message to peers, return number of peers this message is published to
+   * Note: `async` due to crypto only if `StrictSign`, otherwise it's a sync fn.
+   *
+   * For messages not from us, this class uses `forwardMessage`.
+   */
+  async publish(topic, data, opts) {
+    var _a2, _b2;
+    const startMs = Date.now();
+    const transformedData = this.dataTransform != null ? this.dataTransform.outboundTransform(topic, data) : data;
+    if (this.publishConfig == null) {
+      throw Error("PublishError.Uninitialized");
+    }
+    const { raw: rawMsg, msg } = await buildRawMessage(this.publishConfig, topic, data, transformedData);
+    const msgId2 = await this.msgIdFn(msg);
+    const msgIdStr = this.msgIdToStrFn(msgId2);
+    const ignoreDuplicatePublishError = (opts == null ? void 0 : opts.ignoreDuplicatePublishError) ?? this.opts.ignoreDuplicatePublishError;
+    if (this.seenCache.has(msgIdStr)) {
+      if (ignoreDuplicatePublishError) {
+        (_a2 = this.metrics) == null ? void 0 : _a2.onPublishDuplicateMsg(topic);
+        return { recipients: [] };
+      }
+      throw Error("PublishError.Duplicate");
+    }
+    const { tosend, tosendCount } = this.selectPeersToPublish(topic);
+    const willSendToSelf = this.opts.emitSelf && this.subscriptions.has(topic);
+    const allowPublishToZeroTopicPeers = (opts == null ? void 0 : opts.allowPublishToZeroTopicPeers) ?? this.opts.allowPublishToZeroTopicPeers;
+    if (tosend.size === 0 && !allowPublishToZeroTopicPeers && !willSendToSelf) {
+      throw Error("PublishError.NoPeersSubscribedToTopic");
+    }
+    this.seenCache.put(msgIdStr);
+    this.mcache.put({ msgId: msgId2, msgIdStr }, rawMsg, true);
+    this.gossipTracer.deliverMessage(msgIdStr);
+    this.publishedMessageIds.put(msgIdStr);
+    const batchPublish = (opts == null ? void 0 : opts.batchPublish) ?? this.opts.batchPublish;
+    const rpc = createGossipRpc([rawMsg]);
+    if (batchPublish) {
+      this.sendRpcInBatch(tosend, rpc);
+    } else {
+      for (const id of tosend) {
+        const sent = this.sendRpc(id, rpc);
+        if (!sent) {
+          tosend.delete(id);
+        }
+      }
+    }
+    const durationMs = Date.now() - startMs;
+    (_b2 = this.metrics) == null ? void 0 : _b2.onPublishMsg(topic, tosendCount, tosend.size, rawMsg.data != null ? rawMsg.data.length : 0, durationMs);
+    if (willSendToSelf) {
+      tosend.add(this.components.peerId.toString());
+      super.dispatchEvent(new CustomEvent("gossipsub:message", {
+        detail: {
+          propagationSource: this.components.peerId,
+          msgId: msgIdStr,
+          msg
+        }
+      }));
+      super.dispatchEvent(new CustomEvent("message", { detail: msg }));
+    }
+    return {
+      recipients: Array.from(tosend.values()).map((str) => this.peers.get(str) ?? peerIdFromString$1(str))
+    };
+  }
+  /**
+   * Send the same data in batch to tosend list without considering cached control messages
+   * This is not only faster but also avoid allocating memory for each peer
+   * see https://github.com/ChainSafe/js-libp2p-gossipsub/issues/344
+   */
+  sendRpcInBatch(tosend, rpc) {
+    var _a2;
+    const rpcBytes = RPC.encode(rpc);
+    const prefixedData = encode.single(rpcBytes);
+    for (const id of tosend) {
+      const outboundStream = this.streamsOutbound.get(id);
+      if (outboundStream == null) {
+        this.log(`Cannot send RPC to ${id} as there is no open stream to it available`);
+        tosend.delete(id);
+        continue;
+      }
+      try {
+        outboundStream.pushPrefixed(prefixedData);
+      } catch (e2) {
+        tosend.delete(id);
+        this.log.error(`Cannot send rpc to ${id}`, e2);
+      }
+      (_a2 = this.metrics) == null ? void 0 : _a2.onRpcSent(rpc, rpcBytes.length);
+    }
+  }
+  /**
+   * This function should be called when `asyncValidation` is `true` after
+   * the message got validated by the caller. Messages are stored in the `mcache` and
+   * validation is expected to be fast enough that the messages should still exist in the cache.
+   * There are three possible validation outcomes and the outcome is given in acceptance.
+   *
+   * If acceptance = `MessageAcceptance.Accept` the message will get propagated to the
+   * network. The `propagation_source` parameter indicates who the message was received by and
+   * will not be forwarded back to that peer.
+   *
+   * If acceptance = `MessageAcceptance.Reject` the message will be deleted from the memcache
+   * and the P₄ penalty will be applied to the `propagationSource`.
+   *
+   * If acceptance = `MessageAcceptance.Ignore` the message will be deleted from the memcache
+   * but no P₄ penalty will be applied.
+   *
+   * This function will return true if the message was found in the cache and false if was not
+   * in the cache anymore.
+   *
+   * This should only be called once per message.
+   */
+  reportMessageValidationResult(msgId2, propagationSource, acceptance) {
+    var _a2;
+    let cacheEntry;
+    if (acceptance === TopicValidatorResult.Accept) {
+      cacheEntry = this.mcache.validate(msgId2);
+      if (cacheEntry != null) {
+        const { message: rawMsg, originatingPeers } = cacheEntry;
+        this.score.deliverMessage(propagationSource, msgId2, rawMsg.topic);
+        this.forwardMessage(msgId2, cacheEntry.message, propagationSource, originatingPeers);
+      }
+    } else {
+      cacheEntry = this.mcache.remove(msgId2);
+      if (cacheEntry != null) {
+        const rejectReason = rejectReasonFromAcceptance(acceptance);
+        const { message: rawMsg, originatingPeers } = cacheEntry;
+        this.score.rejectMessage(propagationSource, msgId2, rawMsg.topic, rejectReason);
+        for (const peer of originatingPeers) {
+          this.score.rejectMessage(peer, msgId2, rawMsg.topic, rejectReason);
+        }
+      }
+    }
+    const firstSeenTimestampMs = this.score.messageFirstSeenTimestampMs(msgId2);
+    (_a2 = this.metrics) == null ? void 0 : _a2.onReportValidation(cacheEntry, acceptance, firstSeenTimestampMs);
+  }
+  /**
+   * Sends a GRAFT message to a peer
+   */
+  sendGraft(id, topic) {
+    const graft = [
+      {
+        topicID: topic
+      }
+    ];
+    const out = createGossipRpc([], { graft });
+    this.sendRpc(id, out);
+  }
+  /**
+   * Sends a PRUNE message to a peer
+   */
+  async sendPrune(id, topic) {
+    const onUnsubscribe = true;
+    const prune = [await this.makePrune(id, topic, this.opts.doPX, onUnsubscribe)];
+    const out = createGossipRpc([], { prune });
+    this.sendRpc(id, out);
+  }
+  sendIDontWants(msgId2, topic, source) {
+    var _a2;
+    const ids = this.mesh.get(topic);
+    if (ids == null) {
+      return;
+    }
+    const tosend = new Set(ids);
+    tosend.delete(source);
+    for (const id of tosend) {
+      if (((_a2 = this.streamsOutbound.get(id)) == null ? void 0 : _a2.protocol) !== GossipsubIDv12) {
+        tosend.delete(id);
+      }
+    }
+    const idontwantRpc = createGossipRpc([], { idontwant: [{ messageIDs: [msgId2] }] });
+    this.sendRpcInBatch(tosend, idontwantRpc);
+  }
+  /**
+   * Send an rpc object to a peer
+   */
+  sendRpc(id, rpc) {
+    var _a2, _b2, _c2, _d2, _e2;
+    const outboundStream = this.streamsOutbound.get(id);
+    if (outboundStream == null) {
+      this.log(`Cannot send RPC to ${id} as there is no open stream to it available`);
+      return false;
+    }
+    const ctrl = this.control.get(id);
+    if (ctrl != null) {
+      this.piggybackControl(id, rpc, ctrl);
+      this.control.delete(id);
+    }
+    const ihave = this.gossip.get(id);
+    if (ihave != null) {
+      this.piggybackGossip(id, rpc, ihave);
+      this.gossip.delete(id);
+    }
+    const rpcBytes = RPC.encode(rpc);
+    try {
+      outboundStream.push(rpcBytes);
+    } catch (e2) {
+      this.log.error(`Cannot send rpc to ${id}`, e2);
+      if (ctrl != null) {
+        this.control.set(id, ctrl);
+      }
+      if (ihave != null) {
+        this.gossip.set(id, ihave);
+      }
+      return false;
+    }
+    (_a2 = this.metrics) == null ? void 0 : _a2.onRpcSent(rpc, rpcBytes.length);
+    if (((_b2 = rpc.control) == null ? void 0 : _b2.graft) != null) {
+      for (const topic of (_c2 = rpc.control) == null ? void 0 : _c2.graft) {
+        if (topic.topicID != null) {
+          this.safeDispatchEvent("gossipsub:graft", { detail: { peerId: id, topic: topic.topicID, direction: "outbound" } });
+        }
+      }
+    }
+    if (((_d2 = rpc.control) == null ? void 0 : _d2.prune) != null) {
+      for (const topic of (_e2 = rpc.control) == null ? void 0 : _e2.prune) {
+        if (topic.topicID != null) {
+          this.safeDispatchEvent("gossipsub:prune", { detail: { peerId: id, topic: topic.topicID, direction: "outbound" } });
+        }
+      }
+    }
+    return true;
+  }
+  /** Mutates `outRpc` adding graft and prune control messages */
+  piggybackControl(id, outRpc, ctrl) {
+    var _a2, _b2;
+    const rpc = ensureControl(outRpc);
+    for (const graft of ctrl.graft) {
+      if (graft.topicID != null && (((_a2 = this.mesh.get(graft.topicID)) == null ? void 0 : _a2.has(id)) ?? false)) {
+        rpc.control.graft.push(graft);
+      }
+    }
+    for (const prune of ctrl.prune) {
+      if (prune.topicID != null && !(((_b2 = this.mesh.get(prune.topicID)) == null ? void 0 : _b2.has(id)) ?? false)) {
+        rpc.control.prune.push(prune);
+      }
+    }
+  }
+  /** Mutates `outRpc` adding ihave control messages */
+  piggybackGossip(id, outRpc, ihave) {
+    const rpc = ensureControl(outRpc);
+    rpc.control.ihave = ihave;
+  }
+  /**
+   * Send graft and prune messages
+   *
+   * @param tograft - peer id => topic[]
+   * @param toprune - peer id => topic[]
+   */
+  async sendGraftPrune(tograft, toprune, noPX) {
+    const doPX = this.opts.doPX;
+    const onUnsubscribe = false;
+    for (const [id, topics] of tograft) {
+      const graft = topics.map((topicID) => ({ topicID }));
+      let prune = [];
+      const pruning = toprune.get(id);
+      if (pruning != null) {
+        prune = await Promise.all(pruning.map(async (topicID) => this.makePrune(id, topicID, doPX && !(noPX.get(id) ?? false), onUnsubscribe)));
+        toprune.delete(id);
+      }
+      this.sendRpc(id, createGossipRpc([], { graft, prune }));
+    }
+    for (const [id, topics] of toprune) {
+      const prune = await Promise.all(topics.map(async (topicID) => this.makePrune(id, topicID, doPX && !(noPX.get(id) ?? false), onUnsubscribe)));
+      this.sendRpc(id, createGossipRpc([], { prune }));
+    }
+  }
+  /**
+   * Emits gossip - Send IHAVE messages to a random set of gossip peers
+   */
+  emitGossip(peersToGossipByTopic) {
+    const gossipIDsByTopic = this.mcache.getGossipIDs(new Set(peersToGossipByTopic.keys()));
+    for (const [topic, peersToGossip] of peersToGossipByTopic) {
+      this.doEmitGossip(topic, peersToGossip, gossipIDsByTopic.get(topic) ?? []);
+    }
+  }
+  /**
+   * Send gossip messages to GossipFactor peers above threshold with a minimum of D_lazy
+   * Peers are randomly selected from the heartbeat which exclude mesh + fanout peers
+   * We also exclude direct peers, as there is no reason to emit gossip to them
+   *
+   * @param topic
+   * @param candidateToGossip - peers to gossip
+   * @param messageIDs - message ids to gossip
+   */
+  doEmitGossip(topic, candidateToGossip, messageIDs) {
+    if (messageIDs.length === 0) {
+      return;
+    }
+    shuffle(messageIDs);
+    if (messageIDs.length > GossipsubMaxIHaveLength) {
+      this.log("too many messages for gossip; will truncate IHAVE list (%d messages)", messageIDs.length);
+    }
+    if (candidateToGossip.size === 0) {
+      return;
+    }
+    let target = this.opts.Dlazy;
+    const gossipFactor = this.opts.gossipFactor;
+    const factor = gossipFactor * candidateToGossip.size;
+    let peersToGossip = candidateToGossip;
+    if (factor > target) {
+      target = factor;
+    }
+    if (target > peersToGossip.size) {
+      target = peersToGossip.size;
+    } else {
+      peersToGossip = shuffle(Array.from(peersToGossip)).slice(0, target);
+    }
+    peersToGossip.forEach((id) => {
+      let peerMessageIDs = messageIDs;
+      if (messageIDs.length > GossipsubMaxIHaveLength) {
+        peerMessageIDs = shuffle(peerMessageIDs.slice()).slice(0, GossipsubMaxIHaveLength);
+      }
+      this.pushGossip(id, {
+        topicID: topic,
+        messageIDs: peerMessageIDs
+      });
+    });
+  }
+  /**
+   * Flush gossip and control messages
+   */
+  flush() {
+    for (const [peer, ihave] of this.gossip.entries()) {
+      this.gossip.delete(peer);
+      this.sendRpc(peer, createGossipRpc([], { ihave }));
+    }
+    for (const [peer, control] of this.control.entries()) {
+      this.control.delete(peer);
+      const out = createGossipRpc([], { graft: control.graft, prune: control.prune });
+      this.sendRpc(peer, out);
+    }
+  }
+  /**
+   * Adds new IHAVE messages to pending gossip
+   */
+  pushGossip(id, controlIHaveMsgs) {
+    this.log("Add gossip to %s", id);
+    const gossip = this.gossip.get(id) ?? [];
+    this.gossip.set(id, gossip.concat(controlIHaveMsgs));
+  }
+  /**
+   * Make a PRUNE control message for a peer in a topic
+   */
+  async makePrune(id, topic, doPX, onUnsubscribe) {
+    var _a2;
+    this.score.prune(id, topic);
+    if (((_a2 = this.streamsOutbound.get(id)) == null ? void 0 : _a2.protocol) === GossipsubIDv10) {
+      return {
+        topicID: topic,
+        peers: []
+      };
+    }
+    const backoffMs = onUnsubscribe ? this.opts.unsubcribeBackoff : this.opts.pruneBackoff;
+    const backoff = backoffMs / 1e3;
+    this.doAddBackoff(id, topic, backoffMs);
+    if (!doPX) {
+      return {
+        topicID: topic,
+        peers: [],
+        backoff
+      };
+    }
+    const peers = this.getRandomGossipPeers(topic, this.opts.prunePeers, (xid) => {
+      return xid !== id && this.score.score(xid) >= 0;
+    });
+    const px = await Promise.all(Array.from(peers).map(async (peerId) => {
+      const id2 = this.peers.get(peerId) ?? peerIdFromString$1(peerId);
+      let peerInfo;
+      try {
+        peerInfo = await this.components.peerStore.get(id2);
+      } catch (err) {
+        if (err.name !== "NotFoundError") {
+          throw err;
+        }
+      }
+      return {
+        peerID: id2.toMultihash().bytes,
+        signedPeerRecord: peerInfo == null ? void 0 : peerInfo.peerRecordEnvelope
+      };
+    }));
+    return {
+      topicID: topic,
+      peers: px,
+      backoff
+    };
+  }
+  /**
+   * Maintains the mesh and fanout maps in gossipsub.
+   */
+  async heartbeat() {
+    var _a2, _b2;
+    const { D, Dlo, Dhi, Dscore, Dout, fanoutTTL } = this.opts;
+    this.heartbeatTicks++;
+    const scores = /* @__PURE__ */ new Map();
+    const getScore = (id) => {
+      let s2 = scores.get(id);
+      if (s2 === void 0) {
+        s2 = this.score.score(id);
+        scores.set(id, s2);
+      }
+      return s2;
+    };
+    const tograft = /* @__PURE__ */ new Map();
+    const toprune = /* @__PURE__ */ new Map();
+    const noPX = /* @__PURE__ */ new Map();
+    this.clearBackoff();
+    this.peerhave.clear();
+    (_a2 = this.metrics) == null ? void 0 : _a2.cacheSize.set({ cache: "iasked" }, this.iasked.size);
+    this.iasked.clear();
+    this.applyIwantPenalties();
+    this.idontwantCounts.clear();
+    for (const idontwants of this.idontwants.values()) {
+      for (const [msgId2, heartbeatTick] of idontwants) {
+        if (this.heartbeatTicks - heartbeatTick >= this.opts.mcacheLength) {
+          idontwants.delete(msgId2);
+        }
+      }
+    }
+    if (this.heartbeatTicks % this.opts.directConnectTicks === 0) {
+      await this.directConnect();
+    }
+    (_b2 = this.fastMsgIdCache) == null ? void 0 : _b2.prune();
+    this.seenCache.prune();
+    this.gossipTracer.prune();
+    this.publishedMessageIds.prune();
+    const peersToGossipByTopic = /* @__PURE__ */ new Map();
+    this.mesh.forEach((peers, topic) => {
+      const peersInTopic = this.topics.get(topic);
+      const candidateMeshPeers = /* @__PURE__ */ new Set();
+      const peersToGossip = /* @__PURE__ */ new Set();
+      peersToGossipByTopic.set(topic, peersToGossip);
+      if (peersInTopic != null) {
+        const shuffledPeers = shuffle(Array.from(peersInTopic));
+        const backoff = this.backoff.get(topic);
+        for (const id of shuffledPeers) {
+          const peerStreams = this.streamsOutbound.get(id);
+          if (peerStreams != null && this.protocols.includes(peerStreams.protocol) && !peers.has(id) && !this.direct.has(id)) {
+            const score = getScore(id);
+            if ((backoff == null ? void 0 : backoff.has(id)) !== true && score >= 0) {
+              candidateMeshPeers.add(id);
+            }
+            if (score >= this.opts.scoreThresholds.gossipThreshold) {
+              peersToGossip.add(id);
+            }
+          }
+        }
+      }
+      const prunePeer = (id, reason) => {
+        var _a3;
+        this.log("HEARTBEAT: Remove mesh link to %s in %s", id, topic);
+        this.addBackoff(id, topic);
+        peers.delete(id);
+        if (getScore(id) >= this.opts.scoreThresholds.gossipThreshold) {
+          peersToGossip.add(id);
+        }
+        (_a3 = this.metrics) == null ? void 0 : _a3.onRemoveFromMesh(topic, reason, 1);
+        const topics = toprune.get(id);
+        if (topics == null) {
+          toprune.set(id, [topic]);
+        } else {
+          topics.push(topic);
+        }
+      };
+      const graftPeer = (id, reason) => {
+        var _a3;
+        this.log("HEARTBEAT: Add mesh link to %s in %s", id, topic);
+        this.score.graft(id, topic);
+        peers.add(id);
+        peersToGossip.delete(id);
+        (_a3 = this.metrics) == null ? void 0 : _a3.onAddToMesh(topic, reason, 1);
+        const topics = tograft.get(id);
+        if (topics == null) {
+          tograft.set(id, [topic]);
+        } else {
+          topics.push(topic);
+        }
+      };
+      peers.forEach((id) => {
+        const score = getScore(id);
+        if (score < 0) {
+          this.log("HEARTBEAT: Prune peer %s with negative score: score=%d, topic=%s", id, score, topic);
+          prunePeer(id, ChurnReason.BadScore);
+          noPX.set(id, true);
+        }
+      });
+      if (peers.size < Dlo) {
+        const ineed = D - peers.size;
+        const newMeshPeers = removeFirstNItemsFromSet(candidateMeshPeers, ineed);
+        newMeshPeers.forEach((p2) => {
+          graftPeer(p2, InclusionReason.NotEnough);
+        });
+      }
+      if (peers.size > Dhi) {
+        let peersArray = Array.from(peers);
+        peersArray.sort((a2, b) => getScore(b) - getScore(a2));
+        peersArray = peersArray.slice(0, Dscore).concat(shuffle(peersArray.slice(Dscore)));
+        let outbound = 0;
+        peersArray.slice(0, D).forEach((p2) => {
+          if (this.outbound.get(p2) ?? false) {
+            outbound++;
+          }
+        });
+        if (outbound < Dout) {
+          const rotate = (i2) => {
+            const p2 = peersArray[i2];
+            for (let j = i2; j > 0; j--) {
+              peersArray[j] = peersArray[j - 1];
+            }
+            peersArray[0] = p2;
+          };
+          if (outbound > 0) {
+            let ihave = outbound;
+            for (let i2 = 1; i2 < D && ihave > 0; i2++) {
+              if (this.outbound.get(peersArray[i2]) ?? false) {
+                rotate(i2);
+                ihave--;
+              }
+            }
+          }
+          let ineed = D - outbound;
+          for (let i2 = D; i2 < peersArray.length && ineed > 0; i2++) {
+            if (this.outbound.get(peersArray[i2]) ?? false) {
+              rotate(i2);
+              ineed--;
+            }
+          }
+        }
+        peersArray.slice(D).forEach((p2) => {
+          prunePeer(p2, ChurnReason.Excess);
+        });
+      }
+      if (peers.size >= Dlo) {
+        let outbound = 0;
+        peers.forEach((p2) => {
+          if (this.outbound.get(p2) ?? false) {
+            outbound++;
+          }
+        });
+        if (outbound < Dout) {
+          const ineed = Dout - outbound;
+          const newMeshPeers = removeItemsFromSet(candidateMeshPeers, ineed, (id) => this.outbound.get(id) === true);
+          newMeshPeers.forEach((p2) => {
+            graftPeer(p2, InclusionReason.Outbound);
+          });
+        }
+      }
+      if (this.heartbeatTicks % this.opts.opportunisticGraftTicks === 0 && peers.size > 1) {
+        const peersList = Array.from(peers).sort((a2, b) => getScore(a2) - getScore(b));
+        const medianIndex = Math.floor(peers.size / 2);
+        const medianScore = getScore(peersList[medianIndex]);
+        if (medianScore < this.opts.scoreThresholds.opportunisticGraftThreshold) {
+          const ineed = this.opts.opportunisticGraftPeers;
+          const newMeshPeers = removeItemsFromSet(candidateMeshPeers, ineed, (id) => getScore(id) > medianScore);
+          for (const id of newMeshPeers) {
+            this.log("HEARTBEAT: Opportunistically graft peer %s on topic %s", id, topic);
+            graftPeer(id, InclusionReason.Opportunistic);
+          }
+        }
+      }
+    });
+    const now = Date.now();
+    this.fanoutLastpub.forEach((lastpb, topic) => {
+      if (lastpb + fanoutTTL < now) {
+        this.fanout.delete(topic);
+        this.fanoutLastpub.delete(topic);
+      }
+    });
+    this.fanout.forEach((fanoutPeers, topic) => {
+      const topicPeers = this.topics.get(topic);
+      fanoutPeers.forEach((id) => {
+        if (!((topicPeers == null ? void 0 : topicPeers.has(id)) ?? false) || getScore(id) < this.opts.scoreThresholds.publishThreshold) {
+          fanoutPeers.delete(id);
+        }
+      });
+      const peersInTopic = this.topics.get(topic);
+      const candidateFanoutPeers = [];
+      const peersToGossip = /* @__PURE__ */ new Set();
+      peersToGossipByTopic.set(topic, peersToGossip);
+      if (peersInTopic != null) {
+        const shuffledPeers = shuffle(Array.from(peersInTopic));
+        for (const id of shuffledPeers) {
+          const peerStreams = this.streamsOutbound.get(id);
+          if (peerStreams != null && this.protocols.includes(peerStreams.protocol) && !fanoutPeers.has(id) && !this.direct.has(id)) {
+            const score = getScore(id);
+            if (score >= this.opts.scoreThresholds.publishThreshold) {
+              candidateFanoutPeers.push(id);
+            }
+            if (score >= this.opts.scoreThresholds.gossipThreshold) {
+              peersToGossip.add(id);
+            }
+          }
+        }
+      }
+      if (fanoutPeers.size < D) {
+        const ineed = D - fanoutPeers.size;
+        candidateFanoutPeers.slice(0, ineed).forEach((id) => {
+          fanoutPeers.add(id);
+          peersToGossip == null ? void 0 : peersToGossip.delete(id);
+        });
+      }
+    });
+    this.emitGossip(peersToGossipByTopic);
+    await this.sendGraftPrune(tograft, toprune, noPX);
+    this.flush();
+    this.mcache.shift();
+    this.dispatchEvent(new CustomEvent("gossipsub:heartbeat"));
+  }
+  /**
+   * Given a topic, returns up to count peers subscribed to that topic
+   * that pass an optional filter function
+   *
+   * @param topic
+   * @param count
+   * @param filter - a function to filter acceptable peers
+   */
+  getRandomGossipPeers(topic, count, filter2 = () => true) {
+    const peersInTopic = this.topics.get(topic);
+    if (peersInTopic == null) {
+      return /* @__PURE__ */ new Set();
+    }
+    let peers = [];
+    peersInTopic.forEach((id) => {
+      const peerStreams = this.streamsOutbound.get(id);
+      if (peerStreams == null) {
+        return;
+      }
+      if (this.protocols.includes(peerStreams.protocol) && filter2(id)) {
+        peers.push(id);
+      }
+    });
+    peers = shuffle(peers);
+    if (count > 0 && peers.length > count) {
+      peers = peers.slice(0, count);
+    }
+    return new Set(peers);
+  }
+  onScrapeMetrics(metrics) {
+    var _a2, _b2;
+    metrics.mcacheSize.set(this.mcache.size);
+    metrics.mcacheNotValidatedCount.set(this.mcache.notValidatedCount);
+    metrics.cacheSize.set({ cache: "direct" }, this.direct.size);
+    metrics.cacheSize.set({ cache: "seenCache" }, this.seenCache.size);
+    metrics.cacheSize.set({ cache: "fastMsgIdCache" }, ((_a2 = this.fastMsgIdCache) == null ? void 0 : _a2.size) ?? 0);
+    metrics.cacheSize.set({ cache: "publishedMessageIds" }, this.publishedMessageIds.size);
+    metrics.cacheSize.set({ cache: "mcache" }, this.mcache.size);
+    metrics.cacheSize.set({ cache: "score" }, this.score.size);
+    metrics.cacheSize.set({ cache: "gossipTracer.promises" }, this.gossipTracer.size);
+    metrics.cacheSize.set({ cache: "gossipTracer.requests" }, this.gossipTracer.requestMsByMsgSize);
+    metrics.cacheSize.set({ cache: "topics" }, this.topics.size);
+    metrics.cacheSize.set({ cache: "subscriptions" }, this.subscriptions.size);
+    metrics.cacheSize.set({ cache: "mesh" }, this.mesh.size);
+    metrics.cacheSize.set({ cache: "fanout" }, this.fanout.size);
+    metrics.cacheSize.set({ cache: "peers" }, this.peers.size);
+    metrics.cacheSize.set({ cache: "streamsOutbound" }, this.streamsOutbound.size);
+    metrics.cacheSize.set({ cache: "streamsInbound" }, this.streamsInbound.size);
+    metrics.cacheSize.set({ cache: "acceptFromWhitelist" }, this.acceptFromWhitelist.size);
+    metrics.cacheSize.set({ cache: "gossip" }, this.gossip.size);
+    metrics.cacheSize.set({ cache: "control" }, this.control.size);
+    metrics.cacheSize.set({ cache: "peerhave" }, this.peerhave.size);
+    metrics.cacheSize.set({ cache: "outbound" }, this.outbound.size);
+    let backoffSize = 0;
+    const now = Date.now();
+    metrics.connectedPeersBackoffSec.reset();
+    for (const backoff of this.backoff.values()) {
+      backoffSize += backoff.size;
+      for (const [peer, expiredMs] of backoff.entries()) {
+        if (this.peers.has(peer)) {
+          metrics.connectedPeersBackoffSec.observe(Math.max(0, expiredMs - now) / 1e3);
+        }
+      }
+    }
+    metrics.cacheSize.set({ cache: "backoff" }, backoffSize);
+    let idontwantsCount = 0;
+    for (const idontwant of this.idontwants.values()) {
+      idontwantsCount += idontwant.size;
+    }
+    metrics.cacheSize.set({ cache: "idontwants" }, idontwantsCount);
+    for (const [topicStr, peers] of this.topics) {
+      metrics.topicPeersCount.set({ topicStr }, peers.size);
+    }
+    for (const [topicStr, peers] of this.mesh) {
+      metrics.meshPeerCounts.set({ topicStr }, peers.size);
+    }
+    const scores = [];
+    const scoreByPeer = /* @__PURE__ */ new Map();
+    metrics.behaviourPenalty.reset();
+    for (const peerIdStr of this.peers.keys()) {
+      const score = this.score.score(peerIdStr);
+      scores.push(score);
+      scoreByPeer.set(peerIdStr, score);
+      metrics.behaviourPenalty.observe(((_b2 = this.score.peerStats.get(peerIdStr)) == null ? void 0 : _b2.behaviourPenalty) ?? 0);
+    }
+    metrics.registerScores(scores, this.opts.scoreThresholds);
+    metrics.registerScorePerMesh(this.mesh, scoreByPeer);
+    const sw = computeAllPeersScoreWeights(this.peers.keys(), this.score.peerStats, this.score.params, this.score.peerIPs, metrics.topicStrToLabel);
+    metrics.registerScoreWeights(sw);
+  }
+}
+__publicField(GossipSub, "multicodec", GossipsubIDv12);
+const StrictSign = "StrictSign";
+const StrictNoSign = "StrictNoSign";
+var TopicValidatorResult;
+(function(TopicValidatorResult2) {
+  TopicValidatorResult2["Accept"] = "accept";
+  TopicValidatorResult2["Ignore"] = "ignore";
+  TopicValidatorResult2["Reject"] = "reject";
+})(TopicValidatorResult || (TopicValidatorResult = {}));
+function gossipsub(init = {}) {
+  return (components) => new GossipSub(components, init);
+}
+var Peer;
+(function(Peer2) {
+  let _codec;
+  Peer2.codec = () => {
+    if (_codec == null) {
+      _codec = message((obj, w, opts = {}) => {
+        if (opts.lengthDelimited !== false) {
+          w.fork();
+        }
+        if (obj.publicKey != null && obj.publicKey.byteLength > 0) {
+          w.uint32(10);
+          w.bytes(obj.publicKey);
+        }
+        if (obj.addrs != null) {
+          for (const value2 of obj.addrs) {
+            w.uint32(18);
+            w.bytes(value2);
+          }
+        }
+        if (opts.lengthDelimited !== false) {
+          w.ldelim();
+        }
+      }, (reader, length3, opts = {}) => {
+        var _a2;
+        const obj = {
+          publicKey: alloc$1(0),
+          addrs: []
+        };
+        const end = length3 == null ? reader.len : reader.pos + length3;
+        while (reader.pos < end) {
+          const tag = reader.uint32();
+          switch (tag >>> 3) {
+            case 1: {
+              obj.publicKey = reader.bytes();
+              break;
+            }
+            case 2: {
+              if (((_a2 = opts.limits) == null ? void 0 : _a2.addrs) != null && obj.addrs.length === opts.limits.addrs) {
+                throw new MaxLengthError('Decode error - map field "addrs" had too many elements');
+              }
+              obj.addrs.push(reader.bytes());
+              break;
+            }
+            default: {
+              reader.skipType(tag & 7);
+              break;
+            }
+          }
+        }
+        return obj;
+      });
+    }
+    return _codec;
+  };
+  Peer2.encode = (obj) => {
+    return encodeMessage(obj, Peer2.codec());
+  };
+  Peer2.decode = (buf, opts) => {
+    return decodeMessage(buf, Peer2.codec(), opts);
+  };
+})(Peer || (Peer = {}));
+const TOPIC = "_peer-discovery._p2p._pubsub";
+class PubSubPeerDiscovery extends (_ca = TypedEventEmitter, _ba = peerDiscoverySymbol, _aa = Symbol.toStringTag, _ca) {
+  constructor(components, init = {}) {
+    super();
+    __publicField(this, _ba, true);
+    __publicField(this, _aa, "@libp2p/pubsub-peer-discovery");
+    __publicField(this, "interval");
+    __publicField(this, "listenOnly");
+    __publicField(this, "topics");
+    __publicField(this, "intervalId");
+    __publicField(this, "components");
+    __publicField(this, "log");
+    const { interval, topics, listenOnly } = init;
+    this.components = components;
+    this.interval = interval ?? 1e4;
+    this.listenOnly = listenOnly ?? false;
+    this.log = components.logger.forComponent("libp2p:discovery:pubsub");
+    if (Array.isArray(topics) && topics.length > 0) {
+      this.topics = topics;
+    } else {
+      this.topics = [TOPIC];
+    }
+    this._onMessage = this._onMessage.bind(this);
+  }
+  isStarted() {
+    return this.intervalId != null;
+  }
+  start() {
+  }
+  /**
+   * Subscribes to the discovery topic on `libp2p.pubsub` and performs a broadcast
+   * immediately, and every `this.interval`
+   */
+  afterStart() {
+    if (this.intervalId != null) {
+      return;
+    }
+    const pubsub = this.components.pubsub;
+    if (pubsub == null) {
+      throw new Error("PubSub not configured");
+    }
+    for (const topic of this.topics) {
+      pubsub.subscribe(topic);
+      pubsub.addEventListener("message", this._onMessage);
+    }
+    if (this.listenOnly) {
+      return;
+    }
+    this._broadcast();
+    this.intervalId = setInterval(() => {
+      this._broadcast();
+    }, this.interval);
+  }
+  beforeStop() {
+    const pubsub = this.components.pubsub;
+    if (pubsub == null) {
+      throw new Error("PubSub not configured");
+    }
+    for (const topic of this.topics) {
+      pubsub.unsubscribe(topic);
+      pubsub.removeEventListener("message", this._onMessage);
+    }
+  }
+  /**
+   * Unsubscribes from the discovery topic
+   */
+  stop() {
+    if (this.intervalId != null) {
+      clearInterval(this.intervalId);
+      this.intervalId = void 0;
+    }
+  }
+  /**
+   * Performs a broadcast via Pubsub publish
+   */
+  _broadcast() {
+    const peerId = this.components.peerId;
+    if (peerId.publicKey == null) {
+      throw new Error("PeerId was missing public key");
+    }
+    const peer = {
+      publicKey: publicKeyToProtobuf(peerId.publicKey),
+      addrs: this.components.addressManager.getAddresses().map((ma) => ma.bytes)
+    };
+    const encodedPeer = Peer.encode(peer);
+    const pubsub = this.components.pubsub;
+    if (pubsub == null) {
+      throw new Error("PubSub not configured");
+    }
+    for (const topic of this.topics) {
+      if (pubsub.getSubscribers(topic).length === 0) {
+        this.log("skipping broadcasting our peer data on topic %s because there are no peers present", topic);
+        continue;
+      }
+      this.log("broadcasting our peer data on topic %s", topic);
+      void pubsub.publish(topic, encodedPeer);
+    }
+  }
+  /**
+   * Handles incoming pubsub messages for our discovery topic
+   */
+  _onMessage(event) {
+    if (!this.isStarted()) {
+      return;
+    }
+    const message2 = event.detail;
+    if (!this.topics.includes(message2.topic)) {
+      return;
+    }
+    try {
+      const peer = Peer.decode(message2.data);
+      const publicKey = publicKeyFromProtobuf(peer.publicKey);
+      const peerId = peerIdFromPublicKey(publicKey);
+      if (peerId.equals(this.components.peerId)) {
+        return;
+      }
+      this.log("discovered peer %p on %s", peerId, message2.topic);
+      this.safeDispatchEvent("peer", {
+        detail: {
+          id: peerId,
+          multiaddrs: peer.addrs.map((b) => multiaddr(b))
+        }
+      });
+    } catch (err) {
+      this.log.error("error handling incoming message", err);
+    }
+  }
+}
+function pubsubPeerDiscovery(init = {}) {
+  return (components) => new PubSubPeerDiscovery(components, init);
+}
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
 const FQ_REPO = `${OWNER}/${REPO}`;
 const SERVER_PEER_PATH = "data/server-peer.json";
 const SERVER_PEER_URL = `https://api.github.com/repos/${FQ_REPO}/contents/${SERVER_PEER_PATH}`;
+const SERVER_PEER_RAW_URL = `https://raw.githubusercontent.com/${FQ_REPO}/main/${SERVER_PEER_PATH}`;
 const STATE_PATH = "data/state.json";
 const STATE_URL = `https://api.github.com/repos/${FQ_REPO}/contents/${STATE_PATH}`;
 const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
@@ -26809,7 +32663,7 @@ const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
 let libp2p = null;
 let isHost = false;
-let lastPeerInfo = null;
+let serverPeers = [];
 function calculateHash(index, previousHash, timestamp, transactions) {
   const value2 = `${index}${previousHash}${timestamp}${JSON.stringify(transactions)}`;
   return CryptoJS.SHA256(value2).toString();
@@ -26913,7 +32767,7 @@ function getGithubAccessToken() {
   var _a2;
   let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
   if (!githubAccessToken) {
-    githubAccessToken = (_a2 = document.getElementById("githubAccessToken")) == null ? void 0 : _a2.value;
+    githubAccessToken = (_a2 = document.getElementById("github-token")) == null ? void 0 : _a2.value;
     if (!githubAccessToken) {
       console.log("No GitHub access token provided");
       alert("Please enter your GitHub access token.");
@@ -26927,124 +32781,46 @@ function getGithubAccessToken() {
 async function initP2P(host) {
   console.log("Entering initP2P, host:", host);
   isHost = host;
+  if (libp2p) {
+    console.log("libp2p already initialized, reusing instance");
+    return;
+  }
   let bootstrapList = [];
-  if (isHost) {
-    try {
-      const response = await fetch(`${SERVER_PEER_URL}?ref=main`);
-      if (response.ok) {
-        const peerData = await response.json();
-        console.log("Raw peer data from server-peer.json:", peerData.content);
-        let b64Encoded = peerData.content;
-        let payloadString = atob(b64Encoded);
-        let peerJson = JSON.parse(payloadString);
-        bootstrapList = (peerJson.peers || []).filter((addr) => {
-          try {
-            multiaddr(addr);
-            console.log(`Valid multiaddr: ${addr}`);
-            return true;
-          } catch (e2) {
-            console.error(`Invalid multiaddr in server-peer.json: ${addr}`, e2);
-            return false;
-          }
-        });
-        console.log("Filtered bootstrapList:", bootstrapList);
-      } else if (response.status === 404) {
-        console.log("server-peer.json not found, creating with host peerInfo");
-        const githubAccessToken = getGithubAccessToken();
-        if (!githubAccessToken) {
-          console.log("No PAT available for creating server-peer.json");
-        } else {
-          const tempConfig = {
-            transports: [webRTC(), circuitRelayTransport()],
-            connectionEncryption: [noise()],
-            streamMuxers: [yamux()],
-            services: { identify: identify() }
-          };
-          const tempNode = await createLibp2p(tempConfig);
-          const peerId = `/ip4/0.0.0.0/tcp/0/p2p/${tempNode.peerId.toString()}`;
-          await tempNode.stop();
-          console.log(`My peer ID: ${peerId}`);
-          bootstrapList.push(peerId);
-          console.log("bootstrapList: " + JSON.stringify(bootstrapList));
-          const initialContent = btoa(JSON.stringify(bootstrapList, null, 2));
-          const body = { message: "Updated server peer data.", content: initialContent, branch: "main" };
-          const createResponse = await fetch(`${SERVER_PEER_URL}`, {
-            method: "PUT",
-            headers: {
-              "Authorization": `token ${githubAccessToken}`,
-              "Accept": "application/vnd.github.v3+json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-          });
-          if (createResponse.ok) {
-            console.log("server-peer.json created successfully with host peerInfo");
-          } else {
-            console.error("Failed to create server-peer.json:", await createResponse.text());
-          }
-        }
-      } else {
-        console.log("Error fetching server-peer.json, status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error loading/creating server-peer.json:", error);
+  serverPeers = [];
+  try {
+    const response = await fetch(SERVER_PEER_RAW_URL);
+    if (response.ok) {
+      serverPeers = await response.json();
+      bootstrapList = serverPeers.map((peer) => `/p2p/${peer}`);
+      console.log("Loaded server peers:", serverPeers);
+    } else if (response.status === 404) {
+      console.log("server-peer.json not found");
+    } else {
+      console.log("Error fetching server-peer.json, status:", response.status);
     }
+  } catch (error) {
+    console.error("Error loading server-peer.json:", error);
   }
   try {
     const config = {
       transports: [webRTC(), circuitRelayTransport()],
       connectionEncryption: [noise()],
       streamMuxers: [yamux()],
-      services: { identify: identify() }
+      services: {
+        identify: identify(),
+        pubsub: gossipsub()
+      },
+      peerDiscovery: [
+        pubsubPeerDiscovery()
+      ]
     };
-    if (bootstrapList.length) {
-      config.peerDiscovery = [bootstrap({ list: bootstrapList })];
+    if (bootstrapList.length > 0) {
+      config.peerDiscovery.push(bootstrap({ list: bootstrapList }));
     } else {
-      console.log("No valid peers in bootstrapList, initializing libp2p without peer discovery");
+      console.log("No valid peers in bootstrapList, initializing without bootstrap");
     }
     libp2p = await createLibp2p(config);
     console.log("P2P node started:", libp2p.peerId.toString());
-    if (isHost) {
-      const peerInfo = `/ip4/0.0.0.0/tcp/0/p2p/${libp2p.peerId.toString()}`;
-      if (peerInfo !== lastPeerInfo) {
-        console.log("Updating server-peer.json with:", peerInfo);
-        const githubAccessToken = getGithubAccessToken();
-        if (!githubAccessToken) {
-          console.log("No PAT available for updating server-peer.json");
-          return;
-        }
-        try {
-          const response = await fetch(`${SERVER_PEER_URL}?ref=main`, {
-            headers: {
-              "Authorization": `token ${githubAccessToken}`,
-              "Accept": "application/vnd.github.v3+json"
-            }
-          });
-          let sha2 = null;
-          if (response.ok) {
-            const data = await response.json();
-            sha2 = data.sha;
-          }
-          console.log(`peerInfo: ${peerInfo}`);
-          await fetch(`${SERVER_PEER_URL}`, {
-            method: "PUT",
-            headers: {
-              "Authorization": `token ${githubAccessToken}`,
-              "Accept": "application/vnd.github.v3+json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              message: "Update server peer info",
-              content: btoa(JSON.stringify({ peers: [peerInfo] }, null, 2)),
-              sha: sha2
-            })
-          });
-          lastPeerInfo = peerInfo;
-        } catch (error) {
-          console.error("Error updating server-peer.json:", error);
-        }
-      }
-    }
     libp2p.addEventListener("peer:discovery", (evt) => {
       console.log("Peer discovered:", evt.detail.id.toString());
     });
@@ -27054,14 +32830,147 @@ async function initP2P(host) {
       const txn = JSON.parse(toString(data));
       console.log("Received transaction via P2P:", txn);
     });
+    if (isHost) {
+      const peerId = libp2p.peerId.toString();
+      if (!serverPeers.includes(peerId)) {
+        serverPeers.push(peerId);
+        await updateServerPeers();
+      }
+      console.log("Host peer ID added to server-peer.json if not present");
+    }
   } catch (error) {
     console.error("Failed to initialize P2P:", error);
   }
 }
+async function updateServerPeers() {
+  const githubAccessToken = getGithubAccessToken();
+  if (!githubAccessToken) {
+    console.error("No PAT available for updating server-peer.json");
+    return false;
+  }
+  try {
+    const response = await fetch(SERVER_PEER_URL + "?ref=main", {
+      headers: {
+        "Authorization": `token ${githubAccessToken}`,
+        "Accept": "application/vnd.github.v3+json"
+      }
+    });
+    let sha2 = null;
+    if (response.ok) {
+      const data = await response.json();
+      sha2 = data.sha;
+    }
+    const body = {
+      message: "Update server peer IDs",
+      content: btoa(JSON.stringify(serverPeers, null, 2)),
+      branch: "main",
+      sha: sha2 || void 0
+    };
+    const updateResponse = await fetch(SERVER_PEER_URL, {
+      method: "PUT",
+      headers: {
+        "Authorization": `token ${githubAccessToken}`,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if (updateResponse.ok) {
+      console.log("server-peer.json updated successfully");
+      return true;
+    } else {
+      console.error("Failed to update server-peer.json:", await updateResponse.text());
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating server-peer.json:", error);
+    return false;
+  }
+}
+async function removeHostPeerId() {
+  if (!isHost || !libp2p)
+    return;
+  const peerId = libp2p.peerId.toString();
+  serverPeers = serverPeers.filter((id) => id !== peerId);
+  await updateServerPeers();
+}
+async function connectAndSendTx(tx) {
+  if (isHost) {
+    const issueBody = JSON.stringify({
+      type: "gitchain_txn",
+      repo: FQ_REPO,
+      txn: tx
+    });
+    const response = await fetch(ISSUES_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `token ${getGithubAccessToken()}`,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: `tx ${tx.from} to ${tx.to}`,
+        body: issueBody
+      })
+    });
+    if (response.ok) {
+      console.log("Host created issue for TX");
+    } else {
+      console.error("Host failed to create issue:", response.status, await response.text());
+    }
+    return;
+  }
+  let peers = [];
+  try {
+    const res = await fetch(SERVER_PEER_RAW_URL);
+    if (res.ok) {
+      peers = await res.json();
+      console.log("Loaded active server peers:", peers);
+    } else if (res.status === 404) {
+      alert("The server is currently not running.");
+      return;
+    } else {
+      alert("Failed to fetch server peer info. Please try again or notify the administrator.");
+      return;
+    }
+  } catch (error) {
+    console.error("Failed to fetch server-peer.json:", error);
+    alert("Failed to connect to server. Please try again or notify the server administrator.");
+    return;
+  }
+  if (peers.length === 0) {
+    alert("The server is currently not running.");
+    return;
+  }
+  let connected = false;
+  for (const peerId of peers) {
+    try {
+      const ma = multiaddr(`/p2p/${peerId}`);
+      const connection = await libp2p.dial(ma);
+      const stream = await connection.newStream(PROTOCOL);
+      const txJson = JSON.stringify(tx);
+      await pipeStringToStream(txJson, stream);
+      console.log("TX sent to server peer:", peerId);
+      connected = true;
+      break;
+    } catch (error) {
+      console.error("Failed to dial server peer:", peerId, error);
+    }
+  }
+  if (!connected) {
+    alert("Failed to connect to any server. Please try again or notify the server administrator.");
+  }
+}
+async function pipeStringToStream(str, stream) {
+  console.log("Writing string to stream, length:", str.length);
+  const data = fromString(str);
+  await stream.sink([data]);
+  console.log("String written to stream");
+}
 function saveGithubAccessToken() {
   var _a2;
   console.log("Entering saveGithubAccessToken");
-  const githubAccessToken = (_a2 = document.getElementById("githubAccessToken")) == null ? void 0 : _a2.value;
+  const githubAccessToken = (_a2 = document.getElementById("github-token")) == null ? void 0 : _a2.value;
   if (githubAccessToken) {
     localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
     console.log("PAT saved, initializing P2P as host");
@@ -27178,7 +33087,7 @@ async function closeIssueWithComment(issueNumber, blockIndex, valid) {
 async function processTxns() {
   console.log("Entering processTxns");
   const output = document.getElementById("output");
-  const processingMessage = document.getElementById("processingMessage");
+  const processingMessage = document.getElementById("processing-message");
   processingMessage.classList.add("visible");
   let stateData = await fetchState();
   let state = stateData == null ? void 0 : stateData.content;
@@ -27314,11 +33223,15 @@ window.addEventListener("load", () => {
     processTxns();
   }, UPDATE_INTERVAL);
 });
+window.addEventListener("unload", async () => {
+  await removeHostPeerId();
+});
 window.gitchain = {
   saveGithubAccessToken,
   viewChain,
   processTxns,
-  fetchState
+  fetchState,
+  connectAndSendTx
 };
 window.dispatchEvent(new Event("gitchain:init"));
 //# sourceMappingURL=bundle.js.map
