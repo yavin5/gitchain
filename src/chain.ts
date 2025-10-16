@@ -213,10 +213,10 @@ export async function initP2P(host: boolean): Promise<void> {
             streamMuxers: [yamux()],
             services: {
                 identify: identify(),
-                pubsub: gossipsub()
+                pubsub: gossipsub({ emitSelf: true }) // Allow local message handling
             },
             peerDiscovery: [
-                pubsubPeerDiscovery()
+                pubsubPeerDiscovery({ interval: 1000 }) // Faster discovery for testing
             ]
         };
         if (bootstrapList.length > 0) {
@@ -228,6 +228,9 @@ export async function initP2P(host: boolean): Promise<void> {
         console.log('P2P node started:', libp2p.peerId.toString());
         libp2p.addEventListener('peer:discovery', (evt: any) => {
             console.log('Peer discovered:', evt.detail.id.toString());
+        });
+        libp2p.services.pubsub.addEventListener('subscription-change', (evt: any) => {
+            console.log('Subscription change:', evt.detail);
         });
         await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
             console.log('Received P2P stream from:', connection.remotePeer.toString());
