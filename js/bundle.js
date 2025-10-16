@@ -32831,7 +32831,11 @@ async function initP2P(host) {
     });
     await libp2p.handle(PROTOCOL, async ({ stream, connection }) => {
       console.log("Received P2P stream from:", connection.remotePeer.toString());
-      const data = await stream.read();
+      const chunks = [];
+      for await (const chunk of stream.source) {
+        chunks.push(chunk);
+      }
+      const data = concat(chunks);
       const txn = JSON.parse(toString(data));
       console.log("Received transaction via P2P:", txn);
     });
@@ -32845,6 +32849,7 @@ async function initP2P(host) {
     }
   } catch (error) {
     console.error("Failed to initialize P2P:", error);
+    throw error;
   }
 }
 async function updateServerPeers() {
@@ -32954,7 +32959,8 @@ async function connectAndSendTx(tx) {
       const connection = await libp2p.dial(ma);
       const stream = await connection.newStream(PROTOCOL);
       const txJson = JSON.stringify(tx);
-      await pipeStringToStream(txJson, stream);
+      const data = fromString(txJson);
+      await stream.sink([data]);
       console.log("TX sent to server peer:", peerId);
       connected = true;
       break;
@@ -32966,12 +32972,6 @@ async function connectAndSendTx(tx) {
     alert("Failed to connect to any server. Please try again or notify the server administrator.");
   }
 }
-async function pipeStringToStream(str, stream) {
-  console.log("Writing string to stream, length:", str.length);
-  const data = fromString(str);
-  await stream.sink([data]);
-  console.log("String written to stream");
-}
 function saveGithubAccessToken() {
   var _a2;
   console.log("Entering saveGithubAccessToken");
@@ -32979,7 +32979,6 @@ function saveGithubAccessToken() {
   if (githubAccessToken) {
     localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
     console.log("PAT saved, initializing P2P as host");
-    initP2P(true);
   } else {
     console.error("No GitHub access token provided");
     throw new Error("Enter a GitHub access token first.");
@@ -33214,6 +33213,12 @@ Balances:
   output.textContent = text;
   console.log("viewChain completed, chain length:", chain.length);
 }
+function getLibp2p() {
+  return libp2p;
+}
+function getServerPeers() {
+  return serverPeers;
+}
 window.addEventListener("load", () => {
   console.log("Window loaded, checking for PAT");
   if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
@@ -33239,4 +33244,13 @@ window.gitchain = {
   connectAndSendTx
 };
 window.dispatchEvent(new Event("gitchain:init"));
+export {
+  getServerPeers as a,
+  fetchState as f,
+  getLibp2p as g,
+  initP2P as i,
+  processTxns as p,
+  saveGithubAccessToken as s,
+  viewChain as v
+};
 //# sourceMappingURL=bundle.js.map

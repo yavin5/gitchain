@@ -15,7 +15,7 @@ export default defineConfig({
           console.error('Build error:', err);
         } else {
           console.log('Build completed. Output files in js/:');
-          console.log('Expected: bundle.js, main.js, init.js');
+          console.log('Expected: bundle.js, main.js');
         }
       }
     }
@@ -56,7 +56,7 @@ export default defineConfig({
           '@libp2p/circuit-relay-v2': 'circuitRelayTransport',
           '@libp2p/bootstrap': 'bootstrap',
           '@libp2p/gossipsub': 'gossipsub',
-          '@libp2p/pubsub-peer-discovery': 'pubsub-peer-discovery',
+          '@libp2p/pubsub-peer-discovery': 'pubsubPeerDiscovery',
           '@chainsafe/libp2p-noise': 'noise',
           '@chainsafe/libp2p-yamux': 'yamux',
           '@libp2p/identify': 'identify',

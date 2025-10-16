@@ -10,6 +10,19 @@ declare const ec: any;
 declare const sha3: {
     keccak256: (data: string) => string;
 };
+// Declare window.gitchain for TypeScript
+interface Gitchain {
+    saveGithubAccessToken: () => void;
+    viewChain: () => Promise<void>;
+    processTxns: () => Promise<void>;
+    fetchState: () => Promise<{ content: State; sha: string } | null>;
+    connectAndSendTx: (tx: Transaction) => Promise<void>;
+}
+declare global {
+    interface Window {
+        gitchain: Gitchain;
+    }
+}
 
 import { createLibp2p } from 'libp2p';
 import { webRTC } from '@libp2p/webrtc';
@@ -41,7 +54,6 @@ const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 // Global P2P state
 let libp2p: any = null;
 let isHost = false;
-let lastPeerId: string | null = null; // Track for change detection
 let serverPeers: string[] = [];
 // Interfaces
 interface Transaction {
@@ -234,7 +246,11 @@ export async function initP2P(host: boolean): Promise<void> {
         });
         await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
             console.log('Received P2P stream from:', connection.remotePeer.toString());
-            const data = await stream.read();
+            const chunks: Uint8Array[] = [];
+            for await (const chunk of stream.source) {
+                chunks.push(chunk);
+            }
+            const data = uint8Concat(chunks);
             const txn = JSON.parse(uint8ToString(data));
             console.log('Received transaction via P2P:', txn);
         });
@@ -248,6 +264,7 @@ export async function initP2P(host: boolean): Promise<void> {
         }
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
+        throw error; // Propagate error for debugging
     }
 }
 // Update server-peer.json
@@ -302,29 +319,6 @@ async function removeHostPeerId(): Promise<void> {
     const peerId = libp2p.peerId.toString();
     serverPeers = serverPeers.filter(id => id !== peerId);
     await updateServerPeers();
-}
-// Get file SHA
-async function getFileSha(path: string): Promise<string | null> {
-    const githubAccessToken = getGithubAccessToken();
-    if (!githubAccessToken) return null;
-    try {
-        const res = await fetch(`https://api.github.com/repos/${FQ_REPO}/contents/${path}?ref=main`, {
-            headers: {
-                'Authorization': `token ${githubAccessToken}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            return data.sha;
-        }
-        if (res.status === 404) return null;
-        console.error(`Failed to fetch SHA for ${path}: ${res.status} ${await res.text()}`);
-        return null;
-    } catch (error) {
-        console.error(`Error fetching SHA for ${path}:`, error);
-        return null;
-    }
 }
 // Client-side: Connect and Send TX
 export async function connectAndSendTx(tx: Transaction) {
@@ -382,7 +376,8 @@ export async function connectAndSendTx(tx: Transaction) {
             const connection = await libp2p.dial(ma);
             const stream = await connection.newStream(PROTOCOL);
             const txJson = JSON.stringify(tx);
-            await pipeStringToStream(txJson, stream);
+            const data = uint8FromString(txJson);
+            await stream.sink([data]);
             console.log('TX sent to server peer:', peerId);
             connected = true;
             break;
@@ -394,24 +389,6 @@ export async function connectAndSendTx(tx: Transaction) {
         alert('Failed to connect to any server. Please try again or notify the server administrator.');
     }
 }
-// Stream helpers
-async function pipeToString(stream: any): Promise<string> {
-    console.log('Reading stream to string');
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of stream.source) {
-        chunks.push(chunk);
-    }
-    const data = uint8Concat(chunks);
-    const result = uint8ToString(data);
-    console.log('Stream read complete, length:', result.length);
-    return result;
-}
-async function pipeStringToStream(str: string, stream: any) {
-    console.log('Writing string to stream, length:', str.length);
-    const data = uint8FromString(str);
-    await stream.sink([data]);
-    console.log('String written to stream');
-}
 // Save GitHub access token
 export function saveGithubAccessToken(): void {
     console.log('Entering saveGithubAccessToken');
@@ -419,7 +396,6 @@ export function saveGithubAccessToken(): void {
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
         console.log('PAT saved, initializing P2P as host');
-        initP2P(true);
     } else {
         console.error('No GitHub access token provided');
         throw new Error('Enter a GitHub access token first.');

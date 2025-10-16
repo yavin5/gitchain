@@ -1,123 +1,145 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState, initP2P, getLibp2p, getServerPeers, connectAndSendTx } from './chain.ts';
-
-window.gitchain = {
-    saveGithubAccessToken,
-    viewChain,
-    processTxns,
-    fetchState,
-    connectAndSendTx
-};
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize P2P and wait for completion
-    const isServer = localStorage.getItem('gitchain_github_access_token') !== null;
+import { i as initP2P, g as getLibp2p, f as fetchState, s as saveGithubAccessToken, p as processTxns, v as viewChain, a as getServerPeers } from "./bundle.js";
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("DOMContentLoaded triggered");
+  try {
+    const isServer = localStorage.getItem("gitchain_github_access_token") !== null;
+    console.log("isServer:", isServer);
     await initP2P(isServer);
     const libp2p = getLibp2p();
-    const peerIdDisplay = document.getElementById('peer-id');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-message');
-    const messagesDiv = document.getElementById('messages');
-    const processTxnsButton = document.getElementById('process-txns');
-    const blockHeightDiv = document.getElementById('block-height');
-
-    // Display shortened peer ID
-    if (libp2p && libp2p.peerId) {
-        const shortPeerId = libp2p.peerId.toString().slice(0, 8);
-        peerIdDisplay.textContent = shortPeerId;
-        console.log('Peer ID displayed:', shortPeerId);
-    } else {
-        console.error('Failed to display peer ID: libp2p or peerId not available');
-        peerIdDisplay.textContent = 'Error: Peer ID unavailable';
+    if (!libp2p) {
+      console.error("libp2p initialization failed");
+      document.getElementById("token-message").textContent = "Error: Failed to initialize P2P network";
+      return;
     }
-
-    // Update block height
+    const peerIdDisplay = document.getElementById("peer-id");
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-message");
+    const messagesDiv = document.getElementById("messages");
+    const processTxnsButton = document.getElementById("process-txns");
+    const blockHeightDiv = document.getElementById("block-height");
+    const saveTokenButton = document.getElementById("save-token");
+    const tokenMessage = document.getElementById("token-message");
+    if (libp2p && libp2p.peerId) {
+      const shortPeerId = libp2p.peerId.toString().slice(0, 8);
+      peerIdDisplay.textContent = shortPeerId;
+      console.log("Peer ID displayed:", shortPeerId);
+    } else {
+      console.error("Failed to display peer ID: libp2p or peerId not available");
+      peerIdDisplay.textContent = "Error: Peer ID unavailable";
+    }
     const stateData = await fetchState();
     if (stateData) {
-        blockHeightDiv.textContent = `Block Height: ${stateData.content.chain.length}`;
-        console.log('Block height set:', stateData.content.chain.length);
-    }
-
-    // Show process button if server
-    processTxnsButton.classList.toggle('hidden', !isServer);
-
-    // Pubsub subscribe for messages
-    if (libp2p && libp2p.services.pubsub) {
-        try {
-            await libp2p.services.pubsub.subscribe('gitchain-chat');
-            console.log('Subscribed to gitchain-chat');
-            libp2p.services.pubsub.addEventListener('message', (evt) => {
-                if (evt.detail.topic === 'gitchain-chat') {
-                    const message = new TextDecoder().decode(evt.detail.data);
-                    const senderId = evt.detail.from.toString().slice(0, 8);
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = `${senderId}: ${message}`;
-                    messagesDiv.appendChild(messageElement);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to latest
-                    console.log('Received message:', { senderId, message });
-                }
-            });
-        } catch (error) {
-            console.error('Failed to subscribe to gitchain-chat:', error);
-        }
+      blockHeightDiv.textContent = `Block Height: ${stateData.content.chain.length}`;
+      console.log("Block height set:", stateData.content.chain.length);
     } else {
-        console.error('Pubsub service not available');
+      console.error("Failed to fetch state");
+      blockHeightDiv.textContent = "Error: Failed to fetch state";
     }
-
-    // Send message
-    sendButton.addEventListener('click', async () => {
-        const message = messageInput.value.trim();
-        if (message && libp2p && libp2p.services.pubsub) {
-            try {
-                // Publish to peers
-                await libp2p.services.pubsub.publish('gitchain-chat', new TextEncoder().encode(message));
-                console.log('Published message:', message);
-                // Append locally to ensure sender sees their own message
-                const shortPeerId = libp2p.peerId.toString().slice(0, 8);
-                const messageElement = document.createElement('p');
-                messageElement.textContent = `${shortPeerId}: ${message}`;
-                messagesDiv.appendChild(messageElement);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
-                messageInput.value = '';
-            } catch (error) {
-                console.error('Failed to publish message:', error);
-                messagesDiv.appendChild(document.createElement('p')).textContent = 'Error: Failed to send message';
-            }
-        } else {
-            console.error('Cannot send message: libp2p or pubsub not available');
+    processTxnsButton.classList.toggle("hidden", !isServer);
+    console.log("Process Transactions button visibility:", !processTxnsButton.classList.contains("hidden"));
+    if (libp2p && libp2p.services.pubsub) {
+      try {
+        await libp2p.services.pubsub.subscribe("gitchain-chat");
+        console.log("Subscribed to gitchain-chat");
+        libp2p.services.pubsub.addEventListener("message", (evt) => {
+          if (evt.detail.topic === "gitchain-chat") {
+            const message = new TextDecoder().decode(evt.detail.data);
+            const senderId = evt.detail.from.toString().slice(0, 8);
+            const messageElement = document.createElement("p");
+            messageElement.textContent = `${senderId}: ${message}`;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            console.log("Received message:", { senderId, message });
+          }
+        });
+      } catch (error) {
+        console.error("Failed to subscribe to gitchain-chat:", error);
+        messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Failed to subscribe to chat";
+      }
+    } else {
+      console.error("Pubsub service not available");
+      messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Pubsub unavailable";
+    }
+    sendButton.addEventListener("click", async () => {
+      console.log("Send button clicked");
+      const message = messageInput.value.trim();
+      if (message && libp2p && libp2p.services.pubsub) {
+        try {
+          await libp2p.services.pubsub.publish("gitchain-chat", new TextEncoder().encode(message));
+          console.log("Published message:", message);
+          const shortPeerId = libp2p.peerId.toString().slice(0, 8);
+          const messageElement = document.createElement("p");
+          messageElement.textContent = `${shortPeerId}: ${message}`;
+          messagesDiv.appendChild(messageElement);
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          messageInput.value = "";
+        } catch (error) {
+          console.error("Failed to publish message:", error);
+          messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Failed to send message";
         }
+      } else {
+        console.error("Cannot send message: libp2p or pubsub not available or empty message");
+        messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Cannot send message";
+      }
     });
-
-    // Save token event
-    document.getElementById('save-token').addEventListener('click', async () => {
-        await saveGithubAccessToken();
-        processTxnsButton.classList.remove('hidden');
-        document.getElementById('token-message').textContent = 'Token saved successfully';
+    saveTokenButton.addEventListener("click", async () => {
+      console.log("Save token button clicked");
+      try {
+        saveGithubAccessToken();
+        tokenMessage.textContent = "Token saved successfully";
+        console.log("Token saved, re-initializing P2P as host");
         await initP2P(true);
         const newLibp2p = getLibp2p();
         if (newLibp2p && newLibp2p.peerId) {
-            peerIdDisplay.textContent = newLibp2p.peerId.toString().slice(0, 8);
-            console.log('Peer ID updated after PAT save:', newLibp2p.peerId.toString().slice(0, 8));
+          const shortPeerId = newLibp2p.peerId.toString().slice(0, 8);
+          peerIdDisplay.textContent = shortPeerId;
+          console.log("Peer ID updated after PAT save:", shortPeerId);
+        } else {
+          console.error("Failed to update peer ID after PAT save");
+          peerIdDisplay.textContent = "Error: Peer ID unavailable";
         }
+        processTxnsButton.classList.remove("hidden");
+        console.log("Process Transactions button shown after PAT save");
+      } catch (error) {
+        console.error("Failed to save PAT:", error);
+        tokenMessage.textContent = "Error: Failed to save token";
+      }
     });
-
-    // Process transactions
-    document.getElementById('process-txns').addEventListener('click', async () => {
-        document.getElementById('processing-message').classList.add('visible');
+    processTxnsButton.addEventListener("click", async () => {
+      console.log("Process Transactions button clicked");
+      try {
+        document.getElementById("processing-message").classList.add("visible");
         await processTxns();
-        document.getElementById('processing-message').classList.remove('visible');
+        document.getElementById("processing-message").classList.remove("visible");
         const updatedState = await fetchState();
         if (updatedState) {
-            blockHeightDiv.textContent = `Block Height: ${updatedState.content.chain.length}`;
-            console.log('Block height updated:', updatedState.content.chain.length);
+          blockHeightDiv.textContent = `Block Height: ${updatedState.content.chain.length}`;
+          console.log("Block height updated:", updatedState.content.chain.length);
+        } else {
+          console.error("Failed to fetch updated state");
+          blockHeightDiv.textContent = "Error: Failed to fetch state";
         }
+      } catch (error) {
+        console.error("Failed to process transactions:", error);
+        document.getElementById("processing-message").textContent = "Error: Failed to process transactions";
+      }
     });
-
-    // View chain
-    document.getElementById('view-chain').addEventListener('click', viewChain);
-
-    // Log active servers if client
+    document.getElementById("view-chain").addEventListener("click", async () => {
+      console.log("View Chain button clicked");
+      try {
+        await viewChain();
+      } catch (error) {
+        console.error("Failed to view chain:", error);
+        document.getElementById("output").textContent = "Error: Failed to view chain";
+      }
+    });
     if (!isServer) {
-        const peers = getServerPeers();
-        console.log('Active server peers:', peers);
+      const peers = getServerPeers();
+      console.log("Active server peers:", peers);
     }
+  } catch (error) {
+    console.error("Error in DOMContentLoaded:", error);
+    document.getElementById("token-message").textContent = "Error: Failed to initialize UI";
+  }
 });
+//# sourceMappingURL=main.js.map
