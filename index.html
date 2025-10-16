@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gitchain</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com wss://*.webrtc.yavin5.github.io;">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <h1>Gitchain</h1>
-  <input type="text" id="github-token" placeholder="Enter GitHub PAT">
-  <button id="save-token">Save Personal Access Token</button>
-  <div id="token-message"></div>
-  <button id="process-txns" class="hidden">Process Transactions</button>
-  <div id="processing-message"></div>
-  <button id="view-chain">View Chain</button>
-  <div id="output"></div>
-  <div id="block-height"></div>
-  <div id="peer-id-display"><b>Your peer ID is: <span id="peer-id"></span></b></div>
-  <textarea id="message-input" placeholder="Type your message here..."></textarea>
-  <button id="send-message">Send</button>
-  <div id="messages" class="message-box"></div>
-  <script type="module" src="/gitchain/js/bundle.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gitchain</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com wss://*.webrtc.yavin5.github.io;">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>Gitchain</h1>
+    <input type="text" id="github-token" placeholder="Enter GitHub PAT">
+    <button id="save-token">Save Personal Access Token</button>
+    <div id="token-message"></div>
+    <button id="process-txns" class="hidden">Process Transactions</button>
+    <div id="processing-message"></div>
+    <button id="view-chain">View Chain</button>
+    <div id="output"></div>
+    <div id="block-height"></div>
+    <div id="peer-id-display"><b>Your peer ID is: <span id="peer-id"></span></b></div>
+    <textarea id="message-input" placeholder="Type your message here..."></textarea>
+    <button id="send-message">Send</button>
+    <div id="messages" class="message-box"></div>
+    <script type="module" src="js/bundle.js"></script>
+  </body>
 </html>
