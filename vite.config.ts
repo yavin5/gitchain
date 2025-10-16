@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite';
 import typescript from 'vite-plugin-typescript';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -37,9 +41,12 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     rollupOptions: {
-      input: 'src/chain.ts',
+      input: {
+        bundle: resolve(__dirname, 'src/chain.ts'),
+        main: resolve(__dirname, 'src/main.js')
+      },
       output: {
-        entryFileNames: 'bundle.js',
+        entryFileNames: '[name].js',
         format: 'es',
         preserveModules: false,
         exports: 'named',
@@ -48,8 +55,8 @@ export default defineConfig({
           '@libp2p/webrtc': 'webRTC',
           '@libp2p/circuit-relay-v2': 'circuitRelayTransport',
           '@libp2p/bootstrap': 'bootstrap',
-	  '@libp2p/gossipsub': 'gossipsub',
-	  '@libp2p/pubsub-peer-discovery': 'pubsub-peer-discovery',
+          '@libp2p/gossipsub': 'gossipsub',
+          '@libp2p/pubsub-peer-discovery': 'pubsub-peer-discovery',
           '@chainsafe/libp2p-noise': 'noise',
           '@chainsafe/libp2p-yamux': 'yamux',
           '@libp2p/identify': 'identify',
