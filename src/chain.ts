@@ -220,7 +220,26 @@ export async function initP2P(host: boolean): Promise<void> {
     }
     try {
         const config: any = {
-            transports: [webRTC(), circuitRelayTransport()],
+            transports: [
+	        webRTC({
+                        rtcConfiguration: {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:global.stun.twilio.com:3478' },
+                                { urls: 'stun:stun.nextcloud.com:3478' },
+                                { urls: 'stun:stun.1und1.de:3478' },
+                                { urls: 'stun:stun.stunprotocol.org:3478' },
+                                { urls: 'stun:stun.services.mozilla.com:3478' },
+                                { urls: 'stun:stun.ekiga.net:3478' },
+                                { urls: 'stun:stun.voipbuster.com:3478' }
+                            ]
+                        }
+                }),
+                webSockets(),
+	        circuitRelayTransport({
+                        discoverRelays: 1
+                })
+            ],
             connectionEncryption: [noise()],
             streamMuxers: [yamux()],
             services: {
