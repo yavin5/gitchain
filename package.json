@@ -23,6 +23,7 @@
     "@libp2p/pubsub-peer-discovery": "^12.0.0",
     "@libp2p/identify": "^4.0.5",
     "@libp2p/webrtc": "^6.0.6",
+    "@libp2p/websockets": "^10.0.6",
     "@multiformats/multiaddr": "^13.0.1",
     "ethereum-cryptography": "^2.2.1",
     "libp2p": "^3.0.6",

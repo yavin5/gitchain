@@ -17,7 +17,7 @@ var __privateWrapper = (obj, member, setter, getter) => ({
     return __privateGet(obj, member, getter);
   }
 });
-var _a, _b, _c, _d, _e, _f, _listeners, _g, _h, _i, _j, _k, _l, _m, _n, _components, _string, _bytes, _o, _PersistentStore_instances, findExistingPeer_fn, saveIfDifferent_fn, peerIsExpired_fn, _p, _PersistentPeerStore_instances, emitIfUpdated_fn, _q, _queue, _carryoverIntervalCount, _isIntervalIgnored, _intervalCount, _intervalCap, _rateLimitedInInterval, _rateLimitFlushScheduled, _interval, _intervalEnd, _lastExecutionTime, _intervalId, _timeoutId, _queue2, _queueClass, _pending, _concurrency, _isPaused, _idAssigner, _runningTasks, _PQueue_instances, doesIntervalAllowAnother_get, doesConcurrentAllowAnother_get, next_fn, onResumeInterval_fn, isIntervalPaused_get, createIntervalTimeout_fn, clearIntervalTimer_fn, clearTimeoutTimer_fn, tryToStartAnother_fn, initializeIntervalIfNeeded_fn, onInterval_fn, processQueue_fn, throwOnAbort_fn, onEvent_fn, setupRateLimitTracking_fn, scheduleRateLimitUpdate_fn, updateRateLimitState_fn, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _Libp2p_instances, onDiscoveryPeer_fn, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _ReservationStore_instances, createReservation_fn, removeReservation_fn, checkReservationCount_fn, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca;
+var _a, _b, _c, _d, _e, _f, _listeners, _g, _h, _i, _j, _k, _l, _m, _n, _components, _string, _bytes, _o, _PersistentStore_instances, findExistingPeer_fn, saveIfDifferent_fn, peerIsExpired_fn, _p, _PersistentPeerStore_instances, emitIfUpdated_fn, _q, _queue, _carryoverIntervalCount, _isIntervalIgnored, _intervalCount, _intervalCap, _rateLimitedInInterval, _rateLimitFlushScheduled, _interval, _intervalEnd, _lastExecutionTime, _intervalId, _timeoutId, _queue2, _queueClass, _pending, _concurrency, _isPaused, _idAssigner, _runningTasks, _PQueue_instances, doesIntervalAllowAnother_get, doesConcurrentAllowAnother_get, next_fn, onResumeInterval_fn, isIntervalPaused_get, createIntervalTimeout_fn, clearIntervalTimer_fn, clearTimeoutTimer_fn, tryToStartAnother_fn, initializeIntervalIfNeeded_fn, onInterval_fn, processQueue_fn, throwOnAbort_fn, onEvent_fn, setupRateLimitTracking_fn, scheduleRateLimitUpdate_fn, updateRateLimitState_fn, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _Libp2p_instances, onDiscoveryPeer_fn, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _ReservationStore_instances, createReservation_fn, removeReservation_fn, checkReservationCount_fn, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca, _da, _ea, _fa;
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
 const connectionSymbol = Symbol.for("@libp2p/connection");
 const contentRoutingSymbol = Symbol.for("@libp2p/content-routing");
@@ -15709,7 +15709,7 @@ fmt(_QUIC);
 const QUIC_V1 = fmt(_QUIC_V1);
 const _WEB = or(_IP_OR_DOMAIN, _TCP, _UDP, _QUIC, _QUIC_V1);
 const _WebSockets = or(and(_WEB, code(CODE_WS), optional(value(CODE_P2P))));
-const WebSockets = fmt(_WebSockets);
+const WebSockets$1 = fmt(_WebSockets);
 const _WebSocketsSecure = or(and(_WEB, code(CODE_WSS), optional(value(CODE_P2P))), and(_WEB, code(CODE_TLS), optional(value(CODE_SNI)), code(CODE_WS), optional(value(CODE_P2P))));
 const WebSocketsSecure = fmt(_WebSocketsSecure);
 const _WebRTCDirect = and(_UDP, code(CODE_WEBRTC_DIRECT), optional(value(CODE_CERTHASH)), optional(value(CODE_CERTHASH)), optional(value(CODE_P2P)));
@@ -16443,7 +16443,7 @@ class AddressManager {
     }
     const listeners = this.components.transportManager.getListeners();
     const transportMatchers = [
-      (ma2) => WebSockets.exactMatch(ma2) || WebSocketsSecure.exactMatch(ma2),
+      (ma2) => WebSockets$1.exactMatch(ma2) || WebSocketsSecure.exactMatch(ma2),
       (ma2) => TCP.exactMatch(ma2),
       (ma2) => QUIC_V1.exactMatch(ma2)
     ];
@@ -16699,7 +16699,7 @@ function getServiceName(service) {
 function connectionGater(gater = {}) {
   if (gater.denyDialMultiaddr == null) {
     gater.denyDialMultiaddr = (multiaddr2) => {
-      if (WebSockets.matches(multiaddr2)) {
+      if (WebSockets$1.matches(multiaddr2)) {
         return true;
       }
       return isPrivate(multiaddr2);
@@ -16975,8 +16975,8 @@ function reliableTransportsFirst(a2, b) {
   if (!isAWebSocketSecure && isBWebSocketSecure) {
     return 1;
   }
-  const isAWebSocket = WebSockets.exactMatch(a2.multiaddr);
-  const isBWebSocket = WebSockets.exactMatch(b.multiaddr);
+  const isAWebSocket = WebSockets$1.exactMatch(a2.multiaddr);
+  const isBWebSocket = WebSockets$1.exactMatch(b.multiaddr);
   if (isAWebSocket && !isBWebSocket) {
     return -1;
   }
@@ -24103,6 +24103,358 @@ function noise(init = {}) {
 function webRTC(init) {
   return (components) => new WebRTCTransport(components, init);
 }
+const ASSUME_HTTP_CODES = [
+  CODE_TCP,
+  CODE_DNS,
+  CODE_DNSADDR,
+  CODE_DNS4,
+  CODE_DNS6
+];
+function extractSNI(ma) {
+  var _a2;
+  return (_a2 = extractTuple("sni", ma)) == null ? void 0 : _a2.value;
+}
+function extractPort(ma) {
+  var _a2;
+  const port = (_a2 = extractTuple("tcp", ma)) == null ? void 0 : _a2.value;
+  if (port == null) {
+    return "";
+  }
+  return `:${port}`;
+}
+function extractTuple(name2, ma) {
+  return ma.find((component) => component.name === name2);
+}
+function hasTLS(ma) {
+  return ma.some(({ code: code2 }) => code2 === CODE_TLS);
+}
+function interpretNext(head, rest) {
+  const interpreter = interpreters[head.name];
+  if (interpreter == null) {
+    throw new Error(`Can't interpret protocol ${head.name}`);
+  }
+  const restVal = interpreter(head, rest);
+  if (head.code === CODE_IP6) {
+    return `[${restVal}]`;
+  }
+  return restVal;
+}
+const interpreters = {
+  ip4: (head, rest) => head.value,
+  ip6: (head, rest) => {
+    if (rest.length === 0) {
+      return head.value;
+    }
+    return `[${head.value}]`;
+  },
+  tcp: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return `tcp://${interpretNext(tail, rest)}:${head.value}`;
+  },
+  udp: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return `udp://${interpretNext(tail, rest)}:${head.value}`;
+  },
+  dnsaddr: (head, rest) => head.value,
+  dns4: (head, rest) => head.value,
+  dns6: (head, rest) => head.value,
+  dns: (head, rest) => head.value,
+  ipfs: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return `${interpretNext(tail, rest)}`;
+  },
+  p2p: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return `${interpretNext(tail, rest)}`;
+  },
+  http: (head, rest) => {
+    const maHasTLS = hasTLS(rest);
+    const sni = extractSNI(rest);
+    const port = extractPort(rest);
+    if (maHasTLS && sni != null) {
+      return `https://${sni}${port}`;
+    }
+    const protocol = maHasTLS ? "https://" : "http://";
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    let baseVal = interpretNext(tail, rest);
+    baseVal = baseVal == null ? void 0 : baseVal.replace("tcp://", "");
+    return `${protocol}${baseVal}`;
+  },
+  "http-path": (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    const baseVal = interpretNext(tail, rest);
+    const decodedValue = decodeURIComponent(head.value ?? "");
+    return `${baseVal}${decodedValue}`;
+  },
+  tls: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return interpretNext(tail, rest);
+  },
+  sni: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    return interpretNext(tail, rest);
+  },
+  https: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    let baseVal = interpretNext(tail, rest);
+    baseVal = baseVal == null ? void 0 : baseVal.replace("tcp://", "");
+    return `https://${baseVal}`;
+  },
+  ws: (head, rest) => {
+    const maHasTLS = hasTLS(rest);
+    const sni = extractSNI(rest);
+    const port = extractPort(rest);
+    if (maHasTLS && sni != null) {
+      return `wss://${sni}${port}`;
+    }
+    const protocol = maHasTLS ? "wss://" : "ws://";
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    let baseVal = interpretNext(tail, rest);
+    baseVal = baseVal == null ? void 0 : baseVal.replace("tcp://", "");
+    return `${protocol}${baseVal}`;
+  },
+  wss: (head, rest) => {
+    const tail = rest.pop();
+    if (tail == null) {
+      throw new Error("Unexpected end of multiaddr");
+    }
+    let baseVal = interpretNext(tail, rest);
+    baseVal = baseVal == null ? void 0 : baseVal.replace("tcp://", "");
+    return `wss://${baseVal}`;
+  }
+};
+function multiaddrToUri(input, opts) {
+  const ma = multiaddr(input);
+  const components = ma.getComponents();
+  const head = components.pop();
+  if (head == null) {
+    throw new Error("Unexpected end of multiaddr");
+  }
+  const interpreter = interpreters[head.name];
+  if (interpreter == null) {
+    throw new Error(`No interpreter found for ${head.name}`);
+  }
+  let uri = interpreter(head, components) ?? "";
+  if (ASSUME_HTTP_CODES.includes(head.code)) {
+    uri = uri.replace(/^.*:\/\//, "");
+    if (head.value === "443") {
+      uri = `https://${uri}`;
+    } else {
+      uri = `http://${uri}`;
+    }
+  }
+  if (uri.startsWith("http://") || uri.startsWith("https://") || uri.startsWith("ws://") || uri.startsWith("wss://")) {
+    uri = new URL(uri).toString();
+    if (uri.endsWith("/")) {
+      uri = uri.substring(0, uri.length - 1);
+    }
+  }
+  return uri;
+}
+function createListener$1() {
+  throw new Error("WebSocket Servers can not be created in the browser!");
+}
+const DEFAULT_MAX_BUFFERED_AMOUNT = 1024 * 1024 * 4;
+const DEFAULT_BUFFERED_AMOUNT_POLL_INTERVAL = 10;
+class WebSocketMultiaddrConnection extends AbstractMultiaddrConnection {
+  constructor(init) {
+    super(init);
+    __publicField(this, "websocket");
+    __publicField(this, "maxBufferedAmount");
+    __publicField(this, "checkBufferedAmountTask");
+    this.websocket = init.websocket;
+    this.maxBufferedAmount = init.maxBufferedAmount ?? DEFAULT_MAX_BUFFERED_AMOUNT;
+    this.checkBufferedAmountTask = repeatingTask(this.checkBufferedAmount.bind(this), init.bufferedAmountPollInterval ?? DEFAULT_BUFFERED_AMOUNT_POLL_INTERVAL);
+    this.websocket.addEventListener("close", (evt) => {
+      this.log('closed - code %d, reason "%s", wasClean %s', evt.code, evt.reason, evt.wasClean);
+      this.checkBufferedAmountTask.stop();
+      if (!evt.wasClean) {
+        this.onRemoteReset();
+        return;
+      }
+      this.onTransportClosed();
+    }, { once: true });
+    this.websocket.addEventListener("message", (evt) => {
+      try {
+        let buf;
+        if (typeof evt.data === "string") {
+          buf = fromString(evt.data);
+        } else if (evt.data instanceof ArrayBuffer) {
+          buf = new Uint8Array(evt.data, 0, evt.data.byteLength);
+        } else {
+          this.abort(new Error("Incorrect binary type"));
+          return;
+        }
+        this.onData(buf);
+      } catch (err) {
+        this.log.error("error receiving data - %e", err);
+      }
+    });
+  }
+  sendData(data) {
+    for (const buf of data) {
+      this.websocket.send(buf);
+    }
+    const canSendMore = this.websocket.bufferedAmount < this.maxBufferedAmount;
+    if (!canSendMore) {
+      this.checkBufferedAmountTask.start();
+    }
+    return {
+      sentBytes: data.byteLength,
+      canSendMore
+    };
+  }
+  sendReset() {
+    this.websocket.close(1006);
+  }
+  async sendClose(options) {
+    var _a2;
+    this.websocket.close();
+    (_a2 = options == null ? void 0 : options.signal) == null ? void 0 : _a2.throwIfAborted();
+  }
+  sendPause() {
+  }
+  sendResume() {
+  }
+  checkBufferedAmount() {
+    this.log("buffered amount now %d", this.websocket.bufferedAmount);
+    if (this.websocket.bufferedAmount === 0) {
+      this.checkBufferedAmountTask.stop();
+      this.safeDispatchEvent("drain");
+    }
+  }
+}
+function webSocketToMaConn(init) {
+  return new WebSocketMultiaddrConnection(init);
+}
+_O = transportSymbol, _N = Symbol.toStringTag, _M = serviceCapabilities;
+class WebSockets {
+  constructor(components, init = {}) {
+    __publicField(this, "log");
+    __publicField(this, "init");
+    __publicField(this, "logger");
+    __publicField(this, "metrics");
+    __publicField(this, "components");
+    __publicField(this, _O, true);
+    __publicField(this, _N, "@libp2p/websockets");
+    __publicField(this, _M, [
+      "@libp2p/transport"
+    ]);
+    this.log = components.logger.forComponent("libp2p:websockets");
+    this.logger = components.logger;
+    this.components = components;
+    this.init = init;
+    if (components.metrics != null) {
+      this.metrics = {
+        dialerEvents: components.metrics.registerCounterGroup("libp2p_websockets_dialer_events_total", {
+          label: "event",
+          help: "Total count of WebSockets dialer events by type"
+        })
+      };
+    }
+  }
+  async dial(ma, options) {
+    var _a2;
+    this.log("dialing %s", ma);
+    options = options ?? {};
+    const maConn = webSocketToMaConn({
+      websocket: await this._connect(ma, options),
+      remoteAddr: ma,
+      metrics: (_a2 = this.metrics) == null ? void 0 : _a2.dialerEvents,
+      direction: "outbound",
+      log: this.components.logger.forComponent("libp2p:websockets:connection"),
+      maxBufferedAmount: this.init.maxBufferedAmount,
+      bufferedAmountPollInterval: this.init.bufferedAmountPollInterval
+    });
+    this.log("new outbound connection %s", maConn.remoteAddr);
+    const conn = await options.upgrader.upgradeOutbound(maConn, options);
+    this.log("outbound connection %s upgraded", maConn.remoteAddr);
+    return conn;
+  }
+  async _connect(ma, options) {
+    var _a2, _b2, _c2, _d2, _e2, _f2;
+    (_a2 = options == null ? void 0 : options.signal) == null ? void 0 : _a2.throwIfAborted();
+    const uri = multiaddrToUri(ma);
+    this.log("create websocket connection to %s", uri);
+    const websocket = new WebSocket(uri);
+    websocket.binaryType = "arraybuffer";
+    try {
+      (_b2 = options.onProgress) == null ? void 0 : _b2.call(options, new CustomProgressEvent("websockets:open-connection"));
+      await pEvent(websocket, "open", options);
+    } catch (err) {
+      if ((_c2 = options.signal) == null ? void 0 : _c2.aborted) {
+        (_d2 = this.metrics) == null ? void 0 : _d2.dialerEvents.increment({ abort: true });
+        throw new ConnectionFailedError(`Could not connect to ${uri}`);
+      } else {
+        (_e2 = this.metrics) == null ? void 0 : _e2.dialerEvents.increment({ error: true });
+      }
+      try {
+        websocket.close();
+      } catch {
+      }
+      throw err;
+    }
+    this.log("connected %s", ma);
+    (_f2 = this.metrics) == null ? void 0 : _f2.dialerEvents.increment({ connect: true });
+    return websocket;
+  }
+  /**
+   * Creates a WebSockets listener. The provided `handler` function will be called
+   * anytime a new incoming Connection has been successfully upgraded via
+   * `upgrader.upgradeInbound`
+   */
+  createListener(options) {
+    return createListener$1({
+      logger: this.logger,
+      events: this.components.events,
+      metrics: this.components.metrics
+    }, {
+      ...this.init,
+      ...options
+    });
+  }
+  listenFilter(multiaddrs) {
+    return multiaddrs.filter((ma) => WebSockets$1.exactMatch(ma) || WebSocketsSecure.exactMatch(ma));
+  }
+  dialFilter(multiaddrs) {
+    return this.listenFilter(multiaddrs);
+  }
+}
+function webSockets(init = {}) {
+  return (components) => {
+    return new WebSockets(components, init);
+  };
+}
 var FrameType;
 (function(FrameType2) {
   FrameType2[FrameType2["Data"] = 0] = "Data";
@@ -24511,13 +24863,13 @@ function debugFrame(header) {
   };
 }
 const YAMUX_PROTOCOL_ID = "/yamux/1.0.0";
-_N = Symbol.toStringTag, _M = serviceCapabilities;
+_Q = Symbol.toStringTag, _P = serviceCapabilities;
 class Yamux {
   constructor(init = {}) {
     __publicField(this, "protocol", YAMUX_PROTOCOL_ID);
     __publicField(this, "_init");
-    __publicField(this, _N, "@chainsafe/libp2p-yamux");
-    __publicField(this, _M, [
+    __publicField(this, _Q, "@chainsafe/libp2p-yamux");
+    __publicField(this, _P, [
       "@libp2p/stream-multiplexing"
     ]);
     this._init = init;
@@ -25155,14 +25507,14 @@ class AbstractIdentify {
     this.started = false;
   }
 }
-class Identify extends (_P = AbstractIdentify, _O = serviceCapabilities, _P) {
+class Identify extends (_S = AbstractIdentify, _R = serviceCapabilities, _S) {
   constructor(components, init = {}) {
     super(components, {
       ...init,
       protocol: `/${init.protocolPrefix ?? defaultValues.protocolPrefix}/${MULTICODEC_IDENTIFY_PROTOCOL_NAME}/${MULTICODEC_IDENTIFY_PROTOCOL_VERSION}`,
       log: components.logger.forComponent("libp2p:identify")
     });
-    __publicField(this, _O, [
+    __publicField(this, _R, [
       "@libp2p/identify"
     ]);
     if (init.runOnConnectionOpen ?? defaultValues.runOnConnectionOpen) {
@@ -26597,12 +26949,12 @@ class CircuitRelayTransport {
     __publicField(this, "started");
     __publicField(this, "log");
     __publicField(this, "shutdownController");
-    __publicField(this, _T, "@libp2p/circuit-relay-v2-transport");
-    __publicField(this, _S, [
+    __publicField(this, _W, "@libp2p/circuit-relay-v2-transport");
+    __publicField(this, _V, [
       "@libp2p/transport",
       "@libp2p/circuit-relay-v2-transport"
     ]);
-    __publicField(this, _Q, true);
+    __publicField(this, _T, true);
     this.components = components;
     this.log = components.logger.forComponent("libp2p:circuit-relay:transport");
     this.maxInboundStopStreams = init.maxInboundStopStreams ?? defaults.maxInboundStopStreams;
@@ -26630,7 +26982,7 @@ class CircuitRelayTransport {
     this.started = false;
     this.onStop = this.onStop.bind(this);
   }
-  get [(_T = Symbol.toStringTag, _S = serviceCapabilities, _R = serviceDependencies, _Q = transportSymbol, _R)]() {
+  get [(_W = Symbol.toStringTag, _V = serviceCapabilities, _U = serviceDependencies, _T = transportSymbol, _U)]() {
     if (this.discovery != null) {
       return [
         "@libp2p/identify"
@@ -26849,7 +27201,7 @@ function circuitRelayTransport(init = {}) {
 const DEFAULT_BOOTSTRAP_TAG_NAME = "bootstrap";
 const DEFAULT_BOOTSTRAP_TAG_VALUE = 50;
 const DEFAULT_BOOTSTRAP_DISCOVERY_TIMEOUT = 1e3;
-class Bootstrap extends (_X = TypedEventEmitter, _W = peerDiscoverySymbol, _V = Symbol.toStringTag, _U = serviceCapabilities, _X) {
+class Bootstrap extends (__ = TypedEventEmitter, _Z = peerDiscoverySymbol, _Y = Symbol.toStringTag, _X = serviceCapabilities, __) {
   constructor(components, options = { list: [] }) {
     if (options.list == null || options.list.length === 0) {
       throw new Error("Bootstrap requires a list of peer addresses");
@@ -26861,9 +27213,9 @@ class Bootstrap extends (_X = TypedEventEmitter, _W = peerDiscoverySymbol, _V = 
     __publicField(this, "timeout");
     __publicField(this, "components");
     __publicField(this, "_init");
-    __publicField(this, _W, this);
-    __publicField(this, _V, "@libp2p/bootstrap");
-    __publicField(this, _U, [
+    __publicField(this, _Z, this);
+    __publicField(this, _Y, "@libp2p/bootstrap");
+    __publicField(this, _X, [
       "@libp2p/peer-discovery"
     ]);
     this.components = components;
@@ -30292,7 +30644,7 @@ var GossipStatusCode;
   GossipStatusCode2[GossipStatusCode2["started"] = 0] = "started";
   GossipStatusCode2[GossipStatusCode2["stopped"] = 1] = "stopped";
 })(GossipStatusCode || (GossipStatusCode = {}));
-class GossipSub extends (_$ = TypedEventEmitter, __ = Symbol.toStringTag, _Z = serviceCapabilities, _Y = serviceDependencies, _$) {
+class GossipSub extends (_ca = TypedEventEmitter, _ba = Symbol.toStringTag, _aa = serviceCapabilities, _$ = serviceDependencies, _ca) {
   constructor(components, options = {}) {
     super();
     /**
@@ -30426,11 +30778,11 @@ class GossipSub extends (_$ = TypedEventEmitter, __ = Symbol.toStringTag, _Z = s
     __publicField(this, "runOnLimitedConnection");
     __publicField(this, "allowedTopics");
     __publicField(this, "heartbeatTimer", null);
-    __publicField(this, __, "@chainsafe/libp2p-gossipsub");
-    __publicField(this, _Z, [
+    __publicField(this, _ba, "@chainsafe/libp2p-gossipsub");
+    __publicField(this, _aa, [
       "@libp2p/pubsub"
     ]);
-    __publicField(this, _Y, [
+    __publicField(this, _$, [
       "@libp2p/identify"
     ]);
     __publicField(this, "runHeartbeat", () => {
@@ -32518,11 +32870,11 @@ var Peer;
   };
 })(Peer || (Peer = {}));
 const TOPIC = "_peer-discovery._p2p._pubsub";
-class PubSubPeerDiscovery extends (_ca = TypedEventEmitter, _ba = peerDiscoverySymbol, _aa = Symbol.toStringTag, _ca) {
+class PubSubPeerDiscovery extends (_fa = TypedEventEmitter, _ea = peerDiscoverySymbol, _da = Symbol.toStringTag, _fa) {
   constructor(components, init = {}) {
     super();
-    __publicField(this, _ba, true);
-    __publicField(this, _aa, "@libp2p/pubsub-peer-discovery");
+    __publicField(this, _ea, true);
+    __publicField(this, _da, "@libp2p/pubsub-peer-discovery");
     __publicField(this, "interval");
     __publicField(this, "listenOnly");
     __publicField(this, "topics");

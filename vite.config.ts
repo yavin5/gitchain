@@ -24,6 +24,7 @@ export default defineConfig({
     alias: {
       'libp2p': 'libp2p',
       '@libp2p/webrtc': '@libp2p/webrtc',
+      '@libp2p/websockets': '@libp2p/websockets',
       '@libp2p/circuit-relay-v2': '@libp2p/circuit-relay-v2',
       '@libp2p/bootstrap': '@libp2p/bootstrap',
       '@libp2p/gossipsub': '@libp2p/gossipsub',
@@ -53,6 +54,7 @@ export default defineConfig({
         globals: {
           'libp2p': 'libp2p',
           '@libp2p/webrtc': 'webRTC',
+          '@libp2p/websockets': 'webSockets',
           '@libp2p/circuit-relay-v2': 'circuitRelayTransport',
           '@libp2p/bootstrap': 'bootstrap',
           '@libp2p/gossipsub': 'gossipsub',
@@ -70,6 +72,7 @@ export default defineConfig({
     include: [
       'libp2p',
       '@libp2p/webrtc',
+      '@libp2p/websockets',
       '@libp2p/circuit-relay-v2',
       '@libp2p/bootstrap',
       '@libp2p/gossipsub',
