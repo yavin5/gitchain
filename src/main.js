@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Display shortened peer ID
         if (libp2p && libp2p.peerId) {
-            const shortPeerId = libp2p.peerId.toString().slice(0, 8);
+            const shortPeerId = libp2p.peerId.toString().slice(-8);
             peerIdDisplay.textContent = shortPeerId;
             console.log('Peer ID displayed:', shortPeerId);
         } else {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 libp2p.services.pubsub.addEventListener('message', (evt) => {
                     if (evt.detail.topic === 'gitchain-chat') {
                         const message = new TextDecoder().decode(evt.detail.data);
-                        const senderId = evt.detail.from.toString().slice(0, 8);
+                        const senderId = evt.detail.from.toString().slice(-8);
                         const messageElement = document.createElement('p');
                         messageElement.textContent = `${senderId}: ${message}`;
                         messagesDiv.appendChild(messageElement);
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await libp2p.services.pubsub.publish('gitchain-chat', new TextEncoder().encode(message));
                     console.log('Published message:', message);
                     // Append locally to ensure sender sees their own message
-                    const shortPeerId = libp2p.peerId.toString().slice(0, 8);
+                    const shortPeerId = libp2p.peerId.toString().slice(-8);
                     const messageElement = document.createElement('p');
                     messageElement.textContent = `${shortPeerId}: ${message}`;
                     messagesDiv.appendChild(messageElement);
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await initP2P(true);
                 const newLibp2p = getLibp2p();
                 if (newLibp2p && newLibp2p.peerId) {
-                    const shortPeerId = newLibp2p.peerId.toString().slice(0, 8);
+                    const shortPeerId = newLibp2p.peerId.toString().slice(-8);
                     peerIdDisplay.textContent = shortPeerId;
                     console.log('Peer ID updated after PAT save:', shortPeerId);
                 } else {
