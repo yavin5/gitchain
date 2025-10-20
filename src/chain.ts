@@ -316,7 +316,7 @@ async function updateServerPeers(): Promise<boolean> {
             branch: 'main',
             sha: sha || undefined
         };
-        const updateResponse = await fetch(SERVER_PEER_URL, {
+        const updateResponse = await fetch(SERVER_PEER_URL + '?ref=main', {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${githubAccessToken}`,
@@ -471,7 +471,7 @@ async function updateState(newContent: State, oldSha: string | null, message: st
         const body: any = { message, content: fileContent, branch: 'main' };
         if (oldSha) body.sha = oldSha;
         console.log('Sending PUT request to update state');
-        const response = await fetch(STATE_URL, {
+        const response = await fetch(STATE_URL + '?ref=main', {
             method: 'PUT',
             headers: {
                 'Authorization': `token ${githubAccessToken}`,

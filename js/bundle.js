@@ -33246,7 +33246,7 @@ async function updateServerPeers() {
       branch: "main",
       sha: sha2 || void 0
     };
-    const updateResponse = await fetch(SERVER_PEER_URL, {
+    const updateResponse = await fetch(SERVER_PEER_URL + "?ref=main", {
       method: "PUT",
       headers: {
         "Authorization": `token ${githubAccessToken}`,
@@ -33399,7 +33399,7 @@ async function updateState(newContent, oldSha, message2, retries = 3) {
     if (oldSha)
       body.sha = oldSha;
     console.log("Sending PUT request to update state");
-    const response = await fetch(STATE_URL, {
+    const response = await fetch(STATE_URL + "?ref=main", {
       method: "PUT",
       headers: {
         "Authorization": `token ${githubAccessToken}`,
