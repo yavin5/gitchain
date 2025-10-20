@@ -213,7 +213,7 @@ export async function initP2P(host: boolean): Promise<void> {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
             let data = await response.json();
-            data = (data as string[]).filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
+            //data = (data as string[]).filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
             for (const peer of data) {
                 if (peer.length > 40 && serverPeers.indexOf(peer) == -1) {
                     serverPeers.push(peer);
@@ -288,7 +288,7 @@ export async function initP2P(host: boolean): Promise<void> {
         const peerId = libp2p.peerId.toString();
         console.log(`My peer ID is: ${peerId}`);
         if (isServer) {
-            if (peerId.length > 40 && !peerId.startsWith('/webrtc/p2p/webrtc')) {
+            if (peerId.length > 40 && !peerId.startsWith('/webrtc/p2p')) {
                 try {
                     serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
                 } catch (error) {
