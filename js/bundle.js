@@ -33216,6 +33216,13 @@ async function initP2P(host) {
       console.log("Server peer ID added to server-peer.json if not already present");
     }
     for (const peer of serverPeers) {
+      if (!peer.startsWith("/webrtc/")) {
+        var index = serverPeers.indexOf(peer, 0);
+        if (index > -1) {
+          serverPeers.splice(index, 1);
+        }
+        continue;
+      }
       try {
         const ma = multiaddr(peer);
         await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });

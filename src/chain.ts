@@ -289,6 +289,13 @@ export async function initP2P(host: boolean): Promise<void> {
 
         // Now dial every server peer to see which ones we can connect to.
         for (const peer of serverPeers) {
+            if (!peer.startsWith('/webrtc/')) {
+                var index = serverPeers.indexOf(peer, 0);
+                if (index > -1) {
+                    serverPeers.splice(index, 1);
+                }
+                continue;
+            }
             try {
                 const ma = multiaddr(peer);
                 await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
