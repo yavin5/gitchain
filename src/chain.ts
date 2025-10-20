@@ -314,7 +314,9 @@ async function updateServerPeers(): Promise<boolean> {
         console.log("data content: " + data.content);
         if ((data.content)) {
             console.log('base64 decoding and JSON parsing content.');
-            data = JSON.parse(btoa(data.content));
+            data = btoa(data.content);
+            console.log('base64 decoded: ' + data);
+            data = JSON.parse(data);
         }
         console.log("data: " + data);
         if (Array.isArray(data)) {
