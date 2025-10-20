@@ -213,7 +213,7 @@ export async function initP2P(host: boolean): Promise<void> {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
             serverPeers = await response.json();
-            bootstrapList = serverPeers.filter(peer => peer !== '').map(peer => `/p2p-circuit/p2p/${peer}`);
+            bootstrapList = serverPeers.filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
             console.log('Loaded server peers:', serverPeers);
         } else if (response.status === 404) {
             console.log('server-peer.json not found');
@@ -396,7 +396,7 @@ export async function connectAndSendTx(tx: Transaction) {
     let connected = false;
     for (const peerId of peers) {
         try {
-            const ma = multiaddr(`/p2p/${peerId}`);
+            const ma = multiaddr(`/webrtc/p2p/${peerId}`);
             const connection = await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
             const stream = await connection.newStream(PROTOCOL);
             const txJson = JSON.stringify(tx);
