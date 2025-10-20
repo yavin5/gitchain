@@ -33137,14 +33137,12 @@ async function initP2P(host) {
     console.log("libp2p already initialized, reusing instance");
     return;
   }
-  let bootstrapList = [];
   serverPeers = [];
   localStorage.setItem("debug", "libp2p:*");
   try {
     const response = await fetch(SERVER_PEER_RAW_URL);
     if (response.ok) {
       serverPeers = await response.json();
-      bootstrapList = serverPeers.filter((peer) => peer !== "").map((peer) => `/webrtc/p2p/${peer}`);
       console.log("Loaded server peers:", serverPeers);
     } else if (response.status === 404) {
       console.log("server-peer.json not found");
@@ -33186,10 +33184,10 @@ async function initP2P(host) {
         pubsubPeerDiscovery({ interval: 2e4 })
       ]
     };
-    if (bootstrapList.length > 0) {
-      config.peerDiscovery.push(bootstrap({ list: bootstrapList }));
+    if (serverPeers.length > 0) {
+      config.peerDiscovery.push(bootstrap({ list: serverPeers }));
     } else {
-      console.log("No valid peers in bootstrapList, initializing without bootstrap");
+      console.log("No valid peers in serverPeers, initializing without bootstrap");
     }
     libp2p = await createLibp2p(config);
     console.log("P2P node started:", libp2p.peerId.toString());
