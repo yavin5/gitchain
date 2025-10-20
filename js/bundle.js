@@ -33241,8 +33241,8 @@ async function updateServerPeers() {
       data = await response.json();
       sha2 = data.sha;
     }
-    console.log("data: " + data);
-    if (typeof data === typeof String) {
+    console.log("data: " + JSON.stringify(data));
+    if (typeof data === typeof Object) {
       data = JSON.parse(data);
     }
     if (Array.isArray(data)) {
