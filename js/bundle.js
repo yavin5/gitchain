@@ -33211,7 +33211,7 @@ async function initP2P(host) {
     const peerId = libp2p.peerId.toString();
     console.log(`My peer ID is: ${peerId}`);
     if (isServer) {
-      if (!serverPeers.includes(peerId)) {
+      if (peerId.length > 40 && !serverPeers.includes(`/webrtc/p2p/${peerId}`)) {
         serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
         await updateServerPeers();
       }
