@@ -33258,7 +33258,14 @@ async function updateServerPeers() {
     if (Array.isArray(data)) {
       for (const serverPeer in serverPeers) {
         if (!data.includes(serverPeer)) {
-          data.push(serverPeer);
+          if (serverPeer.startsWith("/webrtc/")) {
+            console.log("Adding server peer: " + serverPeer);
+            data.push(serverPeer);
+          } else {
+            console.log("Not adding server peer: " + serverPeer);
+          }
+        } else {
+          console.log("Not adding dupe server peer: " + serverPeer);
         }
       }
       console.log("Added serverPeers to data array.");
