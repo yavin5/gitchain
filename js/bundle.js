@@ -33233,7 +33233,7 @@ async function initP2P(host) {
     } else {
       try {
         console.log("Dialing peer: " + peer);
-        const ma = multiaddr(peer);
+        const ma = multiaddr(peer.substring("/webrtc".length));
         await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
       } catch (error) {
         console.error(`Failed to dial ${peer}: ${error}`);

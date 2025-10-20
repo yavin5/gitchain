@@ -305,7 +305,8 @@ export async function initP2P(host: boolean): Promise<void> {
         } else {
             try {
                 console.log("Dialing peer: " + peer);
-                const ma = multiaddr(peer);
+                // We must remove the "/webrtc" front part of the string.
+                const ma = multiaddr(peer.substring('/webrtc'.length));
                 await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
             } catch(error) {
                 console.error(`Failed to dial ${peer}: ${error}`);
