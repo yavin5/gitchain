@@ -339,16 +339,16 @@ async function updateServerPeers(): Promise<boolean> {
             data = JSON.parse(data);
         }
         if (Array.isArray(data)) {
-            for (const serverPeer in serverPeers) {
-                if (!serverPeer.startsWith('/webrtc/')) {
-                    console.log("Skipping badly formatted server peer: " + serverPeer);
+            for (let i = 0; i < serverPeers.length; i++) {
+                if (!serverPeers[i].startsWith('/webrtc/')) {
+                    console.log("Skipping badly formatted server peer: " + serverPeers[i]);
                     continue;
                 }
-                if (!data.includes(serverPeer)) {
-                    console.log('Adding server peer: ' + serverPeer);
-                    data.push(serverPeer);
+                if (!data.includes(serverPeers[i])) {
+                    console.log('Adding server peer: ' + serverPeers[i]);
+                    data.push(serverPeers[i]);
                 } else {
-                    console.log("Not adding dupe server peer: " + serverPeer);
+                    console.log("Not adding dupe server peer: " + serverPeers[i]);
                 }
             }
             console.log('Added serverPeers to data array: ' + JSON.stringify(serverPeers));

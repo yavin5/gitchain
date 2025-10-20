@@ -33266,16 +33266,16 @@ async function updateServerPeers() {
       data = JSON.parse(data);
     }
     if (Array.isArray(data)) {
-      for (const serverPeer in serverPeers) {
-        if (!serverPeer.startsWith("/webrtc/")) {
-          console.log("Skipping badly formatted server peer: " + serverPeer);
+      for (let i2 = 0; i2 < serverPeers.length; i2++) {
+        if (!serverPeers[i2].startsWith("/webrtc/")) {
+          console.log("Skipping badly formatted server peer: " + serverPeers[i2]);
           continue;
         }
-        if (!data.includes(serverPeer)) {
-          console.log("Adding server peer: " + serverPeer);
-          data.push(serverPeer);
+        if (!data.includes(serverPeers[i2])) {
+          console.log("Adding server peer: " + serverPeers[i2]);
+          data.push(serverPeers[i2]);
         } else {
-          console.log("Not adding dupe server peer: " + serverPeer);
+          console.log("Not adding dupe server peer: " + serverPeers[i2]);
         }
       }
       console.log("Added serverPeers to data array: " + JSON.stringify(serverPeers));
