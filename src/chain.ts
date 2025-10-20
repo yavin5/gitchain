@@ -306,15 +306,21 @@ async function updateServerPeers(): Promise<boolean> {
             }
         });
         let sha: string | null = null;
-	let data: any;
+	    let data: any;
         if (response.ok) {
             data = await response.json();
             sha = data.sha;
         }
+        console.log("data: " + data);
+        if (typeof(data) === typeof(String)) {
+            data = JSON.parse(data);
+        }
         if (Array.isArray(data)) {
             (data as Array<string>).push(...serverPeers);
+            console.log('Added serverPeers to data array.');
         } else {
             data = serverPeers;
+            console.log('data = serverPeers: ' + JSON.stringify(serverPeers));
         }
         const body = {
             message: 'Update server peer IDs',

@@ -33241,10 +33241,16 @@ async function updateServerPeers() {
       data = await response.json();
       sha2 = data.sha;
     }
+    console.log("data: " + data);
+    if (typeof data === typeof String) {
+      data = JSON.parse(data);
+    }
     if (Array.isArray(data)) {
       data.push(...serverPeers);
+      console.log("Added serverPeers to data array.");
     } else {
       data = serverPeers;
+      console.log("data = serverPeers: " + JSON.stringify(serverPeers));
     }
     const body = {
       message: "Update server peer IDs",
