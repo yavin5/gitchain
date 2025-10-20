@@ -212,15 +212,11 @@ export async function initP2P(host: boolean): Promise<void> {
     try {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
-            serverPeers = await response.json();
-            serverPeers = serverPeers.filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
-            for (const peer of serverPeers) {
-                if (!(peer.length > 40)) {
-                    var index = serverPeers.indexOf(peer, 0);
-                    if (index > -1) {
-                        console.log("removing bad peer " + peer);
-                        serverPeers.splice(index, 1);
-                    }
+            let data = await response.json();
+            data = (data as string[]).filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
+            for (const peer of data) {
+                if (peer.length > 40 && serverPeers.indexOf(peer) == -1) {
+                    serverPeers.push(peer);
                 }
             }
             console.log('Loaded server peers:', serverPeers);
@@ -303,12 +299,7 @@ export async function initP2P(host: boolean): Promise<void> {
 
     // Now dial every server peer to see which ones we can connect to.
     for (const peer of serverPeers) {
-        console.log("Considering peer: " + peer);
         if (!peer.startsWith('/webrtc/') || peer.length < 40) {
-            var index = serverPeers.indexOf(peer, 0);
-            if (index > -1) {
-                serverPeers.splice(index, 1);
-            }
             continue;
         } else {
             try {
