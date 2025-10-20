@@ -218,6 +218,7 @@ export async function initP2P(host: boolean): Promise<void> {
                 if (!(peer.length > 40)) {
                     var index = serverPeers.indexOf(peer, 0);
                     if (index > -1) {
+                        console.log("removing bad peer " + peer);
                         serverPeers.splice(index, 1);
                     }
                 }
@@ -303,7 +304,7 @@ export async function initP2P(host: boolean): Promise<void> {
     // Now dial every server peer to see which ones we can connect to.
     for (const peer of serverPeers) {
         console.log("Considering peer: " + peer);
-        if (!peer.startsWith('/webrtc/') || peer.length <40) {
+        if (!peer.startsWith('/webrtc/') || peer.length < 40) {
             var index = serverPeers.indexOf(peer, 0);
             if (index > -1) {
                 serverPeers.splice(index, 1);

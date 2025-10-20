@@ -33148,6 +33148,7 @@ async function initP2P(host) {
         if (!(peer.length > 40)) {
           var index = serverPeers.indexOf(peer, 0);
           if (index > -1) {
+            console.log("removing bad peer " + peer);
             serverPeers.splice(index, 1);
           }
         }
