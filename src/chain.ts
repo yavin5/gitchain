@@ -281,7 +281,7 @@ export async function initP2P(host: boolean): Promise<void> {
         if (isServer) {
             const peerId = libp2p.peerId.toString();
             if (!serverPeers.includes(peerId)) {
-                serverPeers.push(peerId);
+                serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
                 await updateServerPeers();
             }
             console.log('Host peer ID added to server-peer.json if not present');
