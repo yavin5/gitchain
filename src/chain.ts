@@ -340,7 +340,10 @@ async function updateServerPeers(): Promise<boolean> {
         }
         if (Array.isArray(data)) {
             for (const serverPeer in serverPeers) {
-                if (!serverPeer.startsWith('/webrtc/')) continue;
+                if (!serverPeer.startsWith('/webrtc/')) {
+                    console.log("Skipping server peer: " + serverPeer);
+                    continue;
+                }
                 if (!data.includes(serverPeer)) {
                     console.log('Adding server peer: ' + serverPeer);
                     data.push(serverPeer);
