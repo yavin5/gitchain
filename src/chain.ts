@@ -312,14 +312,16 @@ async function updateServerPeers(): Promise<boolean> {
             sha = data.sha;
         }
         console.log("data content: " + data.content);
-        if (typeof(data.content) === typeof(String)) {
+        if ((data.content)) {
             console.log('base64 decoding and JSON parsing content.');
             data = JSON.parse(btoa(data.content));
         }
+        console.log("data: " + data);
         if (Array.isArray(data)) {
             (data as Array<string>).push(...serverPeers);
             console.log('Added serverPeers to data array.');
         } else {
+            console.log('typeof data: ' + typeof data);
             data = serverPeers;
             console.log('data = serverPeers: ' + JSON.stringify(serverPeers));
         }

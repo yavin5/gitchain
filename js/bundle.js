@@ -33242,14 +33242,16 @@ async function updateServerPeers() {
       sha2 = data.sha;
     }
     console.log("data content: " + data.content);
-    if (typeof data.content === typeof String) {
+    if (data.content) {
       console.log("base64 decoding and JSON parsing content.");
       data = JSON.parse(btoa(data.content));
     }
+    console.log("data: " + data);
     if (Array.isArray(data)) {
       data.push(...serverPeers);
       console.log("Added serverPeers to data array.");
     } else {
+      console.log("typeof data: " + typeof data);
       data = serverPeers;
       console.log("data = serverPeers: " + JSON.stringify(serverPeers));
     }
