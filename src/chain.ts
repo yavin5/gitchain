@@ -228,7 +228,7 @@ export async function initP2P(host: boolean): Promise<void> {
     } catch (error) {
         console.error('Error loading server-peer.json:', error);
     }
-    //try {
+
         // Create libp2p configuration.
         const config: any = {
 	    addresses: { listen: ['/webrtc'] },
@@ -294,40 +294,37 @@ export async function initP2P(host: boolean): Promise<void> {
                 } catch (error) {
                     console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
                 }
-                await updateServerPeers();
+                serverPeers = await updateServerPeers();
                 // TODO catch the case where the update failed.
-            }
-            console.log('Added my server peer address to server-peer.json.');
-        }
-    //} catch (error) {
-    //    console.error('Failed to initialize P2P:', error);
-    //    throw error; // Propagate error for debugging
-    //}
+                console.log('Added my server peer address to server-peer.json.');
 
-    // Now dial every server peer to see which ones we can connect to.
-    for (const peer of serverPeers) {
-        if (peer.length < 40) {
-            console.log("SKIPPING bad peer: " + peer);
-            continue;
-        } else {
-            try {
-                console.log("Dialing peer: " + peer);
-                // We must remove the "/webrtc" front part of the string.
-                const ma = multiaddr(peer);
-                await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
-            } catch(error) {
-                console.error(`Failed to dial ${peer}: ${error}`);
+                // Now dial every server peer to see which ones we can connect to.
+                for (const peer of serverPeers) {
+                    if (peer.length < 40) {
+                        console.log("SKIPPING bad peer: " + peer);
+                        continue;
+                    } else {
+                        try {
+                            console.log("Dialing peer: " + peer);
+                            // We must remove the "/webrtc" front part of the string.
+                            const ma = multiaddr(peer);
+                            await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
+                        } catch(error) {
+                            console.error(`Failed to dial ${peer}: ${error}`);
+                        }
+                    }
+                }
             }
         }
-    }
 }
+    
 // Update server-peer.json
-async function updateServerPeers(): Promise<boolean> {
+async function updateServerPeers(): Promise<string[]> {
     console.debug("Entering updateServerPeers() with serverPeers: " + JSON.stringify(serverPeers));
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken) {
         console.error('No PAT available for updating server-peer.json');
-        return false;
+        return serverPeers;
     }
     try {
         const response = await fetch(SERVER_PEER_URL + '?ref=main', {
@@ -386,14 +383,14 @@ async function updateServerPeers(): Promise<boolean> {
         if (updateResponse.ok) {
             console.log('server-peer.json updated successfully');
             serverPeers = data;
-            return true;
+            return data;
         } else {
             console.error('Failed to update server-peer.json:', await updateResponse.text());
-            return false;
+            return serverPeers;
         }
     } catch (error) {
         console.error('Error updating server-peer.json:', error);
-        return false;
+        return serverPeers;
     }
 }
 // Remove host peer ID on unload

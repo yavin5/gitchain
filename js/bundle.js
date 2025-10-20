@@ -33222,21 +33222,21 @@ async function initP2P(host) {
       } catch (error) {
         console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
       }
-      await updateServerPeers();
-    }
-    console.log("Added my server peer address to server-peer.json.");
-  }
-  for (const peer of serverPeers) {
-    if (peer.length < 40) {
-      console.log("SKIPPING bad peer: " + peer);
-      continue;
-    } else {
-      try {
-        console.log("Dialing peer: " + peer);
-        const ma = multiaddr(peer);
-        await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
-      } catch (error) {
-        console.error(`Failed to dial ${peer}: ${error}`);
+      serverPeers = await updateServerPeers();
+      console.log("Added my server peer address to server-peer.json.");
+      for (const peer of serverPeers) {
+        if (peer.length < 40) {
+          console.log("SKIPPING bad peer: " + peer);
+          continue;
+        } else {
+          try {
+            console.log("Dialing peer: " + peer);
+            const ma = multiaddr(peer);
+            await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
+          } catch (error) {
+            console.error(`Failed to dial ${peer}: ${error}`);
+          }
+        }
       }
     }
   }
@@ -33246,7 +33246,7 @@ async function updateServerPeers() {
   const githubAccessToken = getGithubAccessToken();
   if (!githubAccessToken) {
     console.error("No PAT available for updating server-peer.json");
-    return false;
+    return serverPeers;
   }
   try {
     const response = await fetch(SERVER_PEER_URL + "?ref=main", {
@@ -33305,14 +33305,14 @@ async function updateServerPeers() {
     if (updateResponse.ok) {
       console.log("server-peer.json updated successfully");
       serverPeers = data;
-      return true;
+      return data;
     } else {
       console.error("Failed to update server-peer.json:", await updateResponse.text());
-      return false;
+      return serverPeers;
     }
   } catch (error) {
     console.error("Error updating server-peer.json:", error);
-    return false;
+    return serverPeers;
   }
 }
 async function removeHostPeerId() {
