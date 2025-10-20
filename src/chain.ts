@@ -284,7 +284,17 @@ export async function initP2P(host: boolean): Promise<void> {
                 serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
                 await updateServerPeers();
             }
-            console.log('Host peer ID added to server-peer.json if not present');
+            console.log('Server peer ID added to server-peer.json if not already present');
+        }
+
+        // Now dial every server peer to see which ones we can connect to.
+        for (const peer of serverPeers) {
+            try {
+                const ma = multiaddr(peer);
+                await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
+            } catch(error) {
+                console.error(`Failed to dial ${peer}: ${error}`);
+            }
         }
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
@@ -313,14 +323,16 @@ async function updateServerPeers(): Promise<boolean> {
         }
         console.log("data content: " + data.content);
         if ((data.content)) {
-            console.log('base64 decoding and JSON parsing content.');
             data = atob(data.content);
             console.log('base64 decoded: ' + data);
             data = JSON.parse(data);
         }
-        console.log("data: " + data);
         if (Array.isArray(data)) {
-            (data as Array<string>).push(...serverPeers);
+            for (const serverPeer in serverPeers) {
+                if (!data.includes(serverPeer)) {
+                    data.push(serverPeer);
+                }
+            }
             console.log('Added serverPeers to data array.');
         } else {
             console.log('typeof data: ' + typeof data);
