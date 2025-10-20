@@ -330,7 +330,7 @@ async function updateServerPeers(): Promise<boolean> {
         if (Array.isArray(data)) {
             for (const serverPeer in serverPeers) {
                 if (!data.includes(serverPeer)) {
-                    data.push(serverPeer);
+                    if (serverPeer != "0") data.push(serverPeer);
                 }
             }
             console.log('Added serverPeers to data array.');
