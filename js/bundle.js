@@ -33222,13 +33222,14 @@ async function initP2P(host) {
           serverPeers.splice(index, 1);
         }
         continue;
-      }
-      try {
-        console.log("Dialing peer: " + peer);
-        const ma = multiaddr(peer);
-        await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
-      } catch (error) {
-        console.error(`Failed to dial ${peer}: ${error}`);
+      } else {
+        try {
+          console.log("Dialing peer: " + peer);
+          const ma = multiaddr(peer);
+          await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
+        } catch (error) {
+          console.error(`Failed to dial ${peer}: ${error}`);
+        }
       }
     }
   } catch (error) {
