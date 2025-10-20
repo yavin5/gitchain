@@ -33207,9 +33207,9 @@ async function initP2P(host) {
       const txn = JSON.parse(toString(data));
       console.log("Received transaction via P2P:", txn);
     });
+    const peerId = libp2p.peerId.toString();
+    console.log(`My peer ID is: ${peerId}`);
     if (isServer) {
-      const peerId = libp2p.peerId.toString();
-      console.log(`My peer ID is: ${peerId}`);
       if (!serverPeers.includes(peerId)) {
         serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
         await updateServerPeers();
