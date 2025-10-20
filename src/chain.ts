@@ -269,27 +269,33 @@ export async function initP2P(host: boolean): Promise<void> {
         console.log('P2P node started:', libp2p.peerId.toString());
         libp2p.addEventListener('peer:discovery', (evt: any) => {
             console.log('Peer discovered:', evt.detail.id.toString());
+            console.log('Event: ' + JSON.stringify(evt));
         });
         libp2p.services.pubsub.addEventListener('subscription-change', (evt: any) => {
             console.log('Subscription change:', evt.detail);
+            console.debug('Event: ' + JSON.stringify(evt));
         });
         await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
-            console.log('Received P2P stream from:', connection.remotePeer.toString());
+            console.debug('Received P2P stream from:', connection.remotePeer.toString());
             const chunks: Uint8Array[] = [];
             for await (const chunk of stream.source) {
                 chunks.push(chunk);
             }
             const data = uint8Concat(chunks);
             const txn = JSON.parse(uint8ToString(data));
-            console.log('Received transaction via P2P:', txn);
+            console.debug('Received transaction via P2P:', txn);
         });
         const peerId = libp2p.peerId.toString();
         console.log(`My peer ID is: ${peerId}`);
         if (isServer) {
             if (peerId.length > 40) {
-                serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
+                try {
+                    serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
+                } catch (error) {
+                    console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
+                }
                 await updateServerPeers();
-                // TODO catch the case where that failed.
+                // TODO catch the case where the update failed.
             }
             console.log('Added my server peer address to server-peer.json.');
         }
