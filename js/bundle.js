@@ -33139,6 +33139,7 @@ async function initP2P(host) {
   }
   let bootstrapList = [];
   serverPeers = [];
+  localStorage.setItem("debug", "libp2p:*");
   try {
     const response = await fetch(SERVER_PEER_RAW_URL);
     if (response.ok) {
@@ -33327,7 +33328,7 @@ async function connectAndSendTx(tx) {
   for (const peerId of peers) {
     try {
       const ma = multiaddr(`/p2p/${peerId}`);
-      const connection = await libp2p.dial(ma);
+      const connection = await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
       const stream = await connection.newStream(PROTOCOL);
       const txJson = JSON.stringify(tx);
       const data = fromString(txJson);

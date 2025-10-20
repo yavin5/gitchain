@@ -30,7 +30,7 @@ import { webSockets } from '@libp2p/websockets';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
-import { circuitRelayTransport } from '@libp2p/circuit-relay-v2';
+import { circuitRelayTransport, CircuitRelayTransportInit } from '@libp2p/circuit-relay-v2';
 import { bootstrap } from '@libp2p/bootstrap';
 import { gossipsub } from '@libp2p/gossipsub';
 import { pubsubPeerDiscovery } from '@libp2p/pubsub-peer-discovery';
@@ -205,6 +205,10 @@ export async function initP2P(host: boolean): Promise<void> {
     }
     let bootstrapList: string[] = [];
     serverPeers = [];
+
+    // First, enable debug logging!
+    localStorage.setItem('debug', 'libp2p:*');
+
     try {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
@@ -239,7 +243,7 @@ export async function initP2P(host: boolean): Promise<void> {
                 webSockets(),
 	        circuitRelayTransport({
                         discoverRelays: 1
-                })
+                } as CircuitRelayTransportInit)
             ],
             connectionEncryption: [noise()],
             streamMuxers: [yamux()],
@@ -393,7 +397,7 @@ export async function connectAndSendTx(tx: Transaction) {
     for (const peerId of peers) {
         try {
             const ma = multiaddr(`/p2p/${peerId}`);
-            const connection = await libp2p.dial(ma);
+            const connection = await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
             const stream = await connection.newStream(PROTOCOL);
             const txJson = JSON.stringify(tx);
             const data = uint8FromString(txJson);
