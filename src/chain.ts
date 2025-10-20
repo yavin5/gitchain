@@ -297,6 +297,7 @@ export async function initP2P(host: boolean): Promise<void> {
                 continue;
             }
             try {
+                console.log("Dialing peer: " + peer);
                 const ma = multiaddr(peer);
                 await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
             } catch(error) {
