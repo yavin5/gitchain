@@ -33231,7 +33231,7 @@ async function initP2P(host) {
   }
   for (const peer of serverPeers) {
     console.log("Considering peer: " + peer);
-    if (!peer.startsWith("/webrtc/")) {
+    if (!peer.startsWith("/webrtc/") || peer.length < 40) {
       var index = serverPeers.indexOf(peer, 0);
       if (index > -1) {
         serverPeers.splice(index, 1);
