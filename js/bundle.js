@@ -33236,13 +33236,19 @@ async function updateServerPeers() {
       }
     });
     let sha2 = null;
+    let data;
     if (response.ok) {
-      const data = await response.json();
+      data = await response.json();
       sha2 = data.sha;
+    }
+    if (Array.isArray(data)) {
+      data.putAll(serverPeers);
+    } else {
+      data = serverPeers;
     }
     const body = {
       message: "Update server peer IDs",
-      content: btoa(JSON.stringify(serverPeers, null, 2)),
+      content: btoa(JSON.stringify(data, null, 2)),
       branch: "main",
       sha: sha2 || void 0
     };

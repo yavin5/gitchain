@@ -306,13 +306,19 @@ async function updateServerPeers(): Promise<boolean> {
             }
         });
         let sha: string | null = null;
+	let data: any;
         if (response.ok) {
-            const data = await response.json();
+            data = await response.json();
             sha = data.sha;
+        }
+        if (Array.isArray(data)) {
+            data.putAll(serverPeers);
+        } else {
+            data = serverPeers;
         }
         const body = {
             message: 'Update server peer IDs',
-            content: btoa(JSON.stringify(serverPeers, null, 2)),
+            content: btoa(JSON.stringify(data, null, 2)),
             branch: 'main',
             sha: sha || undefined
         };
