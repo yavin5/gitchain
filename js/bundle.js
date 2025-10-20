@@ -33014,7 +33014,7 @@ const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
 let libp2p = null;
-let isHost = false;
+let isServer = false;
 let serverPeers = [];
 function calculateHash(index, previousHash, timestamp, transactions) {
   const value2 = `${index}${previousHash}${timestamp}${JSON.stringify(transactions)}`;
@@ -33132,7 +33132,7 @@ function getGithubAccessToken() {
 }
 async function initP2P(host) {
   console.log("Entering initP2P, host:", host);
-  isHost = host;
+  isServer = host;
   if (libp2p) {
     console.log("libp2p already initialized, reusing instance");
     return;
@@ -33144,7 +33144,7 @@ async function initP2P(host) {
     const response = await fetch(SERVER_PEER_RAW_URL);
     if (response.ok) {
       serverPeers = await response.json();
-      bootstrapList = serverPeers.map((peer) => `/p2p/${peer}`);
+      bootstrapList = serverPeers.filter((peer) => peer !== "").map((peer) => `/p2p-circuit/p2p/${peer}`);
       console.log("Loaded server peers:", serverPeers);
     } else if (response.status === 404) {
       console.log("server-peer.json not found");
@@ -33156,6 +33156,7 @@ async function initP2P(host) {
   }
   try {
     const config = {
+      addresses: { listen: ["/webrtc"] },
       transports: [
         webRTC({
           rtcConfiguration: {
@@ -33172,9 +33173,7 @@ async function initP2P(host) {
           }
         }),
         webSockets(),
-        circuitRelayTransport({
-          discoverRelays: 1
-        })
+        circuitRelayTransport({ discoverRelays: 1 })
       ],
       connectionEncryption: [noise()],
       streamMuxers: [yamux()],
@@ -33184,8 +33183,7 @@ async function initP2P(host) {
         // Allow local message handling
       },
       peerDiscovery: [
-        pubsubPeerDiscovery({ interval: 1e3 })
-        // Faster discovery for testing
+        pubsubPeerDiscovery({ interval: 2e4 })
       ]
     };
     if (bootstrapList.length > 0) {
@@ -33211,7 +33209,7 @@ async function initP2P(host) {
       const txn = JSON.parse(toString(data));
       console.log("Received transaction via P2P:", txn);
     });
-    if (isHost) {
+    if (isServer) {
       const peerId = libp2p.peerId.toString();
       if (!serverPeers.includes(peerId)) {
         serverPeers.push(peerId);
@@ -33270,14 +33268,14 @@ async function updateServerPeers() {
   }
 }
 async function removeHostPeerId() {
-  if (!isHost || !libp2p)
+  if (!isServer || !libp2p)
     return;
   const peerId = libp2p.peerId.toString();
   serverPeers = serverPeers.filter((id) => id !== peerId);
   await updateServerPeers();
 }
 async function connectAndSendTx(tx) {
-  if (isHost) {
+  if (isServer) {
     const issueBody = JSON.stringify({
       type: "gitchain_txn",
       repo: FQ_REPO,

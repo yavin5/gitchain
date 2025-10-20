@@ -54,7 +54,7 @@ const PROTOCOL = '/gitchain/tx/1.0.0';
 const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 // Global P2P state
 let libp2p: any = null;
-let isHost = false;
+let isServer = false;
 let serverPeers: string[] = [];
 // Interfaces
 interface Transaction {
@@ -198,7 +198,7 @@ function getGithubAccessToken(): string | null {
 // Initialize libp2p / WebRTC server
 export async function initP2P(host: boolean): Promise<void> {
     console.log('Entering initP2P, host:', host);
-    isHost = host;
+    isServer = host;
     if (libp2p) {
         console.log('libp2p already initialized, reusing instance');
         return;
@@ -213,7 +213,7 @@ export async function initP2P(host: boolean): Promise<void> {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
             serverPeers = await response.json();
-            bootstrapList = serverPeers.map(peer => `/p2p/${peer}`);
+            bootstrapList = serverPeers.filter(peer => peer !== '').map(peer => `/p2p-circuit/p2p/${peer}`);
             console.log('Loaded server peers:', serverPeers);
         } else if (response.status === 404) {
             console.log('server-peer.json not found');
@@ -224,26 +224,26 @@ export async function initP2P(host: boolean): Promise<void> {
         console.error('Error loading server-peer.json:', error);
     }
     try {
+        // Create libp2p configuration.
         const config: any = {
+	    addresses: { listen: ['/webrtc'] },
             transports: [
 	        webRTC({
-                        rtcConfiguration: {
-                            iceServers: [
-                                { urls: 'stun:stun.l.google.com:19302' },
-                                { urls: 'stun:global.stun.twilio.com:3478' },
-                                { urls: 'stun:stun.nextcloud.com:3478' },
-                                { urls: 'stun:stun.1und1.de:3478' },
-                                { urls: 'stun:stun.stunprotocol.org:3478' },
-                                { urls: 'stun:stun.services.mozilla.com:3478' },
-                                { urls: 'stun:stun.ekiga.net:3478' },
-                                { urls: 'stun:stun.voipbuster.com:3478' }
-                            ]
-                        }
+                    rtcConfiguration: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:global.stun.twilio.com:3478' },
+                            { urls: 'stun:stun.nextcloud.com:3478' },
+                            { urls: 'stun:stun.1und1.de:3478' },
+                            { urls: 'stun:stun.stunprotocol.org:3478' },
+                            { urls: 'stun:stun.services.mozilla.com:3478' },
+                            { urls: 'stun:stun.ekiga.net:3478' },
+                            { urls: 'stun:stun.voipbuster.com:3478' }
+                        ]
+                    }
                 }),
                 webSockets(),
-	        circuitRelayTransport({
-                        discoverRelays: 1
-                } as CircuitRelayTransportInit)
+	        circuitRelayTransport({ discoverRelays: 1 } as CircuitRelayTransportInit)
             ],
             connectionEncryption: [noise()],
             streamMuxers: [yamux()],
@@ -252,7 +252,7 @@ export async function initP2P(host: boolean): Promise<void> {
                 pubsub: gossipsub({ emitSelf: true }) // Allow local message handling
             },
             peerDiscovery: [
-                pubsubPeerDiscovery({ interval: 1000 }) // Faster discovery for testing
+                pubsubPeerDiscovery({ interval: 20000 })
             ]
         };
         if (bootstrapList.length > 0) {
@@ -278,7 +278,7 @@ export async function initP2P(host: boolean): Promise<void> {
             const txn = JSON.parse(uint8ToString(data));
             console.log('Received transaction via P2P:', txn);
         });
-        if (isHost) {
+        if (isServer) {
             const peerId = libp2p.peerId.toString();
             if (!serverPeers.includes(peerId)) {
                 serverPeers.push(peerId);
@@ -339,14 +339,14 @@ async function updateServerPeers(): Promise<boolean> {
 }
 // Remove host peer ID on unload
 async function removeHostPeerId(): Promise<void> {
-    if (!isHost || !libp2p) return;
+    if (!isServer || !libp2p) return;
     const peerId = libp2p.peerId.toString();
     serverPeers = serverPeers.filter(id => id !== peerId);
     await updateServerPeers();
 }
 // Client-side: Connect and Send TX
 export async function connectAndSendTx(tx: Transaction) {
-    if (isHost) {
+    if (isServer) {
         const issueBody = JSON.stringify({
             type: 'gitchain_txn',
             repo: FQ_REPO,
