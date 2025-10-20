@@ -33215,27 +33215,27 @@ async function initP2P(host) {
       }
       console.log("Server peer ID added to server-peer.json if not already present");
     }
-    for (const peer of serverPeers) {
-      console.log("Considering peer: " + peer);
-      if (!peer.startsWith("/webrtc/")) {
-        var index = serverPeers.indexOf(peer, 0);
-        if (index > -1) {
-          serverPeers.splice(index, 1);
-        }
-        continue;
-      } else {
-        try {
-          console.log("Dialing peer: " + peer);
-          const ma = multiaddr(peer);
-          await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
-        } catch (error) {
-          console.error(`Failed to dial ${peer}: ${error}`);
-        }
-      }
-    }
   } catch (error) {
     console.error("Failed to initialize P2P:", error);
     throw error;
+  }
+  for (const peer of serverPeers) {
+    console.log("Considering peer: " + peer);
+    if (!peer.startsWith("/webrtc/")) {
+      var index = serverPeers.indexOf(peer, 0);
+      if (index > -1) {
+        serverPeers.splice(index, 1);
+      }
+      continue;
+    } else {
+      try {
+        console.log("Dialing peer: " + peer);
+        const ma = multiaddr(peer);
+        await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
+      } catch (error) {
+        console.error(`Failed to dial ${peer}: ${error}`);
+      }
+    }
   }
 }
 async function updateServerPeers() {

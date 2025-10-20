@@ -286,29 +286,29 @@ export async function initP2P(host: boolean): Promise<void> {
             }
             console.log('Server peer ID added to server-peer.json if not already present');
         }
-
-        // Now dial every server peer to see which ones we can connect to.
-        for (const peer of serverPeers) {
-            console.log("Considering peer: " + peer);
-            if (!peer.startsWith('/webrtc/')) {
-                var index = serverPeers.indexOf(peer, 0);
-                if (index > -1) {
-                    serverPeers.splice(index, 1);
-                }
-                continue;
-            } else {
-                try {
-                    console.log("Dialing peer: " + peer);
-                    const ma = multiaddr(peer);
-                    await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
-                } catch(error) {
-                    console.error(`Failed to dial ${peer}: ${error}`);
-                }
-            }
-        }
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
         throw error; // Propagate error for debugging
+    }
+
+    // Now dial every server peer to see which ones we can connect to.
+    for (const peer of serverPeers) {
+        console.log("Considering peer: " + peer);
+        if (!peer.startsWith('/webrtc/')) {
+            var index = serverPeers.indexOf(peer, 0);
+            if (index > -1) {
+                serverPeers.splice(index, 1);
+            }
+            continue;
+        } else {
+            try {
+                console.log("Dialing peer: " + peer);
+                const ma = multiaddr(peer);
+                await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
+            } catch(error) {
+                console.error(`Failed to dial ${peer}: ${error}`);
+            }
+        }
     }
 }
 // Update server-peer.json
