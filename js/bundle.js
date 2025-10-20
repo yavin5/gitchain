@@ -33143,6 +33143,7 @@ async function initP2P(host) {
     const response = await fetch(SERVER_PEER_RAW_URL);
     if (response.ok) {
       serverPeers = await response.json();
+      serverPeers = serverPeers.filter((peer) => peer !== "").map((peer) => `/webrtc/p2p/${peer}`);
       console.log("Loaded server peers:", serverPeers);
     } else if (response.status === 404) {
       console.log("server-peer.json not found");
