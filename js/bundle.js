@@ -33246,6 +33246,8 @@ async function updateServerPeers() {
       console.log("base64 decoding and JSON parsing content.");
       data = btoa(data.content);
       console.log("base64 decoded: " + data);
+      data = btoa(data.content);
+      console.log("base64 decoded 2nd time: " + data);
       data = JSON.parse(data);
     }
     console.log("data: " + data);
