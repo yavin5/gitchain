@@ -228,7 +228,7 @@ export async function initP2P(host: boolean): Promise<void> {
     } catch (error) {
         console.error('Error loading server-peer.json:', error);
     }
-    try {
+    //try {
         // Create libp2p configuration.
         const config: any = {
 	    addresses: { listen: ['/webrtc'] },
@@ -299,10 +299,10 @@ export async function initP2P(host: boolean): Promise<void> {
             }
             console.log('Added my server peer address to server-peer.json.');
         }
-    } catch (error) {
-        console.error('Failed to initialize P2P:', error);
-        throw error; // Propagate error for debugging
-    }
+    //} catch (error) {
+    //    console.error('Failed to initialize P2P:', error);
+    //    throw error; // Propagate error for debugging
+    //}
 
     // Now dial every server peer to see which ones we can connect to.
     for (const peer of serverPeers) {
@@ -367,6 +367,7 @@ async function updateServerPeers(): Promise<boolean> {
             data = serverPeers;
             console.log('data = serverPeers: ' + JSON.stringify(serverPeers));
         }
+        console.debug("Storing these peers in the server-peer.json: " + JSON.stringify(data));
         const body = {
             message: 'Update server peer IDs',
             content: btoa(JSON.stringify(data, null, 2)),

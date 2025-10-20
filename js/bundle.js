@@ -33158,79 +33158,74 @@ async function initP2P(host) {
   } catch (error) {
     console.error("Error loading server-peer.json:", error);
   }
-  try {
-    const config = {
-      addresses: { listen: ["/webrtc"] },
-      transports: [
-        webRTC({
-          rtcConfiguration: {
-            iceServers: [
-              { urls: "stun:stun.l.google.com:19302" },
-              { urls: "stun:global.stun.twilio.com:3478" },
-              { urls: "stun:stun.nextcloud.com:3478" },
-              { urls: "stun:stun.1und1.de:3478" },
-              { urls: "stun:stun.stunprotocol.org:3478" },
-              { urls: "stun:stun.services.mozilla.com:3478" },
-              { urls: "stun:stun.ekiga.net:3478" },
-              { urls: "stun:stun.voipbuster.com:3478" }
-            ]
-          }
-        }),
-        webSockets(),
-        circuitRelayTransport({ discoverRelays: 1 })
-      ],
-      connectionEncryption: [noise()],
-      streamMuxers: [yamux()],
-      services: {
-        identify: identify(),
-        pubsub: gossipsub({ emitSelf: true })
-        // Allow local message handling
-      },
-      peerDiscovery: [
-        pubsubPeerDiscovery({ interval: 2e4 })
-      ]
-    };
-    if (serverPeers.length > 0) {
-      config.peerDiscovery.push(bootstrap({ list: serverPeers }));
-    } else {
-      console.log("No valid peers in serverPeers, initializing without bootstrap");
-    }
-    libp2p = await createLibp2p(config);
-    console.log("P2P node started:", libp2p.peerId.toString());
-    libp2p.addEventListener("peer:discovery", (evt) => {
-      console.log("Peer discovered:", evt.detail.id.toString());
-      console.log("Event: " + JSON.stringify(evt));
-    });
-    libp2p.services.pubsub.addEventListener("subscription-change", (evt) => {
-      console.log("Subscription change:", evt.detail);
-      console.debug("Event: " + JSON.stringify(evt));
-    });
-    await libp2p.handle(PROTOCOL, async ({ stream, connection }) => {
-      console.debug("Received P2P stream from:", connection.remotePeer.toString());
-      const chunks = [];
-      for await (const chunk of stream.source) {
-        chunks.push(chunk);
-      }
-      const data = concat(chunks);
-      const txn = JSON.parse(toString(data));
-      console.debug("Received transaction via P2P:", txn);
-    });
-    const peerId = libp2p.peerId.toString();
-    console.log(`My peer ID is: ${peerId}`);
-    if (isServer) {
-      if (peerId.length > 40 && !peerId.startsWith("/webrtc/p2p/webrtc")) {
-        try {
-          serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
-        } catch (error) {
-          console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
+  const config = {
+    addresses: { listen: ["/webrtc"] },
+    transports: [
+      webRTC({
+        rtcConfiguration: {
+          iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:global.stun.twilio.com:3478" },
+            { urls: "stun:stun.nextcloud.com:3478" },
+            { urls: "stun:stun.1und1.de:3478" },
+            { urls: "stun:stun.stunprotocol.org:3478" },
+            { urls: "stun:stun.services.mozilla.com:3478" },
+            { urls: "stun:stun.ekiga.net:3478" },
+            { urls: "stun:stun.voipbuster.com:3478" }
+          ]
         }
-        await updateServerPeers();
-      }
-      console.log("Added my server peer address to server-peer.json.");
+      }),
+      webSockets(),
+      circuitRelayTransport({ discoverRelays: 1 })
+    ],
+    connectionEncryption: [noise()],
+    streamMuxers: [yamux()],
+    services: {
+      identify: identify(),
+      pubsub: gossipsub({ emitSelf: true })
+      // Allow local message handling
+    },
+    peerDiscovery: [
+      pubsubPeerDiscovery({ interval: 2e4 })
+    ]
+  };
+  if (serverPeers.length > 0) {
+    config.peerDiscovery.push(bootstrap({ list: serverPeers }));
+  } else {
+    console.log("No valid peers in serverPeers, initializing without bootstrap");
+  }
+  libp2p = await createLibp2p(config);
+  console.log("P2P node started:", libp2p.peerId.toString());
+  libp2p.addEventListener("peer:discovery", (evt) => {
+    console.log("Peer discovered:", evt.detail.id.toString());
+    console.log("Event: " + JSON.stringify(evt));
+  });
+  libp2p.services.pubsub.addEventListener("subscription-change", (evt) => {
+    console.log("Subscription change:", evt.detail);
+    console.debug("Event: " + JSON.stringify(evt));
+  });
+  await libp2p.handle(PROTOCOL, async ({ stream, connection }) => {
+    console.debug("Received P2P stream from:", connection.remotePeer.toString());
+    const chunks = [];
+    for await (const chunk of stream.source) {
+      chunks.push(chunk);
     }
-  } catch (error) {
-    console.error("Failed to initialize P2P:", error);
-    throw error;
+    const data = concat(chunks);
+    const txn = JSON.parse(toString(data));
+    console.debug("Received transaction via P2P:", txn);
+  });
+  const peerId = libp2p.peerId.toString();
+  console.log(`My peer ID is: ${peerId}`);
+  if (isServer) {
+    if (peerId.length > 40 && !peerId.startsWith("/webrtc/p2p/webrtc")) {
+      try {
+        serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
+      } catch (error) {
+        console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
+      }
+      await updateServerPeers();
+    }
+    console.log("Added my server peer address to server-peer.json.");
   }
   for (const peer of serverPeers) {
     if (peer.length < 40) {
@@ -33292,6 +33287,7 @@ async function updateServerPeers() {
       data = serverPeers;
       console.log("data = serverPeers: " + JSON.stringify(serverPeers));
     }
+    console.debug("Storing these peers in the server-peer.json: " + JSON.stringify(data));
     const body = {
       message: "Update server peer IDs",
       content: btoa(JSON.stringify(data, null, 2)),
