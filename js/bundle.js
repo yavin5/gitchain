@@ -33228,6 +33228,7 @@ async function initP2P(host) {
   }
   for (const peer of serverPeers) {
     if (!peer.startsWith("/webrtc/") || peer.length < 40) {
+      console.log("SKIPPING bad peer: " + peer);
       continue;
     } else {
       try {

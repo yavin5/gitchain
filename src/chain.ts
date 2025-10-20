@@ -300,6 +300,7 @@ export async function initP2P(host: boolean): Promise<void> {
     // Now dial every server peer to see which ones we can connect to.
     for (const peer of serverPeers) {
         if (!peer.startsWith('/webrtc/') || peer.length < 40) {
+            console.log("SKIPPING bad peer: " + peer);
             continue;
         } else {
             try {
