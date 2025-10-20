@@ -385,6 +385,7 @@ async function updateServerPeers(): Promise<boolean> {
         });
         if (updateResponse.ok) {
             console.log('server-peer.json updated successfully');
+            serverPeers = data;
             return true;
         } else {
             console.error('Failed to update server-peer.json:', await updateResponse.text());
