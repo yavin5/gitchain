@@ -33242,7 +33242,7 @@ async function updateServerPeers() {
       sha2 = data.sha;
     }
     if (Array.isArray(data)) {
-      data.putAll(serverPeers);
+      data.push(...serverPeers);
     } else {
       data = serverPeers;
     }
@@ -33329,19 +33329,19 @@ async function connectAndSendTx(tx) {
     return;
   }
   let connected = false;
-  for (const peerId of peers) {
+  for (const peer of peers) {
     try {
-      const ma = multiaddr(`/webrtc/p2p/${peerId}`);
+      const ma = multiaddr(peer);
       const connection = await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
       const stream = await connection.newStream(PROTOCOL);
       const txJson = JSON.stringify(tx);
       const data = fromString(txJson);
       await stream.sink([data]);
-      console.log("TX sent to server peer:", peerId);
+      console.log("TX sent to server peer:", peer);
       connected = true;
       break;
     } catch (error) {
-      console.error("Failed to dial server peer:", peerId, error);
+      console.error("Failed to dial server peer:", peer, error);
     }
   }
   if (!connected) {
