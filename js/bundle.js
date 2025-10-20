@@ -33217,23 +33217,23 @@ async function initP2P(host) {
     console.log(`My peer ID is: ${peerId}`);
     if (isServer) {
       if (peerId.length > 40) {
-        serverPeers.push(multiaddr(peerId).toString());
+        serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
         await updateServerPeers();
       }
-      console.log("Server peer ID added to server-peer.json if not already present");
+      console.log("Added my server peer address to server-peer.json.");
     }
   } catch (error) {
     console.error("Failed to initialize P2P:", error);
     throw error;
   }
   for (const peer of serverPeers) {
-    if (!peer.startsWith("/webrtc/") || peer.length < 40) {
+    if (peer.length < 40) {
       console.log("SKIPPING bad peer: " + peer);
       continue;
     } else {
       try {
         console.log("Dialing peer: " + peer);
-        const ma = multiaddr(peer.substring("/webrtc".length));
+        const ma = multiaddr(peer);
         await libp2p.dial(ma, { signal: AbortSignal.timeout(6e4) });
       } catch (error) {
         console.error(`Failed to dial ${peer}: ${error}`);
@@ -33242,6 +33242,7 @@ async function initP2P(host) {
   }
 }
 async function updateServerPeers() {
+  console.debug("Entering updateServerPeers() with serverPeers: " + JSON.stringify(serverPeers));
   const githubAccessToken = getGithubAccessToken();
   if (!githubAccessToken) {
     console.error("No PAT available for updating server-peer.json");

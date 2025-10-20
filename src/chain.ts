@@ -287,11 +287,11 @@ export async function initP2P(host: boolean): Promise<void> {
         console.log(`My peer ID is: ${peerId}`);
         if (isServer) {
             if (peerId.length > 40) {
-                // TODO: Add /webrtc/p2p/ on the front?
-                serverPeers.push(multiaddr(peerId).toString());
+                serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
                 await updateServerPeers();
+                // TODO catch the case where that failed.
             }
-            console.log('Server peer ID added to server-peer.json if not already present');
+            console.log('Added my server peer address to server-peer.json.');
         }
     } catch (error) {
         console.error('Failed to initialize P2P:', error);
@@ -300,14 +300,14 @@ export async function initP2P(host: boolean): Promise<void> {
 
     // Now dial every server peer to see which ones we can connect to.
     for (const peer of serverPeers) {
-        if (!peer.startsWith('/webrtc/') || peer.length < 40) {
+        if (peer.length < 40) {
             console.log("SKIPPING bad peer: " + peer);
             continue;
         } else {
             try {
                 console.log("Dialing peer: " + peer);
                 // We must remove the "/webrtc" front part of the string.
-                const ma = multiaddr(peer.substring('/webrtc'.length));
+                const ma = multiaddr(peer);
                 await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
             } catch(error) {
                 console.error(`Failed to dial ${peer}: ${error}`);
@@ -317,6 +317,7 @@ export async function initP2P(host: boolean): Promise<void> {
 }
 // Update server-peer.json
 async function updateServerPeers(): Promise<boolean> {
+    console.debug("Entering updateServerPeers() with serverPeers: " + JSON.stringify(serverPeers));
     const githubAccessToken = getGithubAccessToken();
     if (!githubAccessToken) {
         console.error('No PAT available for updating server-peer.json');
