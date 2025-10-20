@@ -311,9 +311,10 @@ async function updateServerPeers(): Promise<boolean> {
             data = await response.json();
             sha = data.sha;
         }
-        console.log("data: " + JSON.stringify(data));
-        if (typeof(data) === typeof(Object)) {
-            data = JSON.parse(data);
+        console.log("data content: " + data.content);
+        if (typeof(data.content) === typeof(String)) {
+            console.log('base64 decoding and JSON parsing content.');
+            data = JSON.parse(btoa(data.content));
         }
         if (Array.isArray(data)) {
             (data as Array<string>).push(...serverPeers);
