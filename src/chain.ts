@@ -1,15 +1,5 @@
 import { ADMIN_ADDRESS } from './admin-address.js';
 
-// Declare CryptoJS for TypeScript (loaded via CDN at runtime)
-declare const CryptoJS: {
-    SHA256: (value: string) => { toString: () => string };
-};
-// Declare elliptic for secp256k1 (loaded via CDN)
-declare const ec: any;
-// Declare js-sha3 for keccak256 (loaded via CDN)
-declare const sha3: {
-    keccak256: (data: string) => string;
-};
 // Declare window.gitchain for TypeScript
 interface Gitchain {
     saveGithubAccessToken: () => void;
@@ -17,6 +7,8 @@ interface Gitchain {
     processTxns: () => Promise<void>;
     fetchState: () => Promise<{ content: State; sha: string } | null>;
     connectAndSendTx: (tx: Transaction) => Promise<void>;
+    KasplexSignalling: typeof KasplexSignalling;
+    WebRTCConnection: typeof WebRTCConnection;
 }
 declare global {
     interface Window {
@@ -30,12 +22,19 @@ import { webSockets } from '@libp2p/websockets';
 import { noise } from '@chainsafe/libp2p-noise';
 import { yamux } from '@chainsafe/libp2p-yamux';
 import { identify } from '@libp2p/identify';
-import { circuitRelayTransport, CircuitRelayTransportInit } from '@libp2p/circuit-relay-v2';
+import { circuitRelayTransport } from '@libp2p/circuit-relay-v2';
 import { bootstrap } from '@libp2p/bootstrap';
 import { gossipsub } from '@libp2p/gossipsub';
 import { pubsubPeerDiscovery } from '@libp2p/pubsub-peer-discovery';
 import { multiaddr } from '@multiformats/multiaddr';
-import { fromString as uint8FromString, toString as uint8ToString, concat as uint8Concat } from 'uint8arrays';
+import { fromString as uint8FromString, toString as uint8ToString } from 'uint8arrays';
+import CryptoJS from 'crypto-js';
+import { ec } from 'elliptic';
+import { keccak256 as keccak256Buffer } from 'js-sha3';
+import { concat as uint8Concat } from 'uint8arrays';
+
+// Kasplex SDK
+import { Wallet, Wasm, Kiwi } from '@kasplex/kiwi-web';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -56,7 +55,165 @@ const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 let libp2p: any = null;
 let isServer = false;
 let serverPeers: string[] = [];
+
+// ---------------------------------------------------------------------------
+// KasplexSignalling – signalling layer over Kasplex L2
+// ---------------------------------------------------------------------------
+export class KasplexSignalling {
+  rpcUrl: string;
+  chainId: string;
+  provider: any;
+  wallet: any;
+  mnemonic: string | null = null;
+  address: string | null = null;
+  listeners: ((msg: any) => void)[] = [];
+  pollingInterval: any = null;
+
+  constructor(rpcUrl = 'https://rpc.testnet.kasplex.org', chainId = '167012') {
+    this.rpcUrl = rpcUrl;
+    this.chainId = chainId;
+    // @ts-ignore
+    this.provider = new Kiwi.providers.JsonRpcProvider(rpcUrl, parseInt(chainId));
+  }
+
+  generateWallet() {
+    this.mnemonic = (Wallet as any).generateMnemonic(12);
+    if (!this.mnemonic) throw new Error('Mnemonic not generated');
+    this.wallet = Wallet.fromMnemonic(this.mnemonic);
+    this.address = this.wallet.getAddress().toString();
+    return { mnemonic: this.mnemonic, address: this.address };
+  }
+
+  async connect() {
+    Kiwi.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
+    await this.wallet.connect(this.provider);
+    this.startPolling();
+  }
+
+  async sendMessage(to: string, type: 'offer' | 'answer' | 'candidate', data: any) {
+    if (!this.wallet) throw new Error('Wallet not generated');
+    const payload = JSON.stringify({ from: this.address, to, type, data });
+    const txData = '0x' + Buffer.from(payload, 'utf8').toString('hex');
+
+    const tx = await this.wallet.sendTransaction({
+      to: '0x0000000000000000000000000000000000000000',
+      data: txData,
+      value: 0n,
+      gasLimit: 21000n,
+    });
+    await tx.wait();
+    console.log(`[Kasplex] Sent ${type} to ${to.slice(-8)}`);
+  }
+
+  private startPolling() {
+    this.pollingInterval = setInterval(async () => {
+      try {
+        const blockNumber = await this.provider.getBlockNumber();
+        const block = await this.provider.getBlock(blockNumber, true);
+        for (const tx of block.transactions) {
+          if (tx.to?.toLowerCase() === '0x0000000000000000000000000000000000000000' && tx.input) {
+            const raw = Buffer.from(tx.input.slice(2), 'hex').toString('utf8');
+            let parsed;
+            try { parsed = JSON.parse(raw); } catch { continue; }
+            if (parsed.to === this.address) {
+              this.listeners.forEach(cb => cb(parsed));
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Polling error:', e);
+      }
+    }, 5000);
+  }
+
+  on(event: 'message', cb: (msg: any) => void) {
+    if (event === 'message') this.listeners.push(cb);
+  }
+
+  destroy() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// WebRTCConnection – uses KasplexSignalling for SDP/ICE
+// ---------------------------------------------------------------------------
+export class WebRTCConnection {
+  signaling: KasplexSignalling;
+  localPeerId: string;
+  remotePeerId: string;
+  pc: RTCPeerConnection;
+  dc: RTCDataChannel | null = null;
+
+  constructor(signaling: KasplexSignalling, localPeerId: string, remotePeerId: string) {
+    this.signaling = signaling;
+    this.localPeerId = localPeerId;
+    this.remotePeerId = remotePeerId;
+
+    this.pc = new RTCPeerConnection({
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ],
+    });
+
+    this.signaling.on('message', msg => this.handleSignaling(msg));
+    this.setupDataChannel();
+    this.initiateOffer();
+  }
+
+  private setupDataChannel() {
+    this.dc = this.pc.createDataChannel('gitchain-chat', { ordered: true });
+    this.dc.onopen = () => console.log(`Data channel open → ${this.remotePeerId.slice(-8)}`);
+    this.dc.onmessage = e => {
+      const chat = document.getElementById('chat') as HTMLDivElement;
+      const p = document.createElement('p');
+      p.textContent = `${this.remotePeerId.slice(-8)}: ${e.data}`;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    this.pc.onicecandidate = ev => {
+      if (ev.candidate) this.signaling.sendMessage(this.remotePeerId, 'candidate', ev.candidate);
+    };
+  }
+
+  private async initiateOffer() {
+    const offer = await this.pc.createOffer({ offerToReceiveAudio: false, offerToReceiveVideo: false });
+    await this.pc.setLocalDescription(offer);
+    this.signaling.sendMessage(this.remotePeerId, 'offer', this.pc.localDescription);
+  }
+
+  private async handleSignaling(msg: any) {
+    if (msg.from !== this.remotePeerId) return;
+    try {
+      if (msg.type === 'offer') {
+        await this.pc.setRemoteDescription(msg.data);
+        const answer = await this.pc.createAnswer();
+        await this.pc.setLocalDescription(answer);
+        this.signaling.sendMessage(msg.from, 'answer', this.pc.localDescription);
+      } else if (msg.type === 'answer') {
+        await this.pc.setRemoteDescription(msg.data);
+      } else if (msg.type === 'candidate') {
+        await this.pc.addIceCandidate(msg.data);
+      }
+    } catch (e) {
+      console.error('Signaling handling error:', e);
+    }
+  }
+
+  send(text: string) {
+    if (this.dc?.readyState === 'open') this.dc.send(text);
+  }
+
+  get state() {
+    return this.pc.connectionState;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Interfaces
+// ---------------------------------------------------------------------------
 interface Transaction {
     from: string;
     to: string;
@@ -78,12 +235,18 @@ interface State {
     nonces: { [address: string]: number };
     lastProcessedDate: string;
 }
+
+// ---------------------------------------------------------------------------
 // Calculate hash
+// ---------------------------------------------------------------------------
 function calculateHash(index: number, previousHash: string, timestamp: string, transactions: Transaction[]): string {
     const value = `${index}${previousHash}${timestamp}${JSON.stringify(transactions)}`;
     return CryptoJS.SHA256(value).toString();
 }
+
+// ---------------------------------------------------------------------------
 // Create genesis block
+// ---------------------------------------------------------------------------
 function createOriginalBlock(): Block {
     const timestamp = new Date().toISOString();
     return {
@@ -94,20 +257,21 @@ function createOriginalBlock(): Block {
         hash: calculateHash(0, '0', timestamp, [])
     };
 }
+
+// ---------------------------------------------------------------------------
 // Serialize txn for signing/hash
+// ---------------------------------------------------------------------------
 function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
-// Keccak256 using js-sha3
-function keccak256(data: string): Uint8Array {
-    const hex = sha3.keccak256(data);
-    const matches = hex.match(/.{2}/g);
-    if (!matches) {
-        throw new Error('Failed to parse hex string');
-    }
-    return new Uint8Array(matches.map((byte: string) => parseInt(byte, 16)));
+
+function keccak256Bytes(input: Uint8Array): Uint8Array {
+    return Uint8Array.from(keccak256Buffer.array(input));
 }
+
+// ---------------------------------------------------------------------------
 // Hex to bytes
+// ---------------------------------------------------------------------------
 function hexToBytes(hex: string): Uint8Array {
     const bytes = new Uint8Array(hex.length / 2);
     for (let i = 0; i < hex.length; i += 2) {
@@ -115,14 +279,20 @@ function hexToBytes(hex: string): Uint8Array {
     }
     return bytes;
 }
+
+// ---------------------------------------------------------------------------
 // Bytes to hex
+// ---------------------------------------------------------------------------
 function bytesToHex(bytes: Uint8Array): string {
     return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 }
+
+// ---------------------------------------------------------------------------
 // Verify signature using elliptic
+// ---------------------------------------------------------------------------
 function verifyTxn(txn: Transaction): boolean {
     try {
-        const msgHash = keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }));
+	const msgHash = keccak256Bytes(uint8FromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
         const sigBytes = hexToBytes(txn.signature);
         if (sigBytes.length !== 65) return false;
         const r = bytesToHex(sigBytes.slice(0, 32));
@@ -132,16 +302,22 @@ function verifyTxn(txn: Transaction): boolean {
         const msgHashHex = bytesToHex(msgHash);
         const signature = { r: r, s: s };
         const publicKey = curve.recoverPubKey(msgHashHex, signature, v);
-        const addrHash = keccak256(publicKey.encode('array', true).slice(1)); // Compressed public key without 0x04
+        const pubKeyBytes = publicKey.encode('array', true).slice(1);
+        const pubKeyHex = pubKeyBytes.map((b: number) => b.toString(16).padStart(2, '0')).join('');
+        const addrHash = keccak256Bytes(uint8FromString(pubKeyHex));
         const recoveredAddr = `0x${bytesToHex(addrHash.slice(-20))}`;
         return recoveredAddr.toLowerCase() === txn.from.toLowerCase();
     } catch {
         return false;
     }
 }
+
+// ---------------------------------------------------------------------------
 // Process a single txn (mint if from admin)
+// ---------------------------------------------------------------------------
 async function processTxn(txn: Transaction, state: State): Promise<{ valid: boolean; txid: string }> {
-    const txid = bytesToHex(keccak256(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
+    const txid = bytesToHex(keccak256Bytes(uint8FromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
+    
     if (!verifyTxn(txn)) return { valid: false, txid };
     if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce) return { valid: false, txid };
     if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount) return { valid: false, txid };
@@ -149,7 +325,10 @@ async function processTxn(txn: Transaction, state: State): Promise<{ valid: bool
     state.pending.push(txn);
     return { valid: true, txid };
 }
+
+// ---------------------------------------------------------------------------
 // Create block
+// ---------------------------------------------------------------------------
 async function createBlock(state: State): Promise<number | null> {
     if (state.pending.length === 0) return null;
     const validTxns: Transaction[] = [];
@@ -180,7 +359,10 @@ async function createBlock(state: State): Promise<number | null> {
     state.nonces = newNonces;
     return nextIndex;
 }
+
+// ---------------------------------------------------------------------------
 // Get GitHub access token
+// ---------------------------------------------------------------------------
 function getGithubAccessToken(): string | null {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
     if (!githubAccessToken) {
@@ -195,7 +377,10 @@ function getGithubAccessToken(): string | null {
     console.log('Retrieved GitHub access token');
     return githubAccessToken;
 }
+
+// ---------------------------------------------------------------------------
 // Initialize libp2p / WebRTC server
+// ---------------------------------------------------------------------------
 export async function initP2P(host: boolean): Promise<void> {
     console.log('Entering initP2P, host:', host);
     isServer = host;
@@ -203,17 +388,13 @@ export async function initP2P(host: boolean): Promise<void> {
         console.log('libp2p already initialized, reusing instance');
         return;
     }
-    //let bootstrapList: string[] = [];
-    serverPeers = [];
 
-    // First, enable debug logging!
     localStorage.setItem('debug', 'libp2p:*');
 
     try {
         const response = await fetch(SERVER_PEER_RAW_URL);
         if (response.ok) {
             let data = await response.json();
-            //data = (data as string[]).filter(peer => peer !== '').map(peer => `/webrtc/p2p/${peer}`);
             for (const peer of data) {
                 if (peer.length > 40 && serverPeers.indexOf(peer) == -1) {
                     serverPeers.push(peer);
@@ -229,96 +410,88 @@ export async function initP2P(host: boolean): Promise<void> {
         console.error('Error loading server-peer.json:', error);
     }
 
-        // Create libp2p configuration.
-        const config: any = {
-	    addresses: { listen: ['/webrtc'] },
-            transports: [
-	        webRTC({
-                    rtcConfiguration: {
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:global.stun.twilio.com:3478' },
-                            { urls: 'stun:stun.nextcloud.com:3478' },
-                            { urls: 'stun:stun.1und1.de:3478' },
-                            { urls: 'stun:stun.stunprotocol.org:3478' },
-                            { urls: 'stun:stun.services.mozilla.com:3478' },
-                            { urls: 'stun:stun.ekiga.net:3478' },
-                            { urls: 'stun:stun.voipbuster.com:3478' }
-                        ]
-                    }
-                }),
-                webSockets(),
-	        circuitRelayTransport({ discoverRelays: 1 } as CircuitRelayTransportInit)
-            ],
-            connectionEncryption: [noise()],
-            streamMuxers: [yamux()],
-            services: {
-                identify: identify(),
-                pubsub: gossipsub({ emitSelf: true }) // Allow local message handling
-            },
-            peerDiscovery: [
-                pubsubPeerDiscovery({ interval: 20000 })
-            ]
-        };
-        if (serverPeers.length > 0) {
-            config.peerDiscovery.push(bootstrap({ list: serverPeers }));
-        } else {
-            console.log('No valid peers in serverPeers, initializing without bootstrap');
+    const config: any = {
+        addresses: { listen: ['/webrtc'] },
+        transports: [
+            webRTC({
+                rtcConfiguration: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:global.stun.twilio.com:3478' },
+                        { urls: 'stun:stun.nextcloud.com:3478' },
+                        { urls: 'stun:stun.1und1.de:3478' },
+                        { urls: 'stun:stun.stunprotocol.org:3478' },
+                        { urls: 'stun:stun.services.mozilla.com:3478' },
+                        { urls: 'stun:stun.ekiga.net:3478' },
+                        { urls: 'stun:stun.voipbuster.com:3478' }
+                    ]
+                }
+            }),
+            webSockets(),
+            circuitRelayTransport()
+        ],
+        connectionEncryption: [noise()],
+        streamMuxers: [yamux()],
+        services: {
+            identify: identify(),
+            pubsub: gossipsub({ emitSelf: true })
+        },
+        peerDiscovery: [
+            pubsubPeerDiscovery({ interval: 20000 })
+        ]
+    };
+    if (serverPeers.length > 0) {
+        config.peerDiscovery.push(bootstrap({ list: serverPeers }));
+    } else {
+        console.log('No valid peers in serverPeers, initializing without bootstrap');
+    }
+    libp2p = await createLibp2p(config);
+    console.log('P2P node started:', libp2p.peerId.toString());
+    libp2p.addEventListener('peer:discovery', (evt: any) => {
+        console.log('Peer discovered:', evt.detail.id.toString());
+    });
+    libp2p.services.pubsub.addEventListener('subscription-change', (evt: any) => {
+        console.log('Subscription change:', evt.detail);
+    });
+    await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
+        console.debug('Received P2P stream from:', connection.remotePeer.toString());
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of stream.source) {
+            chunks.push(chunk);
         }
-        libp2p = await createLibp2p(config);
-        console.log('P2P node started:', libp2p.peerId.toString());
-        libp2p.addEventListener('peer:discovery', (evt: any) => {
-            console.log('Peer discovered:', evt.detail.id.toString());
-            console.log('Event: ' + JSON.stringify(evt));
-        });
-        libp2p.services.pubsub.addEventListener('subscription-change', (evt: any) => {
-            console.log('Subscription change:', evt.detail);
-            console.debug('Event: ' + JSON.stringify(evt));
-        });
-        await libp2p.handle(PROTOCOL, async ({ stream, connection }: any) => {
-            console.debug('Received P2P stream from:', connection.remotePeer.toString());
-            const chunks: Uint8Array[] = [];
-            for await (const chunk of stream.source) {
-                chunks.push(chunk);
+        const data = uint8Concat(chunks);
+        const txn = JSON.parse(uint8ToString(data));
+        console.debug('Received transaction via P2P:', txn);
+    });
+    const peerId = libp2p.peerId.toString();
+    console.log(`My peer ID is: ${peerId}`);
+    if (isServer) {
+        if (peerId.length > 40 && !peerId.startsWith('/webrtc/p2p')) {
+            try {
+                const ma = multiaddr(`/webrtc/p2p/${peerId}`);
+                serverPeers.push(ma.toString());
+            } catch (error) {
+                console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
             }
-            const data = uint8Concat(chunks);
-            const txn = JSON.parse(uint8ToString(data));
-            console.debug('Received transaction via P2P:', txn);
-        });
-        const peerId = libp2p.peerId.toString();
-        console.log(`My peer ID is: ${peerId}`);
-        if (isServer) {
-            if (peerId.length > 40 && !peerId.startsWith('/webrtc/p2p')) {
+            serverPeers = await updateServerPeers();
+            console.log('Added my server peer address to server-peer.json.');
+            for (const peer of serverPeers) {
+                if (peer.length < 40) continue;
                 try {
-                    serverPeers.push(multiaddr(`/webrtc/p2p/${peerId}`).toString());
-                } catch (error) {
-                    console.debug(`ERROR: Bad multiaddr: /webrtc/p2p/${peerId}`);
-                }
-                serverPeers = await updateServerPeers();
-                // TODO catch the case where the update failed.
-                console.log('Added my server peer address to server-peer.json.');
-
-                // Now dial every server peer to see which ones we can connect to.
-                for (const peer of serverPeers) {
-                    if (peer.length < 40) {
-                        console.log("SKIPPING bad peer: " + peer);
-                        continue;
-                    } else {
-                        try {
-                            console.log("Dialing peer: " + peer);
-                            // We must remove the "/webrtc" front part of the string.
-                            const ma = multiaddr(peer);
-                            await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
-                        } catch(error) {
-                            console.error(`Failed to dial ${peer}: ${error}`);
-                        }
-                    }
+                    console.log("Dialing peer: " + peer);
+                    const ma = multiaddr(peer);
+                    await libp2p.dial(ma, { signal: AbortSignal.timeout(60000) });
+                } catch(error) {
+                    console.error(`Failed to dial ${peer}: ${error}`);
                 }
             }
         }
+    }
 }
-    
+
+// ---------------------------------------------------------------------------
 // Update server-peer.json
+// ---------------------------------------------------------------------------
 async function updateServerPeers(): Promise<string[]> {
     console.debug("Entering updateServerPeers() with serverPeers: " + JSON.stringify(serverPeers));
     const githubAccessToken = getGithubAccessToken();
@@ -334,37 +507,24 @@ async function updateServerPeers(): Promise<string[]> {
             }
         });
         let sha: string | null = null;
-	    let data: any;
+        let data: any = [];
         if (response.ok) {
             data = await response.json();
             sha = data.sha;
-        }
-        console.log("data content: " + data.content);
-        if ((data.content)) {
-            data = atob(data.content);
-            console.log('base64 decoded: ' + data);
-            data = JSON.parse(data);
-        }
-        if (Array.isArray(data)) {
-            for (let i = 0; i < serverPeers.length; i++) {
-                if (!serverPeers[i].startsWith('/webrtc/')) {
-                    console.log("Skipping badly formatted server peer: " + serverPeers[i]);
-                    continue;
-                }
-                if (!data.includes(serverPeers[i])) {
-                    console.log('Adding server peer: ' + serverPeers[i]);
-                    data.push(serverPeers[i]);
-                } else {
-                    console.log("Not adding dupe server peer: " + serverPeers[i]);
-                }
-            }
-            console.log('Added serverPeers to data array: ' + JSON.stringify(serverPeers));
+            data = JSON.parse(atob(data.content));
+        } else if (response.status === 404) {
+            data = [];
+            sha = null;
         } else {
-            console.log('typeof data: ' + typeof data);
-            data = serverPeers;
-            console.log('data = serverPeers: ' + JSON.stringify(serverPeers));
+            console.error('Error fetching server-peer.json:', response.status, await response.text());
+            return serverPeers;
         }
-        console.debug("Storing these peers in the server-peer.json: " + JSON.stringify(data));
+        if (!Array.isArray(data)) data = [];
+        for (let i = 0; i < serverPeers.length; i++) {
+            if (serverPeers[i].startsWith('/webrtc/p2p/') && !data.includes(serverPeers[i])) {
+                data.push(serverPeers[i]);
+            }
+        }
         const body = {
             message: 'Update server peer IDs',
             content: btoa(JSON.stringify(data, null, 2)),
@@ -385,7 +545,7 @@ async function updateServerPeers(): Promise<string[]> {
             serverPeers = data;
             return data;
         } else {
-            console.error('Failed to update server-peer.json:', await updateResponse.text());
+            console.error('Failed to update server-peer.json:', updateResponse.status, await updateResponse.text());
             return serverPeers;
         }
     } catch (error) {
@@ -393,14 +553,20 @@ async function updateServerPeers(): Promise<string[]> {
         return serverPeers;
     }
 }
+
+// ---------------------------------------------------------------------------
 // Remove host peer ID on unload
+// ---------------------------------------------------------------------------
 async function removeHostPeerId(): Promise<void> {
     if (!isServer || !libp2p) return;
     const peerId = libp2p.peerId.toString();
     serverPeers = serverPeers.filter(id => id !== peerId);
     await updateServerPeers();
 }
+
+// ---------------------------------------------------------------------------
 // Client-side: Connect and Send TX
+// ---------------------------------------------------------------------------
 export async function connectAndSendTx(tx: Transaction) {
     if (isServer) {
         const issueBody = JSON.stringify({
@@ -469,19 +635,26 @@ export async function connectAndSendTx(tx: Transaction) {
         alert('Failed to connect to any server. Please try again or notify the server administrator.');
     }
 }
+
+// ---------------------------------------------------------------------------
 // Save GitHub access token
+// ---------------------------------------------------------------------------
 export function saveGithubAccessToken(): void {
     console.log('Entering saveGithubAccessToken');
     const githubAccessToken = (document.getElementById('github-token') as HTMLInputElement)?.value;
     if (githubAccessToken) {
         localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
         console.log('PAT saved, initializing P2P as host');
+        initP2P(true);
     } else {
         console.error('No GitHub access token provided');
         throw new Error('Enter a GitHub access token first.');
     }
 }
+
+// ---------------------------------------------------------------------------
 // Fetch state
+// ---------------------------------------------------------------------------
 export async function fetchState(): Promise<{ content: State; sha: string } | null> {
     console.log('Entering fetchState');
     const githubAccessToken = getGithubAccessToken();
@@ -514,7 +687,10 @@ export async function fetchState(): Promise<{ content: State; sha: string } | nu
         return null;
     }
 }
+
+// ---------------------------------------------------------------------------
 // Update state with retries
+// ---------------------------------------------------------------------------
 async function updateState(newContent: State, oldSha: string | null, message: string, retries = 3): Promise<boolean> {
     console.log('Entering updateState, message:', message);
     const githubAccessToken = getGithubAccessToken();
@@ -540,7 +716,7 @@ async function updateState(newContent: State, oldSha: string | null, message: st
             if (response.status === 409 && retries > 0) {
                 console.log('Conflict detected, retrying...');
                 const current = await fetchState();
-                if (!current) throw new Error('Failed to refetch');
+                if (!current) throw new Error('Failed to refetch state during conflict resolution');
                 return updateState(newContent, current.sha, message, retries - 1);
             }
             console.error('Error updating state:', response.status, await response.text());
@@ -553,7 +729,10 @@ async function updateState(newContent: State, oldSha: string | null, message: st
         return false;
     }
 }
+
+// ---------------------------------------------------------------------------
 // Close issue with comment
+// ---------------------------------------------------------------------------
 async function closeIssueWithComment(issueNumber: number, blockIndex: number | null, valid: boolean): Promise<void> {
     console.log('Entering closeIssueWithComment, issue:', issueNumber);
     const githubAccessToken = getGithubAccessToken();
@@ -586,7 +765,10 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
         body: JSON.stringify({ state: 'closed' })
     });
 }
+
+// ---------------------------------------------------------------------------
 // Process txns via open issues
+// ---------------------------------------------------------------------------
 export async function processTxns(): Promise<void> {
     console.log('Entering processTxns');
     const output = document.getElementById('output') as HTMLDivElement;
@@ -675,7 +857,10 @@ export async function processTxns(): Promise<void> {
     console.log('processTxns completed');
     processingMessage.classList.remove('visible');
 }
+
+// ---------------------------------------------------------------------------
 // View chain
+// ---------------------------------------------------------------------------
 export async function viewChain(): Promise<void> {
     console.log('Entering viewChain');
     const output = document.getElementById('output') as HTMLDivElement;
@@ -703,14 +888,20 @@ export async function viewChain(): Promise<void> {
     output.textContent = text;
     console.log('viewChain completed, chain length:', chain.length);
 }
+
+// ---------------------------------------------------------------------------
 // Expose libp2p and server peers
+// ---------------------------------------------------------------------------
 export function getLibp2p() {
     return libp2p;
 }
 export function getServerPeers() {
     return serverPeers;
 }
+
+// ---------------------------------------------------------------------------
 // Auto-process and initialize
+// ---------------------------------------------------------------------------
 window.addEventListener('load', () => {
     console.log('Window loaded, checking for PAT');
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
@@ -725,17 +916,28 @@ window.addEventListener('load', () => {
         processTxns();
     }, UPDATE_INTERVAL);
 });
+
+// ---------------------------------------------------------------------------
 // Unload event for removing peer ID
+// ---------------------------------------------------------------------------
 window.addEventListener('unload', async () => {
     await removeHostPeerId();
 });
+
+// ---------------------------------------------------------------------------
 // Expose to window.gitchain
+// ---------------------------------------------------------------------------
 window.gitchain = {
     saveGithubAccessToken,
     viewChain,
     processTxns,
     fetchState,
-    connectAndSendTx
+    connectAndSendTx,
+    KasplexSignalling,
+    WebRTCConnection
 };
+
+// ---------------------------------------------------------------------------
 // Dispatch event
+// ---------------------------------------------------------------------------
 window.dispatchEvent(new Event('gitchain:init'));
