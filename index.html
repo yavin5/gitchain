@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gitchain</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://rpc.testnet.kasplex.org; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline';
+        connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://rpc.testnet.kasplex.org;
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data:;
+      ">
   <link rel="stylesheet" href="styles.css">
   <style>
     .spacer { margin-bottom: 1rem; }
@@ -55,11 +62,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script type="module">
-    import { ec } from 'https://cdn.jsdelivr.net/npm/elliptic@6.6.1/lib/elliptic.js/+esm';
+    import { elliptic.ec as ec } from 'https://cdn.jsdelivr.net/npm/elliptic@6.6.1/lib/elliptic.js/+esm';
     window.ec = ec;
   </script>
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
-  <script type="module" src="js/init.js"></script>
+  <script type="module" src="./js/init.js"></script>
   <script type="module" src="js/main.js"></script>
   <script type="module" src="./js/bundle.js"></script>
 </body>

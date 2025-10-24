@@ -1,7 +1,89 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P, submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection } from './chain.ts';
+// ---------------------------------------------------------------
+// 1. Wait for the whole page (including <script type="module">)
+// ---------------------------------------------------------------
+await new Promise(r => {
+  if (document.readyState === 'complete') r();
+  else window.addEventListener('load', r);
+});
 
-window.gitchain = {
-  saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P,
-  submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection
+// ---------------------------------------------------------------
+// 2. Import the compiled chain code (Vite outputs bundle.js)
+// ---------------------------------------------------------------
+import './bundle.js';          // <-- change if your file is chain.js
+import { KasplexSignalling } from './bundle.js';
+
+// ---------------------------------------------------------------
+// 3. Build the UI (inline – CSP now allows it)
+// ---------------------------------------------------------------
+document.body.insertAdjacentHTML('beforeend', `
+<div id="gitchain-ui" style="font-family:Arial;padding:1rem;max-width:600px;margin:auto;">
+  <h2>Gitchain + Kasplex Demo</h2>
+
+  <label>GitHub PAT: <input id="patInput" type="text" placeholder="ghp_…"></label>
+  <button id="savePat">Save PAT</button>
+
+  <hr>
+
+  <button id="generateWallet">Generate Kasplex Wallet</button>
+  <div id="walletInfo" style="margin-top:0.5rem;"></div>
+
+  <hr>
+
+  <button id="viewChain">View Chain</button>
+  <pre id="output" style="background:#f4f4f4;padding:1rem;max-height:400px;overflow:auto;"></pre>
+</div>
+`);
+
+// ---------------------------------------------------------------
+// 4. Global helpers (used by chain.ts)
+// ---------------------------------------------------------------
+window.saveGithubAccessToken = () => {
+  const token = document.getElementById('patInput').value.trim();
+  if (!token) return alert('Enter a PAT first');
+  localStorage.setItem('gitchain_github_access_token', token);
+  alert('PAT saved – reload the page');
 };
-document.dispatchEvent(new CustomEvent('gitchain:init'));
+
+window.viewChain = async () => {
+  const pre = document.getElementById('output');
+  pre.textContent = 'Loading…';
+  try {
+    const state = await window.gitchain.fetchState();
+    if (!state) throw new Error('No state');
+    pre.textContent = JSON.stringify(state.content, null, 2);
+  } catch (e) {
+    pre.textContent = 'Error: ' + e.message;
+  }
+};
+
+// ---------------------------------------------------------------
+// 5. Kasplex wallet generation
+// ---------------------------------------------------------------
+let signalling = null;
+
+document.getElementById('generateWallet').addEventListener('click', async () => {
+  const infoDiv = document.getElementById('walletInfo');
+  infoDiv.textContent = 'Generating…';
+
+  try {
+    if (!signalling) signalling = new KasplexSignalling();
+    const { mnemonic, address } = signalling.generateWallet();
+    await signalling.connect();               // connects to testnet RPC
+
+    infoDiv.innerHTML = `
+      <strong>Address:</strong> ${address}<br>
+      <strong>Mnemonic (keep secret):</strong><br>
+      <code style="word-break:break-all;">${mnemonic}</code>
+    `;
+
+    // expose for other parts of the app
+    window.gitchain.KasplexSignallingInstance = signalling;
+  } catch (err) {
+    infoDiv.textContent = 'Error: ' + err.message;
+  }
+});
+
+// ---------------------------------------------------------------
+// 6. Dispatch the custom init event that chain.ts waits for
+// ---------------------------------------------------------------
+window.dispatchEvent(new Event('gitchain:init'));
