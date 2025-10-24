@@ -59878,14 +59878,12 @@ let libp2p = null;
 let isServer = false;
 let serverPeers = [];
 class KasplexSignalling {
-  constructor(rpcUrl = "https://rpc.testnet.kasplex.org", chainId = "167012") {
+  constructor(chainId = "167012") {
     this.mnemonic = null;
     this.address = null;
     this.listeners = [];
     this.pollingInterval = null;
-    this.rpcUrl = rpcUrl;
     this.chainId = chainId;
-    this.provider = new Kiwi.providers.JsonRpcProvider(rpcUrl, parseInt(chainId));
   }
   generateWallet() {
     this.mnemonic = Wallet2.generateMnemonic(12);
@@ -59897,7 +59895,7 @@ class KasplexSignalling {
   }
   async connect() {
     Kiwi.setNetwork(this.chainId === "167012" ? exports_kaspa.NetworkType.Testnet : exports_kaspa.NetworkType.Mainnet);
-    await this.wallet.connect(this.provider);
+    await Rpc.setInstance(exports_kaspa.NetworkType.Testnet).connect();
     this.startPolling();
   }
   async sendMessage(to, type, data) {
@@ -60108,7 +60106,7 @@ async function createBlock(state) {
 function getGithubAccessToken() {
   let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
   if (!githubAccessToken) {
-    githubAccessToken = document.getElementById("github-token")?.value;
+    githubAccessToken = document.getElementById("patInput")?.value;
     if (!githubAccessToken) {
       console.log("No GitHub access token provided");
       alert("Please enter your GitHub access token.");

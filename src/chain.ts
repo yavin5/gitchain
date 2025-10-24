@@ -34,7 +34,7 @@ import { keccak256 as keccak256Buffer } from 'js-sha3';
 import { concat as uint8Concat } from 'uint8arrays';
 
 // Kasplex SDK
-import { Wallet, Wasm, Kiwi } from '@kasplex/kiwi-web';
+import { Wallet, Rpc, Wasm, Kiwi } from '@kasplex/kiwi-web';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -60,7 +60,6 @@ let serverPeers: string[] = [];
 // KasplexSignalling – signalling layer over Kasplex L2
 // ---------------------------------------------------------------------------
 export class KasplexSignalling {
-  rpcUrl: string;
   chainId: string;
   provider: any;
   wallet: any;
@@ -69,11 +68,8 @@ export class KasplexSignalling {
   listeners: ((msg: any) => void)[] = [];
   pollingInterval: any = null;
 
-  constructor(rpcUrl = 'https://rpc.testnet.kasplex.org', chainId = '167012') {
-    this.rpcUrl = rpcUrl;
+  constructor(chainId = '167012') {
     this.chainId = chainId;
-    // @ts-ignore
-    this.provider = new Kiwi.providers.JsonRpcProvider(rpcUrl, parseInt(chainId));
   }
 
   generateWallet() {
@@ -86,7 +82,7 @@ export class KasplexSignalling {
 
   async connect() {
     Kiwi.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
-    await this.wallet.connect(this.provider);
+    await Rpc.setInstance(Wasm.NetworkType.Testnet).connect()
     this.startPolling();
   }
 
@@ -366,7 +362,7 @@ async function createBlock(state: State): Promise<number | null> {
 function getGithubAccessToken(): string | null {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
     if (!githubAccessToken) {
-        githubAccessToken = (document.getElementById('github-token') as HTMLInputElement)?.value;
+        githubAccessToken = (document.getElementById('patInput') as HTMLInputElement)?.value;
         if (!githubAccessToken) {
             console.log('No GitHub access token provided');
             alert('Please enter your GitHub access token.');

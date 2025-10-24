@@ -89,10 +89,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5. Generate Kasplex wallet
   // ---------------------------------------------------------------
   generateWalletBtn.addEventListener('click', () => {
-    const rpc = rpcUrlInput.value.trim() || 'https://rpc.testnet.kasplex.org';
+    // The default is testnet's chain ID.
     const chain = chainIdInput.value.trim() || '167012';
 
-    signaling = new window.gitchain.KasplexSignalling(rpc, chain);
+    signaling = new window.gitchain.KasplexSignalling(chain);
     const { mnemonic, address } = signaling.generateWallet();
 
     mnemonicDisplay.textContent   = mnemonic;

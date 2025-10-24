@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const peerIdDisplay = document.getElementById("peerId");
   const messageInput = document.getElementById("message");
   const sendButton = document.getElementById("send");
-  const rpcUrlInput = document.getElementById("rpcUrl");
+  document.getElementById("rpcUrl");
   const chainIdInput = document.getElementById("chainId");
   const generateWalletBtn = document.getElementById("generateWallet");
   const walletInfoDiv = document.getElementById("walletInfo");
@@ -59,9 +59,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
   generateWalletBtn.addEventListener("click", () => {
-    const rpc = rpcUrlInput.value.trim() || "https://rpc.testnet.kasplex.org";
     const chain = chainIdInput.value.trim() || "167012";
-    signaling = new window.gitchain.KasplexSignalling(rpc, chain);
+    signaling = new window.gitchain.KasplexSignalling(chain);
     const { mnemonic, address } = signaling.generateWallet();
     mnemonicDisplay.textContent = mnemonic;
     kasplexAddress.textContent = address;
