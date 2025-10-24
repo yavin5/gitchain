@@ -39,11 +39,10 @@
 
   <!-- New Kasplex Signaling Section -->
   <div class="kasplex-section">
-    <h2>Kasplex Signaling Setup</h2>
-    <label>Chain ID: <input type="text" id="chainId" value="167012"></label><br>
-    <button id="generateWallet">Generate Kasplex Wallet</button>
+    <h2>Kasplex Relay</h2>
+    <label>Chain ID: <input type="text" id="chainId" value="167012"></label> <button id="generateWallet">Generate Wallet</button>
     <div id="walletInfo" class="hidden">
-      <p><strong>Warning: Save this mnemonic securely—do not share!</strong> <span class="warning">Loss means lost funds.</span></p>
+      <p><strong>Warning: Save these seed words ONLY on paper, not share!</strong> <span class="warning">Loss means lost funds on mainnet.</span></p>
       <p class="mnemonic" id="mnemonic"></p>
       <p><strong>Address:</strong> <span id="kasplexAddress"></span></p>
       <a href="https://app.kaspafinance.io/faucets" target="_blank">Get tKAS from Faucet (paste address, claim once)</a><br>
