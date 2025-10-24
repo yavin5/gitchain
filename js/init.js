@@ -1,24 +1,7 @@
-try {
-    // Expose functions to global scope for main.js
-    window.saveGithubAccessToken = saveGithubAccessToken;
-    window.viewChain = viewChain;
-    window.processTxns = processTxns;
-    window.fetchState = fetchState;
-    console.log('Window assignments completed:', {
-        windowSaveGithubAccessToken: window.saveGithubAccessToken,
-        windowViewChain: window.viewChain,
-        windowProcessTxns: window.processTxns,
-        windowFetchState: window.fetchState
-    });
-    // Dispatch custom event to signal main.js
-    window.dispatchEvent(new Event('gitchain:init'));
-} catch (error) {
-    console.error('Error setting global functions:', error);
-}
-// Verify assignments after try-catch
-console.log('Final window assignments:', {
-    windowSaveGithubAccessToken: window.saveGithubAccessToken,
-    windowViewChain: window.viewChain,
-    windowProcessTxns: window.processTxns,
-    windowFetchState: window.fetchState
-});
+import { saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P, submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection } from './chain.ts';
+
+window.gitchain = {
+  saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P,
+  submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection
+};
+document.dispatchEvent(new CustomEvent('gitchain:init'));

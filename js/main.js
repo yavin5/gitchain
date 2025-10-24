@@ -1,145 +1,99 @@
-import { i as initP2P, g as getLibp2p, f as fetchState, s as saveGithubAccessToken, p as processTxns, v as viewChain, a as getServerPeers } from "./bundle.js";
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOMContentLoaded triggered");
-  try {
-    const isServer = localStorage.getItem("gitchain_github_access_token") !== null;
-    console.log("isServer:", isServer);
-    await initP2P(isServer);
-    const libp2p = getLibp2p();
-    if (!libp2p) {
-      console.error("libp2p initialization failed");
-      document.getElementById("token-message").textContent = "Error: Failed to initialize P2P network";
+document.addEventListener("gitchain:init", () => {
+  const patInput = document.getElementById("patInput");
+  const savePatButton = document.getElementById("savePat");
+  const processTxnsButton = document.getElementById("processTxns");
+  const viewChainButton = document.getElementById("viewChain");
+  const tokenMessage = document.getElementById("tokenMessage");
+  const blockHeight = document.getElementById("blockHeight");
+  const peerIdDisplay = document.getElementById("peerId");
+  const messageInput = document.getElementById("message");
+  const sendButton = document.getElementById("send");
+  const rpcUrlInput = document.getElementById("rpcUrl");
+  const chainIdInput = document.getElementById("chainId");
+  const generateWalletButton = document.getElementById("generateWallet");
+  const walletInfoDiv = document.getElementById("walletInfo");
+  const mnemonicDisplay = document.getElementById("mnemonic");
+  const kasplexAddressDisplay = document.getElementById("kasplexAddress");
+  const connectPeersButton = document.getElementById("connectPeers");
+  const chatDiv = document.getElementById("chat");
+  let signaling = null;
+  let localPeerId = "";
+  let connections = /* @__PURE__ */ new Map();
+  if (window.gitchain && window.gitchain.initP2P) {
+    window.gitchain.initP2P().then((peerId) => {
+      localPeerId = peerId;
+      peerIdDisplay.textContent = `Your Peer ID: ${peerId.slice(-8)}`;
+    });
+  }
+  if (window.gitchain && window.gitchain.fetchState) {
+    window.gitchain.fetchState().then((state) => {
+      if (state && state.blocks) {
+        blockHeight.textContent = `Block Height: ${state.blocks.length}`;
+      }
+    });
+  }
+  if (localStorage.getItem("github_pat")) {
+    tokenMessage.textContent = "GitHub Personal Access Token saved.";
+    processTxnsButton.classList.remove("hidden");
+  } else {
+    processTxnsButton.classList.add("hidden");
+  }
+  savePatButton.addEventListener("click", () => {
+    const token = patInput.value.trim();
+    if (token && window.gitchain && window.gitchain.saveGithubAccessToken) {
+      window.gitchain.saveGithubAccessToken(token).then(() => {
+        tokenMessage.textContent = "GitHub Personal Access Token saved.";
+        processTxnsButton.classList.remove("hidden");
+      }).catch((err) => {
+        tokenMessage.textContent = "Error saving token: " + err.message;
+      });
+    }
+  });
+  processTxnsButton.addEventListener("click", () => {
+    if (window.gitchain && window.gitchain.processTxns) {
+      window.gitchain.processTxns();
+    }
+  });
+  viewChainButton.addEventListener("click", () => {
+    if (window.gitchain && window.gitchain.viewChain) {
+      window.gitchain.viewChain();
+    }
+  });
+  generateWalletButton.addEventListener("click", () => {
+    if (window.gitchain && window.gitchain.KasplexSignalling) {
+      signaling = new window.gitchain.KasplexSignalling(rpcUrlInput.value, chainIdInput.value);
+      const wallet = signaling.generateWallet();
+      mnemonicDisplay.textContent = wallet.mnemonic;
+      kasplexAddressDisplay.textContent = wallet.address;
+      walletInfoDiv.classList.remove("hidden");
+      console.log("Kasplex wallet generated:", wallet);
+    }
+  });
+  connectPeersButton.addEventListener("click", async () => {
+    if (!signaling || !signaling.wallet) {
+      alert("Generate wallet first and fund it with tKAS.");
       return;
     }
-    const peerIdDisplay = document.getElementById("peer-id");
-    const messageInput = document.getElementById("message-input");
-    const sendButton = document.getElementById("send-message");
-    const messagesDiv = document.getElementById("messages");
-    const processTxnsButton = document.getElementById("process-txns");
-    const blockHeightDiv = document.getElementById("block-height");
-    const saveTokenButton = document.getElementById("save-token");
-    const tokenMessage = document.getElementById("token-message");
-    if (libp2p && libp2p.peerId) {
-      const shortPeerId = libp2p.peerId.toString().slice(-8);
-      peerIdDisplay.textContent = shortPeerId;
-      console.log("Peer ID displayed:", shortPeerId);
-    } else {
-      console.error("Failed to display peer ID: libp2p or peerId not available");
-      peerIdDisplay.textContent = "Error: Peer ID unavailable";
+    await signaling.connect();
+    const peers = window.gitchain.getServerPeers();
+    for (const peerId of peers) {
+      if (peerId !== localPeerId && !connections.has(peerId)) {
+        const conn = new window.gitchain.WebRTCConnection(signaling, localPeerId, peerId);
+        connections.set(peerId, conn);
+        console.log(`Initiated WebRTC connection to ${peerId.slice(-8)}`);
+      }
     }
-    const stateData = await fetchState();
-    if (stateData) {
-      blockHeightDiv.textContent = `Block Height: ${stateData.content.chain.length}`;
-      console.log("Block height set:", stateData.content.chain.length);
-    } else {
-      console.error("Failed to fetch state");
-      blockHeightDiv.textContent = "Error: Failed to fetch state";
+  });
+  sendButton.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    if (message) {
+      connections.forEach((conn) => conn.send(message));
+      const localMsg = document.createElement("div");
+      localMsg.textContent = `${localPeerId.slice(-8)}: ${message}`;
+      chatDiv.appendChild(localMsg);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+      messageInput.value = "";
     }
-    processTxnsButton.classList.toggle("hidden", !isServer);
-    console.log("Process Transactions button visibility:", !processTxnsButton.classList.contains("hidden"));
-    if (libp2p && libp2p.services.pubsub) {
-      try {
-        await libp2p.services.pubsub.subscribe("gitchain-chat");
-        console.log("Subscribed to gitchain-chat");
-        libp2p.services.pubsub.addEventListener("message", (evt) => {
-          if (evt.detail.topic === "gitchain-chat") {
-            const message = new TextDecoder().decode(evt.detail.data);
-            const senderId = evt.detail.from.toString().slice(-8);
-            const messageElement = document.createElement("p");
-            messageElement.textContent = `${senderId}: ${message}`;
-            messagesDiv.appendChild(messageElement);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            console.log("Received message:", { senderId, message });
-          }
-        });
-      } catch (error) {
-        console.error("Failed to subscribe to gitchain-chat:", error);
-        messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Failed to subscribe to chat";
-      }
-    } else {
-      console.error("Pubsub service not available");
-      messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Pubsub unavailable";
-    }
-    sendButton.addEventListener("click", async () => {
-      console.log("Send button clicked");
-      const message = messageInput.value.trim();
-      if (message && libp2p && libp2p.services.pubsub) {
-        try {
-          await libp2p.services.pubsub.publish("gitchain-chat", new TextEncoder().encode(message));
-          console.log("Published message:", message);
-          const shortPeerId = libp2p.peerId.toString().slice(-8);
-          const messageElement = document.createElement("p");
-          messageElement.textContent = `${shortPeerId}: ${message}`;
-          messagesDiv.appendChild(messageElement);
-          messagesDiv.scrollTop = messagesDiv.scrollHeight;
-          messageInput.value = "";
-        } catch (error) {
-          console.error("Failed to publish message:", error);
-          messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Failed to send message";
-        }
-      } else {
-        console.error("Cannot send message: libp2p or pubsub not available or empty message");
-        messagesDiv.appendChild(document.createElement("p")).textContent = "Error: Cannot send message";
-      }
-    });
-    saveTokenButton.addEventListener("click", async () => {
-      console.log("Save token button clicked");
-      try {
-        saveGithubAccessToken();
-        tokenMessage.textContent = "Token saved successfully";
-        console.log("Token saved, re-initializing P2P as host");
-        await initP2P(true);
-        const newLibp2p = getLibp2p();
-        if (newLibp2p && newLibp2p.peerId) {
-          const shortPeerId = newLibp2p.peerId.toString().slice(-8);
-          peerIdDisplay.textContent = shortPeerId;
-          console.log("Peer ID updated after PAT save:", shortPeerId);
-        } else {
-          console.error("Failed to update peer ID after PAT save");
-          peerIdDisplay.textContent = "Error: Peer ID unavailable";
-        }
-        processTxnsButton.classList.remove("hidden");
-        console.log("Process Transactions button shown after PAT save");
-      } catch (error) {
-        console.error("Failed to save PAT:", error);
-        tokenMessage.textContent = "Error: Failed to save token";
-      }
-    });
-    processTxnsButton.addEventListener("click", async () => {
-      console.log("Process Transactions button clicked");
-      try {
-        document.getElementById("processing-message").classList.add("visible");
-        await processTxns();
-        document.getElementById("processing-message").classList.remove("visible");
-        const updatedState = await fetchState();
-        if (updatedState) {
-          blockHeightDiv.textContent = `Block Height: ${updatedState.content.chain.length}`;
-          console.log("Block height updated:", updatedState.content.chain.length);
-        } else {
-          console.error("Failed to fetch updated state");
-          blockHeightDiv.textContent = "Error: Failed to fetch state";
-        }
-      } catch (error) {
-        console.error("Failed to process transactions:", error);
-        document.getElementById("processing-message").textContent = "Error: Failed to process transactions";
-      }
-    });
-    document.getElementById("view-chain").addEventListener("click", async () => {
-      console.log("View Chain button clicked");
-      try {
-        await viewChain();
-      } catch (error) {
-        console.error("Failed to view chain:", error);
-        document.getElementById("output").textContent = "Error: Failed to view chain";
-      }
-    });
-    if (!isServer) {
-      const peers = getServerPeers();
-      console.log("Active server peers:", peers);
-    }
-  } catch (error) {
-    console.error("Error in DOMContentLoaded:", error);
-    document.getElementById("token-message").textContent = "Error: Failed to initialize UI";
-  }
+  });
 });
 //# sourceMappingURL=main.js.map
