@@ -1,7 +1,10 @@
 // ---------------------------------------------------------------
 // Wait for the custom init event that bundle.js dispatches
 // ---------------------------------------------------------------
-document.addEventListener('gitchain:init', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Wait a tick for bundle.js to run and set window.gitchain
+  await new Promise(r => setTimeout(r, 0));
+
   // ---- DOM elements -------------------------------------------------
   const patInput          = document.getElementById('patInput');
   const savePatButton     = document.getElementById('savePat');

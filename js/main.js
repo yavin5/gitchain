@@ -1,4 +1,5 @@
-document.addEventListener("gitchain:init", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await new Promise((r) => setTimeout(r, 0));
   const patInput = document.getElementById("patInput");
   const savePatButton = document.getElementById("savePat");
   const processTxnsButton = document.getElementById("processTxns");
