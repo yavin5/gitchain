@@ -25,22 +25,21 @@
 </head>
 <body>
   <h1>Gitchain</h1>
-  <div id="tokenMessage"></div>
-  <div id="blockHeight" class="spacer"></div>
-  <div id="peerId" class="spacer"></div>
 
   <!-- Existing GitHub PAT Section -->
   <div>
     <input type="text" id="patInput" placeholder="Enter GitHub Personal Access Token">
     <button id="savePat">Save Personal Access Token</button>
   </div>
+  <div id="tokenMessage"></div>
   <button id="processTxns" class="hidden">Process Transactions</button>
   <button id="viewChain">View Chain</button>
+  <div id="blockHeight" class="spacer"></div>
+  <div id="peerId" class="spacer"></div>
 
   <!-- New Kasplex Signaling Section -->
   <div class="kasplex-section">
     <h2>Kasplex Signaling Setup</h2>
-    <label>RPC URL: <input type="url" id="rpcUrl" value="https://rpc.testnet.kasplex.org"></label><br>
     <label>Chain ID: <input type="text" id="chainId" value="167012"></label><br>
     <button id="generateWallet">Generate Kasplex Wallet</button>
     <div id="walletInfo" class="hidden">

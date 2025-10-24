@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const peerIdDisplay = document.getElementById("peerId");
   const messageInput = document.getElementById("message");
   const sendButton = document.getElementById("send");
-  document.getElementById("rpcUrl");
   const chainIdInput = document.getElementById("chainId");
   const generateWalletBtn = document.getElementById("generateWallet");
   const walletInfoDiv = document.getElementById("walletInfo");
