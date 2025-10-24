@@ -1,27 +1,34 @@
+// ---------------------------------------------------------------
+// Wait for the custom init event that bundle.js dispatches
+// ---------------------------------------------------------------
 document.addEventListener('gitchain:init', () => {
-  const patInput = document.getElementById('patInput');
-  const savePatButton = document.getElementById('savePat');
+  // ---- DOM elements -------------------------------------------------
+  const patInput          = document.getElementById('patInput');
+  const savePatButton     = document.getElementById('savePat');
   const processTxnsButton = document.getElementById('processTxns');
-  const viewChainButton = document.getElementById('viewChain');
-  const tokenMessage = document.getElementById('tokenMessage');
-  const blockHeight = document.getElementById('blockHeight');
-  const peerIdDisplay = document.getElementById('peerId');
-  const messageInput = document.getElementById('message');
-  const sendButton = document.getElementById('send');
+  const viewChainButton   = document.getElementById('viewChain');
+  const tokenMessage      = document.getElementById('tokenMessage');
+  const blockHeight       = document.getElementById('blockHeight');
+  const peerIdDisplay     = document.getElementById('peerId');
+  const messageInput      = document.getElementById('message');
+  const sendButton        = document.getElementById('send');
 
-  const rpcUrlInput = document.getElementById('rpcUrl');
-  const chainIdInput = document.getElementById('chainId');
-  const generateWalletButton = document.getElementById('generateWallet');
-  const walletInfoDiv = document.getElementById('walletInfo');
-  const mnemonicDisplay = document.getElementById('mnemonic');
-  const kasplexAddressDisplay = document.getElementById('kasplexAddress');
-  const connectPeersButton = document.getElementById('connectPeers');
-  const chatDiv = document.getElementById('chat');
+  const rpcUrlInput       = document.getElementById('rpcUrl');
+  const chainIdInput      = document.getElementById('chainId');
+  const generateWalletBtn = document.getElementById('generateWallet');
+  const walletInfoDiv     = document.getElementById('walletInfo');
+  const mnemonicDisplay   = document.getElementById('mnemonic');
+  const kasplexAddress    = document.getElementById('kasplexAddress');
+  const connectPeersBtn   = document.getElementById('connectPeers');
+  const chatDiv           = document.getElementById('chat');
 
-  let signaling = null;
+  let signaling   = null;
   let localPeerId = '';
-  let connections = new Map();
+  const connections = new Map();
 
+  // ---------------------------------------------------------------
+  // 1. P2P init – shows Peer ID
+  // ---------------------------------------------------------------
   if (window.gitchain && window.gitchain.initP2P) {
     window.gitchain.initP2P().then(peerId => {
       localPeerId = peerId;
@@ -29,15 +36,23 @@ document.addEventListener('gitchain:init', () => {
     });
   }
 
+  // ---------------------------------------------------------------
+  // 2. Show current block height
+  // ---------------------------------------------------------------
   if (window.gitchain && window.gitchain.fetchState) {
     window.gitchain.fetchState().then(state => {
-      if (state && state.blocks) {
-        blockHeight.textContent = `Block Height: ${state.blocks.length}`;
+      if (state && state.content && state.content.chain) {
+        blockHeight.textContent = `Block Height: ${state.content.chain.length}`;
+      } else {
+        blockHeight.textContent = `Block Height: 0`;
       }
     });
   }
 
-  if (localStorage.getItem('github_pat')) {
+  // ---------------------------------------------------------------
+  // 3. PAT handling
+  // ---------------------------------------------------------------
+  if (localStorage.getItem('gitchain_github_access_token')) {
     tokenMessage.textContent = 'GitHub Personal Access Token saved.';
     processTxnsButton.classList.remove('hidden');
   } else {
@@ -56,36 +71,42 @@ document.addEventListener('gitchain:init', () => {
     }
   });
 
+  // ---------------------------------------------------------------
+  // 4. Process / View chain
+  // ---------------------------------------------------------------
   processTxnsButton.addEventListener('click', () => {
-    if (window.gitchain && window.gitchain.processTxns) {
-      window.gitchain.processTxns();
-    }
+    if (window.gitchain && window.gitchain.processTxns) window.gitchain.processTxns();
   });
 
   viewChainButton.addEventListener('click', () => {
-    if (window.gitchain && window.gitchain.viewChain) {
-      window.gitchain.viewChain();
-    }
+    if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
 
-  generateWalletButton.addEventListener('click', () => {
-    if (window.gitchain && window.gitchain.KasplexSignalling) {
-      signaling = new window.gitchain.KasplexSignalling(rpcUrlInput.value, chainIdInput.value);
-      const wallet = signaling.generateWallet();
-      mnemonicDisplay.textContent = wallet.mnemonic;
-      kasplexAddressDisplay.textContent = wallet.address;
-      walletInfoDiv.classList.remove('hidden');
-      console.log('Kasplex wallet generated:', wallet);
-    }
+  // ---------------------------------------------------------------
+  // 5. Generate Kasplex wallet
+  // ---------------------------------------------------------------
+  generateWalletBtn.addEventListener('click', () => {
+    const rpc = rpcUrlInput.value.trim() || 'https://rpc.testnet.kasplex.org';
+    const chain = chainIdInput.value.trim() || '167012';
+
+    signaling = new window.gitchain.KasplexSignalling(rpc, chain);
+    const { mnemonic, address } = signaling.generateWallet();
+
+    mnemonicDisplay.textContent   = mnemonic;
+    kasplexAddress.textContent    = address;
+    walletInfoDiv.classList.remove('hidden');
+
+    console.log('Kasplex wallet generated:', { mnemonic, address });
   });
 
-  connectPeersButton.addEventListener('click', async () => {
-    if (!signaling || !signaling.wallet) {
-      alert('Generate wallet first and fund it with tKAS.');
-      return;
-    }
+  // ---------------------------------------------------------------
+  // 6. Connect to peers (after funding)
+  // ---------------------------------------------------------------
+  connectPeersBtn.addEventListener('click', async () => {
+    if (!signaling) return alert('Generate a wallet first.');
     await signaling.connect();
-    const peers = window.gitchain.getServerPeers();
+
+    const peers = window.gitchain.getServerPeers() || [];
     for (const peerId of peers) {
       if (peerId !== localPeerId && !connections.has(peerId)) {
         const conn = new window.gitchain.WebRTCConnection(signaling, localPeerId, peerId);
@@ -95,15 +116,19 @@ document.addEventListener('gitchain:init', () => {
     }
   });
 
+  // ---------------------------------------------------------------
+  // 7. Chat send
+  // ---------------------------------------------------------------
   sendButton.addEventListener('click', () => {
-    const message = messageInput.value.trim();
-    if (message) {
-      connections.forEach(conn => conn.send(message));
-      const localMsg = document.createElement('div');
-      localMsg.textContent = `${localPeerId.slice(-8)}: ${message}`;
-      chatDiv.appendChild(localMsg);
-      chatDiv.scrollTop = chatDiv.scrollHeight;
-      messageInput.value = '';
-    }
+    const msg = messageInput.value.trim();
+    if (!msg) return;
+
+    connections.forEach(conn => conn.send(msg));
+
+    const el = document.createElement('div');
+    el.textContent = `${localPeerId.slice(-8)}: ${msg}`;
+    chatDiv.appendChild(el);
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+    messageInput.value = '';
   });
 });
