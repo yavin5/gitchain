@@ -63,6 +63,13 @@
     import { ec } from 'https://esm.sh/elliptic@6.6.1';
     window.ec = ec;
   </script>
+  <script type="module">
+    import * as wasm from './kaspa-web/kaspa-web-wasm.js';
+    (async () => {
+        await wasm.default('./kaspa-web/kaspa-web-wasm_bg.wasm');
+        console.log(wasm.version());
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
 
   <!-- Our code – **bundle.js is the Vite output** -->
