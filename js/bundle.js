@@ -59886,7 +59886,7 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    this.mnemonic = Wallet2.generateMnemonic(12);
+    this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
     this.wallet = Wallet2.fromMnemonic(this.mnemonic);

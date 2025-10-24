@@ -34,7 +34,7 @@ import { keccak256 as keccak256Buffer } from 'js-sha3';
 import { concat as uint8Concat } from 'uint8arrays';
 
 // Kasplex SDK
-import { Wallet, Rpc, Wasm, Kiwi } from '@kasplex/kiwi-web';
+import { Wallet, Mnemonic, Rpc, Wasm, Kiwi } from '@kasplex/kiwi-web';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -74,7 +74,7 @@ export class KasplexSignalling {
 
   generateWallet() {
     // @ts-ignore
-    this.mnemonic = Wallet.generateMnemonic(12);
+    this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
     this.wallet = Wallet.fromMnemonic(this.mnemonic);
     this.address = this.wallet.getAddress().toString();
