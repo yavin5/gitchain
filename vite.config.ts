@@ -22,6 +22,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      // Keep all your libp2p aliases
       'libp2p': 'libp2p',
       '@libp2p/webrtc': '@libp2p/webrtc',
       '@libp2p/websockets': '@libp2p/websockets',
@@ -32,8 +33,12 @@ export default defineConfig({
       '@chainsafe/libp2p-noise': '@chainsafe/libp2p-noise',
       '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
       '@libp2p/identify': '@libp2p/identify',
+      '@kasplex/kiwi-web': '@kasplex/kiwi-web',
       '@multiformats/multiaddr': '@multiformats/multiaddr',
-      'uint8arrays': 'uint8arrays'
+      'uint8arrays': 'uint8arrays',
+      'crypto-js': 'crypto-js',
+      'elliptic': 'elliptic',
+      'js-sha3': 'js-sha3'
     }
   },
   build: {
@@ -41,6 +46,7 @@ export default defineConfig({
     outDir: 'js',
     minify: false,
     sourcemap: true,
+    target: 'es2022',
     rollupOptions: {
       input: {
         bundle: resolve(__dirname, 'src/chain.ts'),
@@ -62,8 +68,12 @@ export default defineConfig({
           '@chainsafe/libp2p-noise': 'noise',
           '@chainsafe/libp2p-yamux': 'yamux',
           '@libp2p/identify': 'identify',
+          '@kasplex/kiwi-web': 'kiwi-web',
           '@multiformats/multiaddr': 'multiaddr',
-          'uint8arrays': 'uint8arrays'
+          'uint8arrays': 'uint8arrays',
+          'crypto-js': 'CryptoJS',
+          'elliptic': 'elliptic',
+          'js-sha3': 'sha3'
         }
       }
     }
@@ -80,8 +90,12 @@ export default defineConfig({
       '@chainsafe/libp2p-noise',
       '@chainsafe/libp2p-yamux',
       '@libp2p/identify',
+      '@kasplex/kiwi-web',
       '@multiformats/multiaddr',
-      'uint8arrays'
+      'uint8arrays',
+      'crypto-js',
+      'elliptic',
+      'js-sha3'
     ]
   }
 });

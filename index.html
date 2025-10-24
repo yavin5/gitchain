@@ -4,24 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gitchain</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com wss://*.webrtc.yavin5.github.io;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .spacer { margin-bottom: 1rem; }
+    .hidden { display: none; }
+    #message { width: 80%; height: 50px; }
+    #chat { border: 1px solid #ccc; height: 200px; overflow-y: auto; margin-top: 1rem; }
+    .kasplex-section { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; }
+    .mnemonic { font-family: monospace; background: #f5f5f5; padding: 0.5rem; word-break: break-all; }
+    .warning { color: red; font-size: 0.8rem; }
+  </style>
 </head>
 <body>
   <h1>Gitchain</h1>
-  <input type="text" id="github-token" placeholder="Enter GitHub PAT">
-  <button id="save-token">Save Personal Access Token</button>
-  <div id="token-message"></div>
-  <button id="process-txns" class="hidden">Process Transactions</button>
-  <div id="processing-message"></div>
-  <button id="view-chain">View Chain</button>
-  <div id="output"></div>
-  <div id="block-height"></div>
-  <div id="peer-id-display"><b>Your peer ID is: <span id="peer-id"></span></b></div>
-  <textarea id="message-input" placeholder="Type your message here..."></textarea>
-  <button id="send-message">Send</button>
-  <div id="messages" class="message-box"></div>
-  <script type="module" src="js/bundle.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <div id="tokenMessage"></div>
+  <div id="blockHeight" class="spacer"></div>
+  <div id="peerId" class="spacer"></div>
+
+  <!-- Existing GitHub PAT Section -->
+  <div>
+    <input type="text" id="patInput" placeholder="Enter GitHub Personal Access Token">
+    <button id="savePat">Save Personal Access Token</button>
+  </div>
+  <button id="processTxns" class="hidden">Process Transactions</button>
+  <button id="viewChain">View Chain</button>
+
+  <!-- New Kasplex Signaling Section -->
+  <div class="kasplex-section">
+    <h2>Kasplex Signaling Setup</h2>
+    <label>RPC URL: <input type="url" id="rpcUrl" value="https://rpc.testnet.kasplex.org"></label><br>
+    <label>Chain ID: <input type="text" id="chainId" value="167012"></label><br>
+    <button id="generateWallet">Generate Kasplex Wallet</button>
+    <div id="walletInfo" class="hidden">
+      <p><strong>Warning: Save this mnemonic securely—do not share!</strong> <span class="warning">Loss means lost funds.</span></p>
+      <p class="mnemonic" id="mnemonic"></p>
+      <p><strong>Address:</strong> <span id="kasplexAddress"></span></p>
+      <a href="https://app.kaspafinance.io/faucets" target="_blank">Get tKAS from Faucet (paste address, claim once)</a><br>
+      <button id="connectPeers">Funded? Connect to Peers</button>
+    </div>
+  </div>
+
+  <!-- Chat Section -->
+  <div>
+    <textarea id="message" placeholder="Type your message..."></textarea>
+    <button id="send">Send</button>
+  </div>
+  <div id="chat"></div>
+  <div id="output" class="hidden"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
+  <script type="module" src="/js/init.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
