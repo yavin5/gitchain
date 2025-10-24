@@ -64,10 +64,10 @@
     window.ec = ec;
   </script>
   <script type="module">
-    import * as wasm from './kaspa-web/kaspa-web-wasm.js';
+    import * as kaspa from './kaspa-web/dist/wasm/kaspa.js';
     (async () => {
-        await wasm.default('./kaspa-web/kaspa-web-wasm_bg.wasm');
-        console.log(wasm.version());
+        await kaspa.default('./kaspa-web/dist/kaspa_bg.wasm');
+        console.log(kaspa.version());
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
