@@ -73,7 +73,8 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    this.mnemonic = (Wallet as any).generateMnemonic(12);
+    // @ts-ignore
+    this.mnemonic = Wallet.generateMnemonic(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
     this.wallet = Wallet.fromMnemonic(this.mnemonic);
     this.address = this.wallet.getAddress().toString();
