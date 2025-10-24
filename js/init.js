@@ -1,4 +1,4 @@
-import { saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P, submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection } from './chain.ts';
+import { saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P, submitTransaction, getServerPeers, createOriginalBlock, KasplexSignalling, WebRTCConnection } from 'chain.ts';
 
 window.gitchain = {
   saveGithubAccessToken, viewChain, processTxns, fetchState, updateState, initP2P,
