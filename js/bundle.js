@@ -60361,7 +60361,7 @@ async function connectAndSendTx(tx) {
 }
 function saveGithubAccessToken() {
   console.log("Entering saveGithubAccessToken");
-  const githubAccessToken = document.getElementById("github-token")?.value;
+  const githubAccessToken = document.getElementById("patInput")?.value;
   if (githubAccessToken) {
     localStorage.setItem(GITHUB_ACCESS_TOKEN_KEY, githubAccessToken);
     console.log("PAT saved, initializing P2P as host");
