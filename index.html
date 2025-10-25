@@ -64,7 +64,7 @@
     window.ec = ec;
   </script>
   <script type="module">
-    import { kaspa } from '../@kasplex/kiwi-web/dist/wasm/kaspa.js';
+    import { kaspa } from './kiwi-web/dist/wasm/kaspa.js';
     (async () => {
         await kaspa.default('./kiwi-web/dist/kaspa_bg.wasm');
         console.log(kaspa.version());
