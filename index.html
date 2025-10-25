@@ -64,7 +64,7 @@
     window.ec = ec;
   </script>
   <script type="module">
-    import * as kaspa from './kaspa-web/dist/wasm/kaspa.js';
+    import { kaspa } from '@kasplex/kaspa-web/dist/wasm/kaspa.js';
     (async () => {
         await kaspa.default('js/kaspa_bg.wasm');
         console.log(kaspa.version());
