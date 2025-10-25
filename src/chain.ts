@@ -73,7 +73,7 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    Wasm.initSync(new BigInt64Array());
+    Wasm.initSync(new ArrayBuffer());
     Kiwi.setNetwork(Wasm.NetworkType.Testnet);
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
