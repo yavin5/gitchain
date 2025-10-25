@@ -68,7 +68,6 @@
     (async () => {
         await Wasm.default('https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm');
         //await kaspa.default('./kiwi-web/dist/kaspa_bg.wasm');
-	await Wasm.initialize('');
         console.log(Wasm.version());
     })();
   </script>
