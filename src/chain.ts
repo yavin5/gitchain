@@ -73,11 +73,10 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    Wasm.default('https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm');
     // @ts-ignore
-    this.mnemonic = Mnemonic.random(12);
+    this.mnemonic = window.Wasm.Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
-    this.wallet = Wallet.fromMnemonic(this.mnemonic);
+    this.wallet = window.Wasm.Wallet.fromMnemonic(this.mnemonic);
     this.address = this.wallet.getAddress().toString();
     return { mnemonic: this.mnemonic, address: this.address };
   }
