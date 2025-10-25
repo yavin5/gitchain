@@ -73,7 +73,7 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    Wasm.initSync();
+    Wasm.initSync(this);
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
