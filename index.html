@@ -64,9 +64,9 @@
     window.ec = ec;
   </script>
   <script type="module">
-    import * as kaspa from './kaspa-web/dist/wasm/kaspa.js';
+    import * as kaspa from 'kaspa-web/dist/wasm/kaspa.js';
     (async () => {
-        await kaspa.default('./kaspa-web/dist/kaspa_bg.wasm');
+        await kaspa.default('js/kaspa_bg.wasm');
         console.log(kaspa.version());
     })();
   </script>
