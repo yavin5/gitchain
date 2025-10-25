@@ -66,7 +66,7 @@
   <script type="module">
     import { kaspa } from 'kiwi-web/dist/wasm/kaspa.js';
     (async () => {
-        await kaspa.default('js/kaspa_bg.wasm');
+        await kaspa.default('kiwi-web/dist/kaspa_bg.wasm');
         console.log(kaspa.version());
     })();
   </script>
