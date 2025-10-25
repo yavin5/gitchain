@@ -73,10 +73,11 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
+    Kiwi.setNetwork(Wasm.NetworkType.Testnet);
     // @ts-ignore
-    this.mnemonic = window.Wasm.Mnemonic.random(12);
+    this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
-    this.wallet = window.Wasm.Wallet.fromMnemonic(this.mnemonic);
+    this.wallet = Wallet.fromMnemonic(this.mnemonic);
     this.address = this.wallet.getAddress().toString();
     return { mnemonic: this.mnemonic, address: this.address };
   }

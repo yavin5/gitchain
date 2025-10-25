@@ -14011,9 +14011,9 @@ var Peer$2;
   };
 })(Peer$2 || (Peer$2 = {}));
 var Address$1;
-(function(Address2) {
+(function(Address3) {
   let _codec;
-  Address2.codec = () => {
+  Address3.codec = () => {
     if (_codec == null) {
       _codec = message((obj, w, opts = {}) => {
         if (opts.lengthDelimited !== false) {
@@ -14065,11 +14065,11 @@ var Address$1;
     }
     return _codec;
   };
-  Address2.encode = (obj) => {
-    return encodeMessage(obj, Address2.codec());
+  Address3.encode = (obj) => {
+    return encodeMessage(obj, Address3.codec());
   };
-  Address2.decode = (buf, opts) => {
-    return decodeMessage(buf, Address2.codec(), opts);
+  Address3.decode = (buf, opts) => {
+    return decodeMessage(buf, Address3.codec(), opts);
   };
 })(Address$1 || (Address$1 = {}));
 var Tag;
@@ -59090,6 +59090,21 @@ async function __wbg_init(module_or_path) {
   return __wbg_finalize_init(instance, module);
 }
 var kaspa_default = __wbg_init;
+class Mnemonic2 {
+  static random(length3) {
+    if (length3 !== 12 && length3 !== 24) {
+      throw new Error("Invalid length for mnemonic");
+    }
+    let mnemonic = exports_kaspa.Mnemonic.random(length3);
+    return mnemonic.phrase;
+  }
+  static validate(mnemonic) {
+    return exports_kaspa.Mnemonic.validate(mnemonic);
+  }
+  static toSeed(mnemonic, password = "") {
+    return new exports_kaspa.Mnemonic(mnemonic).toSeed(password);
+  }
+}
 var exports_enum = {};
 __export(exports_enum, {
   WalletType: () => WalletType,
@@ -59243,7 +59258,301 @@ function networkToAddressPrefix(network) {
       throw new Error(`Unknown network: ${network}`);
   }
 }
-"qpzry9x8gf2tvdw0s3jn54khce6mua7l".split("").map((c2) => c2.charCodeAt(0));
+class Address2 {
+  static toAddress(network, version2, payload) {
+    let prefix = networkToAddressPrefix(network);
+    return `${prefix}:${Address2.encodePayload(prefix, version2, payload)}`;
+  }
+  static validate(address) {
+    try {
+      const parts = address.split(":");
+      if (parts.length !== 2) {
+        throw new Error("Invalid address format");
+      }
+      let prefix = stringToAddressPrefix(parts[0]);
+      if (prefix == void 0) {
+        throw new Error("Invalid address format");
+      }
+      return this.decodePayload(prefix, parts[1]);
+    } catch (e2) {
+      return false;
+    }
+  }
+  static encodePayload(prefix, version2, payload) {
+    const fiveBitPayload = Address2.conv8to5(new Uint8Array([version2, ...payload]));
+    const fiveBitPrefix = Array.from(prefix).map((c2) => c2.charCodeAt(0) & 31);
+    const checksum = Address2.checksum(fiveBitPayload, fiveBitPrefix);
+    const checksumBytes = new Uint8Array(new BigUint64Array([checksum]).buffer).reverse();
+    const combined = new Uint8Array([...fiveBitPayload, ...Address2.conv8to5(new Uint8Array(checksumBytes.slice(3)))]);
+    const bytes = Array.from(combined).map((c2) => Charset[c2]);
+    return String.fromCharCode(...bytes);
+  }
+  static decodePayload(prefix, address) {
+    const addressU5 = Array.from(address).map((c2) => {
+      const index = c2.charCodeAt(0);
+      if (index >= RevCharset.length) {
+        throw new Error(`Character code ${index} is out of bounds`);
+      }
+      return RevCharset[index];
+    });
+    if (address.length < 8) {
+      throw new Error("Bad payload");
+    }
+    const payloadU5 = new Uint8Array(addressU5.slice(0, address.length - 8));
+    const checksumU5 = new Uint8Array(addressU5.slice(address.length - 8));
+    const fiveBitPrefix = Array.from(prefix).map((c2) => c2.charCodeAt(0) & 31);
+    const checksumBytes = new Uint8Array([0, 0, 0, ...this.conv5to8(new Uint8Array(checksumU5))]);
+    const checksum = new DataView(checksumBytes.buffer).getBigUint64(0, false);
+    if (this.checksum(payloadU5, fiveBitPrefix) !== checksum) {
+      throw new Error("Bad checksum");
+    }
+    const payloadU8 = this.conv5to8(payloadU5);
+    let network = addressPrefixToNetwork(prefix);
+    Address2.toAddress(network, payloadU8[0], payloadU8.slice(1));
+    return true;
+  }
+  static polymod(values) {
+    let c2 = 1n;
+    for (const d2 of values) {
+      const c0 = c2 >> 35n;
+      c2 = (c2 & 0x07ffffffffn) << 5n ^ BigInt(d2);
+      if ((c0 & 0x01n) !== 0n)
+        c2 ^= 0x98f2bc8e61n;
+      if ((c0 & 0x02n) !== 0n)
+        c2 ^= 0x79b76d99e2n;
+      if ((c0 & 0x04n) !== 0n)
+        c2 ^= 0xf33e5fb3c4n;
+      if ((c0 & 0x08n) !== 0n)
+        c2 ^= 0xae2eabe2a8n;
+      if ((c0 & 0x10n) !== 0n)
+        c2 ^= 0x1e4f43e470n;
+    }
+    return c2 ^ 1n;
+  }
+  static checksum(payload, prefix) {
+    return this.polymod(new Uint8Array([...prefix, 0, ...payload, ...new Uint8Array(8)]));
+  }
+  static conv8to5(payload) {
+    const fiveBit = [];
+    let buff = 0, bits = 0;
+    for (const c2 of payload) {
+      buff = buff << 8 | c2;
+      bits += 8;
+      while (bits >= 5) {
+        bits -= 5;
+        fiveBit.push(buff >> bits & 31);
+        buff &= (1 << bits) - 1;
+      }
+    }
+    if (bits > 0) {
+      fiveBit.push(buff << 5 - bits & 31);
+    }
+    return new Uint8Array(fiveBit);
+  }
+  static conv5to8(payload) {
+    const eightBit = [];
+    let buff = 0, bits = 0;
+    for (const c2 of payload) {
+      buff = buff << 5 | c2;
+      bits += 5;
+      while (bits >= 8) {
+        bits -= 8;
+        eightBit.push(buff >> bits & 255);
+        buff &= (1 << bits) - 1;
+      }
+    }
+    return new Uint8Array(eightBit);
+  }
+}
+var Charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l".split("").map((c2) => c2.charCodeAt(0));
+var RevCharset = [
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  15,
+  100,
+  10,
+  17,
+  21,
+  20,
+  26,
+  30,
+  7,
+  5,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  100,
+  29,
+  100,
+  24,
+  13,
+  25,
+  9,
+  8,
+  23,
+  100,
+  18,
+  22,
+  31,
+  27,
+  19,
+  100,
+  1,
+  0,
+  3,
+  16,
+  11,
+  28,
+  12,
+  14,
+  6,
+  4,
+  2
+];
+var DERIVE_PATH = `m/44'/111111'/0'/0/`;
+class Wallet2 {
+  privateKey;
+  walletType;
+  xprv;
+  index;
+  constructor(privateKey, walletType, xprv, index) {
+    this.privateKey = privateKey;
+    this.walletType = walletType;
+    this.xprv = xprv;
+    this.index = index;
+  }
+  static fromMnemonic(mnemonic, password = "") {
+    const seed = Mnemonic2.toSeed(mnemonic, password);
+    const xprv = new exports_kaspa.XPrv(seed);
+    const index = 0;
+    const privateKey = xprv.derivePath(`${DERIVE_PATH}${index}`).toPrivateKey();
+    return new Wallet2(privateKey, 0, xprv, index);
+  }
+  static fromPrivateKey(privateKey) {
+    return new Wallet2(
+      new exports_kaspa.PrivateKey(privateKey),
+      1
+      /* PrivateKey */
+    );
+  }
+  toPrivateKey() {
+    return this.privateKey.toString();
+  }
+  toPublicKey() {
+    return this.privateKey.toPublicKey();
+  }
+  toXOnlyPublicKey() {
+    return this.privateKey.toPublicKey().toXOnlyPublicKey();
+  }
+  toAddress(network) {
+    return this.privateKey.toPublicKey().toAddress(network);
+  }
+  newWallet(index) {
+    if (this.walletType !== 0) {
+      throw new Error("A wallet created from a private key cannot derive new wallets.");
+    }
+    const newIndex = index ?? this.index + 1;
+    const privateKey = this.xprv.derivePath(`${DERIVE_PATH}${newIndex}`).toPrivateKey();
+    return new Wallet2(privateKey, 0, this.xprv, newIndex);
+  }
+  signMessage(message2) {
+    return exports_kaspa.signMessage({
+      message: message2,
+      privateKey: this.privateKey
+    });
+  }
+  verifyMessage(message2, signature2) {
+    return exports_kaspa.verifyMessage({
+      message: message2,
+      signature: signature2,
+      publicKey: this.privateKey.toPublicKey()
+    });
+  }
+  static validate(address) {
+    return Address2.validate(address);
+  }
+}
 class Rpc {
   static instance;
   client;
@@ -59577,10 +59886,11 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    this.mnemonic = window.Wasm.Mnemonic.random(12);
+    Kiwi.setNetwork(exports_kaspa.NetworkType.Testnet);
+    this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
-    this.wallet = window.Wasm.Wallet.fromMnemonic(this.mnemonic);
+    this.wallet = Wallet2.fromMnemonic(this.mnemonic);
     this.address = this.wallet.getAddress().toString();
     return { mnemonic: this.mnemonic, address: this.address };
   }
