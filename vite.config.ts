@@ -22,7 +22,6 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Keep all your libp2p aliases
       'libp2p': 'libp2p',
       '@libp2p/webrtc': '@libp2p/webrtc',
       '@libp2p/websockets': '@libp2p/websockets',
@@ -34,6 +33,7 @@ export default defineConfig({
       '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
       '@libp2p/identify': '@libp2p/identify',
       '@kasplex/kiwi-web': '@kasplex/kiwi-web',
+      'kiwi-web/dist/wasm/kaspa.js': '@kasplex/kiwi-web/dist/wasm/kaspa.js',
       '@multiformats/multiaddr': '@multiformats/multiaddr',
       'uint8arrays': 'uint8arrays',
       'crypto-js': 'crypto-js',
