@@ -33,7 +33,6 @@ export default defineConfig({
       '@chainsafe/libp2p-yamux': '@chainsafe/libp2p-yamux',
       '@libp2p/identify': '@libp2p/identify',
       '@kasplex/kiwi-web': '@kasplex/kiwi-web',
-      '@kasplex/kiwi-web/dist/wasm/kaspa.js': 'kiwi-web/dist/wasm/kaspa.js',
       '@multiformats/multiaddr': '@multiformats/multiaddr',
       'uint8arrays': 'uint8arrays',
       'crypto-js': 'crypto-js',
