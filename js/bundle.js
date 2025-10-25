@@ -59861,7 +59861,7 @@ class Outpoint {
   }
 }
 globalThis.Buffer = Buffer2;
-await exports_kaspa.initWASM32Bindings();
+await exports_kaspa.initSync();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
