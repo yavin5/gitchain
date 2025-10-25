@@ -73,12 +73,13 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    // Ensure WASM is loaded — required for v1.0.15
-    if (!(Wasm as any)._wasm) {
-        // Access any Wasm-bound property to trigger lazy load
-        // This is a known workaround for kiwi-web <=1.0.15
-        void Wasm.NetworkType.Testnet;
-    }
+      // Trigger WASM load via dummy call that requires it
+  try {
+    Wallet.fromPrivateKey(Buffer.from('00'.repeat(32), 'hex').toString());
+    
+  } catch (e) {
+    // Ignore error; we only wanted to trigger WASM init
+  }
 
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);

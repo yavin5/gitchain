@@ -59886,8 +59886,9 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    if (!exports_kaspa._wasm) {
-      void exports_kaspa.NetworkType.Testnet;
+    try {
+      Wallet2.fromPrivateKey(Buffer.from("00".repeat(32), "hex").toString());
+    } catch (e2) {
     }
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
