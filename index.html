@@ -64,11 +64,11 @@
     window.ec = ec;
   </script>
   <script type="module">
-    import { wasm } from 'https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/wasm/kaspa.js';
+    import { Wasm } from 'https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/index.js';
     (async () => {
-        await wasm.default('https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm');
+        await Wasm.default('https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm');
         //await kaspa.default('./kiwi-web/dist/kaspa_bg.wasm');
-        console.log(wasm.version());
+        console.log(Wasm.version());
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
