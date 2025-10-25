@@ -73,8 +73,13 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    Wasm.initSync(new ArrayBuffer());
-    Kiwi.setNetwork(Wasm.NetworkType.Testnet);
+    // Ensure WASM is loaded — required for v1.0.15
+    if (!(Wasm as any)._wasm) {
+        // Access any Wasm-bound property to trigger lazy load
+        // This is a known workaround for kiwi-web <=1.0.15
+        void Wasm.NetworkType.Testnet;
+    }
+
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');
@@ -85,7 +90,7 @@ export class KasplexSignalling {
 
   async connect() {
     Kiwi.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
-    await Rpc.setInstance(Wasm.NetworkType.Testnet).connect()
+    await Rpc.setInstance(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet).connect();
     this.startPolling();
   }
 

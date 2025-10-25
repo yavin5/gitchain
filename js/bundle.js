@@ -59886,8 +59886,9 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    exports_kaspa.initSync(new ArrayBuffer());
-    Kiwi.setNetwork(exports_kaspa.NetworkType.Testnet);
+    if (!exports_kaspa._wasm) {
+      void exports_kaspa.NetworkType.Testnet;
+    }
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
@@ -59897,7 +59898,7 @@ class KasplexSignalling {
   }
   async connect() {
     Kiwi.setNetwork(this.chainId === "167012" ? exports_kaspa.NetworkType.Testnet : exports_kaspa.NetworkType.Mainnet);
-    await Rpc.setInstance(exports_kaspa.NetworkType.Testnet).connect();
+    await Rpc.setInstance(this.chainId === "167012" ? exports_kaspa.NetworkType.Testnet : exports_kaspa.NetworkType.Mainnet).connect();
     this.startPolling();
   }
   async sendMessage(to, type, data) {
