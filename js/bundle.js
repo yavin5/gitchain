@@ -48913,7 +48913,7 @@ __export(exports_kaspa, {
   isScriptPayToPubkeyECDSA: () => isScriptPayToPubkeyECDSA,
   isScriptPayToPubkey: () => isScriptPayToPubkey,
   initWASM32Bindings: () => initWASM32Bindings,
-  initSync: () => initSync$1,
+  initSync: () => initSync,
   initConsolePanicHook: () => initConsolePanicHook,
   initBrowserPanicHook: () => initBrowserPanicHook,
   estimateTransactions: () => estimateTransactions,
@@ -59052,7 +59052,7 @@ function __wbg_finalize_init(instance, module) {
   cachedUint8ArrayMemory0 = null;
   return wasm;
 }
-function initSync$1(module) {
+function initSync(module) {
   if (wasm !== void 0)
     return wasm;
   if (typeof module !== "undefined") {
@@ -59886,7 +59886,7 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    initSync();
+    exports_kaspa.initSync();
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
