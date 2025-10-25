@@ -35,6 +35,7 @@ import { concat as uint8Concat } from 'uint8arrays';
 
 // Kasplex SDK
 import { Wallet, Mnemonic, Rpc, Wasm, Kiwi } from '@kasplex/kiwi-web';
+let wasm = Wasm;
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
