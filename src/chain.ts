@@ -73,7 +73,7 @@ export class KasplexSignalling {
   }
 
   generateWallet() {
-    Wasm.initSync(Wasm);
+    Wasm.default('https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm');
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic) throw new Error('Mnemonic not generated');

@@ -59886,7 +59886,7 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
-    exports_kaspa.initSync(exports_kaspa);
+    exports_kaspa.default("https://cdn.jsdelivr.net/npm/@kasplex/kiwi-web@1.0.15/dist/kaspa_bg.wasm");
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
