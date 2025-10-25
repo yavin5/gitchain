@@ -59886,6 +59886,7 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
+    exports_kaspa.initSync(WebAssembly.Instance);
     Kiwi.setNetwork(exports_kaspa.NetworkType.Testnet);
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
