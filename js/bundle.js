@@ -48913,7 +48913,7 @@ __export(exports_kaspa, {
   isScriptPayToPubkeyECDSA: () => isScriptPayToPubkeyECDSA,
   isScriptPayToPubkey: () => isScriptPayToPubkey,
   initWASM32Bindings: () => initWASM32Bindings,
-  initSync: () => initSync,
+  initSync: () => initSync$1,
   initConsolePanicHook: () => initConsolePanicHook,
   initBrowserPanicHook: () => initBrowserPanicHook,
   estimateTransactions: () => estimateTransactions,
@@ -59052,7 +59052,7 @@ function __wbg_finalize_init(instance, module) {
   cachedUint8ArrayMemory0 = null;
   return wasm;
 }
-function initSync(module) {
+function initSync$1(module) {
   if (wasm !== void 0)
     return wasm;
   if (typeof module !== "undefined") {
@@ -59861,7 +59861,6 @@ class Outpoint {
   }
 }
 globalThis.Buffer = Buffer2;
-await exports_kaspa.initSync();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
@@ -59887,6 +59886,7 @@ class KasplexSignalling {
     this.chainId = chainId;
   }
   generateWallet() {
+    initSync();
     this.mnemonic = Mnemonic2.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
