@@ -87,9 +87,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5. Generate Kaspa wallet
   // ---------------------------------------------------------------
   generateWalletBtn.addEventListener('click', () => {
+    console.log("Clicked generate wallet button.");
     (async () => {
+        console.log("About to instantiate KaspaSignalling.");
         signaling = new window.gitchain.KaspaSignalling('tn-10');
         const { mnemonic, address } = signaling.generateWallet();
+        console.log("Generated wallet: " + mnemonic + " " + address);
 
         mnemonicDisplay.textContent   = mnemonic;
         kaspaAddress.textContent      = address;

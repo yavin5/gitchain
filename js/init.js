@@ -9,8 +9,7 @@ await new Promise(r => {
 // ---------------------------------------------------------------
 // 2. Import the compiled chain code (Vite outputs bundle.js)
 // ---------------------------------------------------------------
-import './bundle.js';          // <-- change if your file is chain.js
-import { KaspaSignalling } from './bundle.js';
+import './bundle.js';
 
 // ---------------------------------------------------------------
 // 3. Build the UI (inline – CSP now allows it)

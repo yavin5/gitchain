@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
   generateWalletBtn.addEventListener("click", () => {
+    console.log("Clicked generate wallet button.");
   });
   connectPeersBtn.addEventListener("click", async () => {
     return alert("Generate a wallet first.");
