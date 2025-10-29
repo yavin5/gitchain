@@ -12,28 +12,6 @@ await new Promise(r => {
 import './bundle.js';
 
 // ---------------------------------------------------------------
-// 3. Build the UI (inline – CSP now allows it)
-// ---------------------------------------------------------------
-document.body.insertAdjacentHTML('beforeend', `
-<div id="gitchain-ui" style="font-family:Arial;padding:1rem;max-width:600px;margin:auto;">
-  <h2>Gitchain</h2>
-
-  <label>GitHub PAT: <input id="patInput" type="text" placeholder="ghp_…"></label>
-  <button id="savePat">Save PAT</button>
-
-  <hr>
-
-  <button id="generateWallet">Generate Kaspa Wallet</button>
-  <div id="walletInfo" style="margin-top:0.5rem;"></div>
-
-  <hr>
-
-  <button id="viewChain">View Chain</button>
-  <pre id="output" style="background:#f4f4f4;padding:1rem;max-height:400px;overflow:auto;"></pre>
-</div>
-`);
-
-// ---------------------------------------------------------------
 // 4. Global helpers (used by chain.ts)
 // ---------------------------------------------------------------
 window.saveGithubAccessToken = () => {

@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
   // Wait a tick for bundle.js to run and set window.gitchain
-  await new Promise(r => setTimeout(r, 0));
+  await new Promise(r => setTimeout(r, 300));
 
   // ---- DOM elements -------------------------------------------------
   const patInput          = document.getElementById('patInput');
