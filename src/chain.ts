@@ -92,7 +92,7 @@ export class KaspaSignalling {
 
   async generateWallet() {
     // Force WASM initialization in KaspaSDK
-    await connect();
+    await this.connect();
 
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
