@@ -64,7 +64,7 @@
     window.ec = ec;
   </script>
   <script type="module">
-      import * as kaspa from './kaspa/kaspa-wasm.js';
+      import * as KaspaSDK from './@kasstamp/sdk';
 
 // enabling console panic hooks allows WASM to print panic details to console
 // initConsolePanicHook();
@@ -73,7 +73,7 @@
 // initBrowserPanicHook();
 
 // if port is not specified, it will use the default port for the specified network
-const rpc = new kaspa.RpcClient({
+const rpc = new KaspaSDK.RpcClient({
   url: '127.0.0.1',
   encoding: Encoding.Borsh,
   network: 'testnet-10',
