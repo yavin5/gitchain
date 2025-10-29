@@ -111,7 +111,7 @@ export default defineConfig({
       'buffer',
       'events'
     ],
-    exclude: ['@kasstamp/kaspa-wasm-sdk']
+    // exclude: ['@kasstamp/kaspa-wasm-sdk']
   },
   // Add static asset handling for WASM files - CRITICAL for WebAssembly
   assetsInclude: ['**/*.wasm'],
