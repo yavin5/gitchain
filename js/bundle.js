@@ -81848,7 +81848,9 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    await self.connect();
+    KaspaSDK.setNetwork(this.chainId === "tn-10" || this.chainId === "tn-11" ? KaspaSDK.NetworkType.Testnet : KaspaSDK.NetworkType.Mainnet);
+    await KaspaSDK.rpcClient.connect();
+    this.startPolling();
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
