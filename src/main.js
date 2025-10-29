@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const generateWalletBtn = document.getElementById('generateWallet');
   const walletInfoDiv     = document.getElementById('walletInfo');
   const mnemonicDisplay   = document.getElementById('mnemonic');
-  const kasplexAddress    = document.getElementById('kasplexAddress');
+  const kaspaAddress      = document.getElementById('kaspaAddress');
   const connectPeersBtn   = document.getElementById('connectPeers');
   const chatDiv           = document.getElementById('chat');
 
@@ -85,20 +85,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ---------------------------------------------------------------
-  // 5. Generate Kasplex wallet
+  // 5. Generate Kaspa wallet
   // ---------------------------------------------------------------
   generateWalletBtn.addEventListener('click', () => {
     // The default is testnet's chain ID.
     const chain = chainIdInput.value.trim() || '167012';
 
-    signaling = new window.gitchain.KasplexSignalling(chain);
-    const { mnemonic, address } = signaling.generateWallet();
+    (async () => {
+        signaling = new window.gitchain.KaspaSignalling(chain);
+        const { mnemonic, address } = signaling.generateWallet();
 
-    mnemonicDisplay.textContent   = mnemonic;
-    kasplexAddress.textContent    = address;
-    walletInfoDiv.classList.remove('hidden');
+        mnemonicDisplay.textContent   = mnemonic;
+        kaspaAddress.textContent      = address;
+        walletInfoDiv.classList.remove('hidden');
 
-    console.log('Kasplex wallet generated:', { mnemonic, address });
+	console.log('Kaspa wallet generated:', { mnemonic, address });
+    });
   });
 
   // ---------------------------------------------------------------

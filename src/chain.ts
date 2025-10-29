@@ -1,3 +1,7 @@
+// IMPORTANT: Initialize logger configuration FIRST, before any other imports
+import { initializeLoggers } from './config/logger.config';
+initializeLoggers();
+
 import { ADMIN_ADDRESS } from './admin-address.js';
 
 // Declare window.gitchain for TypeScript
@@ -7,7 +11,7 @@ interface Gitchain {
     processTxns: () => Promise<void>;
     fetchState: () => Promise<{ content: State; sha: string } | null>;
     connectAndSendTx: (tx: Transaction) => Promise<void>;
-    KasplexSignalling: typeof KasplexSignalling;
+    KaspaSignalling: typeof KaspaSignalling;
     WebRTCConnection: typeof WebRTCConnection;
 }
 declare global {
@@ -33,8 +37,22 @@ import { ec } from 'elliptic';
 import { keccak256 as keccak256Buffer } from 'js-sha3';
 import { concat as uint8Concat } from 'uint8arrays';
 
-// Kasplex SDK
-import { Wallet, Mnemonic, Rpc, Wasm, Kiwi } from '@kasplex/kiwi-web';
+// KaspaSDK from kasstamp
+import {
+  type BalanceMonitoringService,
+  type ITransactionRecord,
+  KaspaSDK,
+  type KaspaSDKConfig,
+  KaspaWalletFactory,
+  type Network,
+  type SimpleWallet,
+  type TransactionMonitoringService,
+  type WalletDescriptor,
+  walletStorage,
+  type IAccountDescriptor,
+  type BalanceEvent,
+  type TransactionEvent,
+} from '@kasstamp/sdk';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -57,9 +75,9 @@ let isServer = false;
 let serverPeers: string[] = [];
 
 // ---------------------------------------------------------------------------
-// KasplexSignalling – signalling layer over Kasplex L2
+// KaspaSignalling – signalling layer over Kaspa
 // ---------------------------------------------------------------------------
-export class KasplexSignalling {
+export class KaspaSignalling {
   chainId: string;
   provider: any;
   wallet: any;
@@ -72,12 +90,9 @@ export class KasplexSignalling {
     this.chainId = chainId;
   }
 
-  generateWallet() {
-
-    // Force WASM initialization in kiwi-web 1.0.15
-  if (!(Wasm as any)._wasm) {
-    (Wasm as any).NetworkType; // triggers lazy WASM load
-  }
+  async generateWallet() {
+    // Force WASM initialization in KaspaSDK
+    await connect();
 
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
@@ -88,8 +103,8 @@ export class KasplexSignalling {
   }
 
   async connect() {
-    Kiwi.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
-    await Rpc.setInstance(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet).connect();
+    KaspaSDK.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
+    await KaspaSDK.rpcClient.setInstance(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet).connect();
     this.startPolling();
   }
 
@@ -105,7 +120,7 @@ export class KasplexSignalling {
       gasLimit: 21000n,
     });
     await tx.wait();
-    console.log(`[Kasplex] Sent ${type} to ${to.slice(-8)}`);
+    console.log(`[Kaspla] Sent ${type} to ${to.slice(-8)}`);
   }
 
   private startPolling() {
@@ -139,16 +154,16 @@ export class KasplexSignalling {
 }
 
 // ---------------------------------------------------------------------------
-// WebRTCConnection – uses KasplexSignalling for SDP/ICE
+// WebRTCConnection – uses KaspaSignalling for SDP/ICE
 // ---------------------------------------------------------------------------
 export class WebRTCConnection {
-  signaling: KasplexSignalling;
+  signaling: KaspaSignalling;
   localPeerId: string;
   remotePeerId: string;
   pc: RTCPeerConnection;
   dc: RTCDataChannel | null = null;
 
-  constructor(signaling: KasplexSignalling, localPeerId: string, remotePeerId: string) {
+  constructor(signaling: KaspaSignalling, localPeerId: string, remotePeerId: string) {
     this.signaling = signaling;
     this.localPeerId = localPeerId;
     this.remotePeerId = remotePeerId;
@@ -936,7 +951,7 @@ window.gitchain = {
     processTxns,
     fetchState,
     connectAndSendTx,
-    KasplexSignalling,
+    KaspaSignalling,
     WebRTCConnection
 };
 

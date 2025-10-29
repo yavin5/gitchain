@@ -11,12 +11,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const sendButton = document.getElementById("send");
   const chainIdInput = document.getElementById("chainId");
   const generateWalletBtn = document.getElementById("generateWallet");
-  const walletInfoDiv = document.getElementById("walletInfo");
-  const mnemonicDisplay = document.getElementById("mnemonic");
-  const kasplexAddress = document.getElementById("kasplexAddress");
+  document.getElementById("walletInfo");
+  document.getElementById("mnemonic");
+  document.getElementById("kaspaAddress");
   const connectPeersBtn = document.getElementById("connectPeers");
   const chatDiv = document.getElementById("chat");
-  let signaling = null;
   let localPeerId = "";
   const connections = /* @__PURE__ */ new Map();
   if (window.gitchain && window.gitchain.initP2P) {
@@ -58,25 +57,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
   generateWalletBtn.addEventListener("click", () => {
-    const chain = chainIdInput.value.trim() || "167012";
-    signaling = new window.gitchain.KasplexSignalling(chain);
-    const { mnemonic, address } = signaling.generateWallet();
-    mnemonicDisplay.textContent = mnemonic;
-    kasplexAddress.textContent = address;
-    walletInfoDiv.classList.remove("hidden");
-    console.log("Kasplex wallet generated:", { mnemonic, address });
+    chainIdInput.value.trim() || "167012";
   });
   connectPeersBtn.addEventListener("click", async () => {
-    if (!signaling) return alert("Generate a wallet first.");
-    await signaling.connect();
-    const peers = window.gitchain.getServerPeers() || [];
-    for (const peerId of peers) {
-      if (peerId !== localPeerId && !connections.has(peerId)) {
-        const conn = new window.gitchain.WebRTCConnection(signaling, localPeerId, peerId);
-        connections.set(peerId, conn);
-        console.log(`Initiated WebRTC connection to ${peerId.slice(-8)}`);
-      }
-    }
+    return alert("Generate a wallet first.");
   });
   sendButton.addEventListener("click", () => {
     const msg = messageInput.value.trim();
