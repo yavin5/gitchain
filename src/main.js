@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const messageInput      = document.getElementById('message');
   const sendButton        = document.getElementById('send');
 
-  const chainIdInput      = document.getElementById('chainId');
   const generateWalletBtn = document.getElementById('generateWallet');
   const walletInfoDiv     = document.getElementById('walletInfo');
   const mnemonicDisplay   = document.getElementById('mnemonic');
@@ -88,11 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5. Generate Kaspa wallet
   // ---------------------------------------------------------------
   generateWalletBtn.addEventListener('click', () => {
-    // The default is testnet's chain ID.
-    const chain = chainIdInput.value.trim() || '167012';
-
     (async () => {
-        signaling = new window.gitchain.KaspaSignalling(chain);
+        signaling = new window.gitchain.KaspaSignalling('tn-10');
         const { mnemonic, address } = signaling.generateWallet();
 
         mnemonicDisplay.textContent   = mnemonic;

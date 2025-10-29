@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const peerIdDisplay = document.getElementById("peerId");
   const messageInput = document.getElementById("message");
   const sendButton = document.getElementById("send");
-  const chainIdInput = document.getElementById("chainId");
   const generateWalletBtn = document.getElementById("generateWallet");
   document.getElementById("walletInfo");
   document.getElementById("mnemonic");
@@ -57,7 +56,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
   generateWalletBtn.addEventListener("click", () => {
-    chainIdInput.value.trim() || "167012";
   });
   connectPeersBtn.addEventListener("click", async () => {
     return alert("Generate a wallet first.");
