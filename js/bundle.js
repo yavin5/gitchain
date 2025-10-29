@@ -81844,7 +81844,7 @@ class KaspaSignalling {
   address = null;
   listeners = [];
   pollingInterval = null;
-  constructor(chainId = "167012") {
+  constructor(chainId = "tn-10") {
     this.chainId = chainId;
   }
   async generateWallet() {
@@ -81857,8 +81857,8 @@ class KaspaSignalling {
     return { mnemonic: this.mnemonic, address: this.address };
   }
   async connect() {
-    KaspaSDK.setNetwork(this.chainId === "167012" ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
-    await KaspaSDK.rpcClient.setInstance(this.chainId === "167012" ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet).connect();
+    KaspaSDK.setNetwork(this.chainId === "tn-10" || this.chainId === "tn-11" ? KaspaSDK.NetworkType.Testnet : KaspaSDK.NetworkType.Mainnet);
+    await KaspaSDK.rpcClient.connect();
     this.startPolling();
   }
   async sendMessage(to, type, data) {

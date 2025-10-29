@@ -86,7 +86,7 @@ export class KaspaSignalling {
   listeners: ((msg: any) => void)[] = [];
   pollingInterval: any = null;
 
-  constructor(chainId = '167012') {
+  constructor(chainId = 'tn-10') {
     this.chainId = chainId;
   }
 
@@ -103,8 +103,8 @@ export class KaspaSignalling {
   }
 
   async connect() {
-    KaspaSDK.setNetwork(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet);
-    await KaspaSDK.rpcClient.setInstance(this.chainId === '167012' ? Wasm.NetworkType.Testnet : Wasm.NetworkType.Mainnet).connect();
+    KaspaSDK.setNetwork(this.chainId === 'tn-10' || this.chainId === 'tn-11' ? KaspaSDK.NetworkType.Testnet : KaspaSDK.NetworkType.Mainnet);
+    await KaspaSDK.rpcClient.connect();
     this.startPolling();
   }
 
