@@ -63,33 +63,6 @@
     import { ec } from 'https://esm.sh/elliptic@6.6.1';
     window.ec = ec;
   </script>
-  <!--script type="module">
-      import * as KaspaSDK from './@kasstamp/sdk/dist/index.js';
-
-// enabling console panic hooks allows WASM to print panic details to console
-// initConsolePanicHook();
-// enabling browser panic hooks will create a full-page DIV with panic details
-// this is useful for mobile devices where console is not available
-// initBrowserPanicHook();
-
-// if port is not specified, it will use the default port for the specified network
-const rpc = new KaspaSDK.RpcClient({
-  //url: 'wss://neutrino-10.kaspa.stream/kaspa',
-  //resolver: new Resolver(),
-  encoding: Encoding.Borsh,
-  network: 'testnet-10',
-});
-
-(async () => {
-  try {
-    await rpc.connect();
-    let info = await rpc.getInfo();
-    console.log(info);
-  } finally {
-    await rpc.disconnect();
-  }
-})
-  </script-->
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
 
   <!-- Our code – **bundle.js is the Vite output** -->
