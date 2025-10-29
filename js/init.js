@@ -63,12 +63,14 @@ let signalling = null;
 
 document.getElementById('generateWallet').addEventListener('click', async () => {
   const infoDiv = document.getElementById('walletInfo');
+  console.log("infoDiv: " +  infoDiv);
   infoDiv.textContent = 'Generating…';
 
   try {
     if (!signalling) signalling = new KaspaSignalling();
+    console.log("signalling.generateWallet()");
     const { mnemonic, address } = signalling.generateWallet();
-    await signalling.connect();               // connects to testnet RPC
+    console.log("signalling.generateWallet() done.. " + mnemonic + " " + address);
 
     infoDiv.innerHTML = `
       <strong>Address:</strong> ${address}<br>
