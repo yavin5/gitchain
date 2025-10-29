@@ -53,6 +53,10 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
+//import { WalletService, walletService } from './WalletService';
+//import type { WalletServiceEvent, WalletServiceEventData } from './WalletService';
+import { UseWallet } from './UseWallet';
+const [walletState, walletActions] = UseWallet();
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -91,8 +95,8 @@ export class KaspaSignalling {
   }
 
   async generateWallet() {
-    await KaspaSDK.rpcClient.connect(this.chainId);
-    this.startPolling();
+    //await KaspaSDK.rpcClient.connect(this.chainId);
+    //this.startPolling();
 
     // @ts-ignore
     this.mnemonic = Mnemonic.random(12);
@@ -103,8 +107,8 @@ export class KaspaSignalling {
   }
 
   async connect(networkName? = 'testnet-10') {
-    await KaspaSDK.rpcClient.connect(networkName);
-    this.startPolling();
+    //await KaspaSDK.rpcClient.connect(networkName);
+    //this.startPolling();
   }
 
   async sendMessage(to: string, type: 'offer' | 'answer' | 'candidate', data: any) {

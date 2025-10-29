@@ -22038,9 +22038,9 @@ class RTCPeerConnectionMultiaddrConnection extends AbstractMultiaddrConnection {
   constructor(init3) {
     super(init3);
     this.peerConnection = init3.peerConnection;
-    const initialState = init3.peerConnection.connectionState;
+    const initialState2 = init3.peerConnection.connectionState;
     this.peerConnection.onconnectionstatechange = () => {
-      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState);
+      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState2);
       if (this.peerConnection.connectionState === "disconnected" || this.peerConnection.connectionState === "failed" || this.peerConnection.connectionState === "closed") {
         this.onTransportClosed();
         this.peerConnection.close();
@@ -77282,7 +77282,7 @@ function createSigningEnclave(storage2, walletId) {
   };
 }
 __name$4(createSigningEnclave, "createSigningEnclave");
-var walletLogger = createLogger("kasstamp:wallet:simple");
+var walletLogger$1 = createLogger("kasstamp:wallet:simple");
 var SimpleWalletImpl = class {
   static {
     __name$4(this, "SimpleWalletImpl");
@@ -77321,13 +77321,13 @@ var SimpleWalletImpl = class {
   async initialize() {
     if (!this.locked) {
       try {
-        walletLogger.debug("📋 Loading existing accounts...");
+        walletLogger$1.debug("📋 Loading existing accounts...");
         const response = await this.wasmWallet.accountsEnumerate({});
         this.accounts = response.accountDescriptors || [];
-        walletLogger.debug(`✅ Loaded ${this.accounts.length} existing accounts`);
+        walletLogger$1.debug(`✅ Loaded ${this.accounts.length} existing accounts`);
         await this.initializeUtxoProcessor();
       } catch (error) {
-        walletLogger.error("❌ Failed to load existing accounts:", error);
+        walletLogger$1.error("❌ Failed to load existing accounts:", error);
       }
     }
   }
@@ -77336,10 +77336,10 @@ var SimpleWalletImpl = class {
    */
   async initializeUtxoProcessor() {
     try {
-      walletLogger.debug("📦 Initializing UTXO processor and context...");
+      walletLogger$1.debug("📦 Initializing UTXO processor and context...");
       const rpcClient = this.wasmWallet.rpc;
       if (!rpcClient) {
-        walletLogger.warn("⚠️ No RPC client available for UTXO processor");
+        walletLogger$1.warn("⚠️ No RPC client available for UTXO processor");
         return;
       }
       const UtxoProcessor3 = await getUtxoProcessor();
@@ -77361,17 +77361,17 @@ var SimpleWalletImpl = class {
           }
         }
         if (addressesToTrack.length > 0) {
-          walletLogger.debug(
+          walletLogger$1.debug(
             `📦 Tracking ${addressesToTrack.length} addresses for UTXO discovery:`,
             addressesToTrack
           );
           await this.context.trackAddresses(addressesToTrack);
-          walletLogger.debug("✅ Addresses tracked for UTXO discovery");
+          walletLogger$1.debug("✅ Addresses tracked for UTXO discovery");
         }
       }
-      walletLogger.debug("✅ UTXO processor and context initialized");
+      walletLogger$1.debug("✅ UTXO processor and context initialized");
     } catch (error) {
-      walletLogger.error("❌ Failed to initialize UTXO processor:", error);
+      walletLogger$1.error("❌ Failed to initialize UTXO processor:", error);
     }
   }
   /**
@@ -77384,7 +77384,7 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before deriving accounts.");
     }
     try {
-      walletLogger.debug(`🔑 Getting existing accounts (change: ${change})...`);
+      walletLogger$1.debug(`🔑 Getting existing accounts (change: ${change})...`);
       const existingAccounts = await this.getExistingAccounts();
       if (existingAccounts.length === 0) {
         throw new Error(
@@ -77392,10 +77392,10 @@ var SimpleWalletImpl = class {
         );
       }
       const account = existingAccounts[0];
-      walletLogger.debug(`✅ Using existing account: ${account.receiveAddress?.toString()}`);
+      walletLogger$1.debug(`✅ Using existing account: ${account.receiveAddress?.toString()}`);
       return account;
     } catch (error) {
-      walletLogger.error("❌ Failed to get account:", error);
+      walletLogger$1.error("❌ Failed to get account:", error);
       throw error;
     }
   }
@@ -77407,13 +77407,13 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before getting accounts.");
     }
     try {
-      walletLogger.debug("📋 Getting existing accounts...");
+      walletLogger$1.debug("📋 Getting existing accounts...");
       const response = await this.wasmWallet.accountsEnumerate({});
       this.accounts = response.accountDescriptors || [];
-      walletLogger.debug(`✅ Found ${this.accounts.length} existing accounts`);
+      walletLogger$1.debug(`✅ Found ${this.accounts.length} existing accounts`);
       return this.accounts;
     } catch (error) {
-      walletLogger.error("❌ Failed to get existing accounts:", error);
+      walletLogger$1.error("❌ Failed to get existing accounts:", error);
       throw error;
     }
   }
@@ -77433,16 +77433,16 @@ var SimpleWalletImpl = class {
    * After locking, unlock() must be called again before signing transactions.
    */
   lock() {
-    walletLogger.debug("🔒 Locking wallet and signing enclave...");
+    walletLogger$1.debug("🔒 Locking wallet and signing enclave...");
     this.locked = true;
     this.signingEnclave.lock();
     this.transactionMonitors.forEach((monitor) => {
       monitor.stop().catch((error) => {
-        walletLogger.warn("⚠️ Failed to stop transaction monitor:", error);
+        walletLogger$1.warn("⚠️ Failed to stop transaction monitor:", error);
       });
     });
     this.transactionMonitors.clear();
-    walletLogger.debug("✅ Wallet and signing enclave locked");
+    walletLogger$1.debug("✅ Wallet and signing enclave locked");
   }
   /**
    * Unlock the wallet with password
@@ -77457,12 +77457,12 @@ var SimpleWalletImpl = class {
    */
   async unlockFromPassword(password) {
     if (!this.locked) {
-      walletLogger.debug("⚠️ Wallet is already unlocked");
+      walletLogger$1.debug("⚠️ Wallet is already unlocked");
       return;
     }
     try {
-      walletLogger.debug("🔓 Unlocking wallet and signing enclave...");
-      walletLogger.debug("📋 Getting existing accounts...");
+      walletLogger$1.debug("🔓 Unlocking wallet and signing enclave...");
+      walletLogger$1.debug("📋 Getting existing accounts...");
       const response = await this.wasmWallet.accountsEnumerate({});
       const accounts = response.accountDescriptors || [];
       if (this.signingEnclave.hasMnemonic()) {
@@ -77474,10 +77474,10 @@ var SimpleWalletImpl = class {
       }
       this.locked = false;
       this.accounts = accounts;
-      walletLogger.debug(`✅ Found ${accounts.length} existing accounts`);
-      walletLogger.debug("✅ Wallet and signing enclave unlocked successfully");
+      walletLogger$1.debug(`✅ Found ${accounts.length} existing accounts`);
+      walletLogger$1.debug("✅ Wallet and signing enclave unlocked successfully");
     } catch (error) {
-      walletLogger.error("❌ Failed to unlock wallet:", error);
+      walletLogger$1.error("❌ Failed to unlock wallet:", error);
       throw error;
     }
   }
@@ -77489,16 +77489,16 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before exporting.");
     }
     try {
-      walletLogger.debug("📤 Exporting wallet to encrypted keystore...");
+      walletLogger$1.debug("📤 Exporting wallet to encrypted keystore...");
       const response = await this.wasmWallet.walletExport({
         walletSecret: "",
         // Empty string - WASM wallet is already unlocked
         includeTransactions: false
       });
-      walletLogger.debug("✅ Wallet exported successfully");
+      walletLogger$1.debug("✅ Wallet exported successfully");
       return response;
     } catch (error) {
-      walletLogger.error("❌ Failed to export wallet:", error);
+      walletLogger$1.error("❌ Failed to export wallet:", error);
       throw error;
     }
   }
@@ -77510,7 +77510,7 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before getting balance.");
     }
     try {
-      walletLogger.debug(`💰 Getting balance for account: ${accountId}`);
+      walletLogger$1.debug(`💰 Getting balance for account: ${accountId}`);
       const response = await this.wasmWallet.accountsGet({
         accountId
       });
@@ -77518,10 +77518,10 @@ var SimpleWalletImpl = class {
         throw new Error("Account not found");
       }
       const balance = response.accountDescriptor.balance || 0n;
-      walletLogger.debug(`💰 Balance: ${balance.toString()} sompi`);
+      walletLogger$1.debug(`💰 Balance: ${balance.toString()} sompi`);
       return balance;
     } catch (error) {
-      walletLogger.error("❌ Failed to get balance:", error);
+      walletLogger$1.error("❌ Failed to get balance:", error);
       throw error;
     }
   }
@@ -77533,17 +77533,17 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before sending transactions.");
     }
     try {
-      walletLogger.debug(`💸 Sending transaction from account: ${request.accountId}`);
+      walletLogger$1.debug(`💸 Sending transaction from account: ${request.accountId}`);
       const response = await this.wasmWallet.accountsSend({
         accountId: request.accountId,
         walletSecret: request.walletSecret,
         destination: request.destination,
         priorityFeeSompi: request.priorityFeeSompi
       });
-      walletLogger.debug(`✅ Transaction sent! IDs: ${response.transactionIds.join(", ")}`);
+      walletLogger$1.debug(`✅ Transaction sent! IDs: ${response.transactionIds.join(", ")}`);
       return response;
     } catch (error) {
-      walletLogger.error("❌ Failed to send transaction:", error);
+      walletLogger$1.error("❌ Failed to send transaction:", error);
       throw error;
     }
   }
@@ -77555,13 +77555,13 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before getting transaction history.");
     }
     try {
-      walletLogger.debug(`📋 Getting transaction history for account: ${accountId}`);
+      walletLogger$1.debug(`📋 Getting transaction history for account: ${accountId}`);
       try {
-        walletLogger.debug(`📋 Activating account for transaction history...`);
+        walletLogger$1.debug(`📋 Activating account for transaction history...`);
         await this.wasmWallet.accountsActivate({ accountIds: [accountId] });
-        walletLogger.debug(`✅ Account activated successfully`);
+        walletLogger$1.debug(`✅ Account activated successfully`);
       } catch (activationError) {
-        walletLogger.warn("⚠️ Failed to activate account:", activationError);
+        walletLogger$1.warn("⚠️ Failed to activate account:", activationError);
       }
       const networkId = new NetworkId(this.network);
       const request = {
@@ -77572,28 +77572,28 @@ var SimpleWalletImpl = class {
         // Use same page size as official wallet (20)
       };
       const response = await this.wasmWallet.transactionsDataGet(request);
-      walletLogger.debug(`📋 Response details:`, {
+      walletLogger$1.debug(`📋 Response details:`, {
         accountId: response.accountId,
         start: response.start,
         total: response.total,
         transactionsCount: response.transactions?.length || 0
       });
       if (response.total === 0n) {
-        walletLogger.debug(
+        walletLogger$1.debug(
           "📋 Wallet appears to be not yet synced (total: 0). This is normal for new wallets."
         );
-        walletLogger.debug(
+        walletLogger$1.debug(
           "📋 The wallet needs to synchronize with the network before transaction history is available."
         );
-        walletLogger.debug(
+        walletLogger$1.debug(
           "📋 This process can take a few minutes depending on network conditions."
         );
         return [];
       }
-      walletLogger.debug(`✅ Retrieved ${response.transactions?.length || 0} transactions`);
+      walletLogger$1.debug(`✅ Retrieved ${response.transactions?.length || 0} transactions`);
       return response.transactions || [];
     } catch (error) {
-      walletLogger.error("❌ Failed to get transaction history:", error);
+      walletLogger$1.error("❌ Failed to get transaction history:", error);
       throw error;
     }
   }
@@ -77609,50 +77609,50 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before getting UTXOs.");
     }
     try {
-      walletLogger.debug(`📦 Getting UTXOs for account: ${accountId}`);
+      walletLogger$1.debug(`📦 Getting UTXOs for account: ${accountId}`);
       const account = this.accounts.find((acc) => acc.accountId === accountId);
       if (!account || !account.receiveAddress) {
-        walletLogger.debug("📦 No receive address found for account");
+        walletLogger$1.debug("📦 No receive address found for account");
         return [];
       }
       const address = account.receiveAddress.toString();
-      walletLogger.debug(`📦 Looking for UTXOs for address: ${address}`);
+      walletLogger$1.debug(`📦 Looking for UTXOs for address: ${address}`);
       try {
         if (this.context) {
-          walletLogger.debug("📦 Found our UtxoContext, checking for UTXOs...");
+          walletLogger$1.debug("📦 Found our UtxoContext, checking for UTXOs...");
           if (this.context.getMatureRange && this.context.matureLength !== void 0) {
             const matureUtxos = this.context.getMatureRange(0, this.context.matureLength);
-            walletLogger.debug(
+            walletLogger$1.debug(
               `📦 Found ${matureUtxos?.length || 0} mature UTXOs from our context`
             );
             let pendingUtxos = [];
             if (this.context.getPending) {
               pendingUtxos = this.context.getPending() || [];
-              walletLogger.debug(`📦 Found ${pendingUtxos.length} pending UTXOs from our context`);
+              walletLogger$1.debug(`📦 Found ${pendingUtxos.length} pending UTXOs from our context`);
             }
             const allUtxos = [...matureUtxos || [], ...pendingUtxos];
-            walletLogger.debug(
+            walletLogger$1.debug(
               `📦 Total UTXOs from our context: ${allUtxos.length} (${matureUtxos?.length || 0} mature + ${pendingUtxos.length} pending)`
             );
             if (allUtxos.length > 0) {
-              walletLogger.debug(`📦 Returning ${allUtxos.length} UTXOs from context`);
+              walletLogger$1.debug(`📦 Returning ${allUtxos.length} UTXOs from context`);
               return allUtxos;
             }
           } else {
-            walletLogger.debug(
+            walletLogger$1.debug(
               "📦 Our UtxoContext found but getMatureRange or matureLength not available"
             );
           }
         } else {
-          walletLogger.debug(
+          walletLogger$1.debug(
             "📦 No UtxoContext available - need to initialize UTXO processor first"
           );
         }
       } catch (contextError) {
-        walletLogger.warn("📦 Failed to get UTXOs from our context:", contextError);
+        walletLogger$1.warn("📦 Failed to get UTXOs from our context:", contextError);
       }
       if (this.context && this.context.matureLength !== void 0 && this.context.matureLength < 2) {
-        walletLogger.debug("📦 Context has limited UTXOs, trying to refresh tracking...");
+        walletLogger$1.debug("📦 Context has limited UTXOs, trying to refresh tracking...");
         try {
           const addressesToTrack = [];
           for (const account2 of this.accounts) {
@@ -77664,26 +77664,26 @@ var SimpleWalletImpl = class {
             }
           }
           if (addressesToTrack.length > 0) {
-            walletLogger.debug("📦 Re-tracking addresses for better UTXO discovery...");
+            walletLogger$1.debug("📦 Re-tracking addresses for better UTXO discovery...");
             await this.context.trackAddresses(addressesToTrack);
             const matureUtxos = this.context.getMatureRange(0, this.context.matureLength);
             const pendingUtxos = this.context.getPending() || [];
             const allUtxos = [...matureUtxos || [], ...pendingUtxos];
             if (allUtxos.length > 0) {
-              walletLogger.debug(`📦 Found ${allUtxos.length} UTXOs after re-tracking`);
+              walletLogger$1.debug(`📦 Found ${allUtxos.length} UTXOs after re-tracking`);
               return allUtxos;
             }
           }
         } catch (refreshError) {
-          walletLogger.warn("📦 Failed to refresh UTXO context:", refreshError);
+          walletLogger$1.warn("📦 Failed to refresh UTXO context:", refreshError);
         }
       }
       try {
-        walletLogger.debug(`📦 Calling accountsGetUtxos for account: ${accountId}`);
+        walletLogger$1.debug(`📦 Calling accountsGetUtxos for account: ${accountId}`);
         const allAddresses = [];
         const account2 = this.accounts.find((acc) => acc.accountId === accountId);
         if (account2) {
-          walletLogger.debug(`📦 Using addresses from cached account`);
+          walletLogger$1.debug(`📦 Using addresses from cached account`);
           if (account2.receiveAddress) {
             allAddresses.push(account2.receiveAddress.toString());
           }
@@ -77691,7 +77691,7 @@ var SimpleWalletImpl = class {
             allAddresses.push(account2.changeAddress.toString());
           }
         } else {
-          walletLogger.debug(`📦 Getting all addresses for account from WASM wallet: ${accountId}`);
+          walletLogger$1.debug(`📦 Getting all addresses for account from WASM wallet: ${accountId}`);
           const accountResponse = await this.wasmWallet.accountsGet({
             accountId
           });
@@ -77704,18 +77704,18 @@ var SimpleWalletImpl = class {
             }
           }
         }
-        walletLogger.debug(`📦 Found ${allAddresses.length} addresses for account:`, allAddresses);
+        walletLogger$1.debug(`📦 Found ${allAddresses.length} addresses for account:`, allAddresses);
         const utxosResponse = await this.wasmWallet.accountsGetUtxos({
           accountId,
           addresses: allAddresses
         });
-        walletLogger.debug(`📦 accountsGetUtxos response:`, {
+        walletLogger$1.debug(`📦 accountsGetUtxos response:`, {
           utxosCount: utxosResponse.utxos?.length || 0,
           hasUtxos: !!utxosResponse.utxos,
           utxosType: typeof utxosResponse.utxos
         });
         if (utxosResponse.utxos && utxosResponse.utxos.length > 0) {
-          walletLogger.debug(`📦 Found ${utxosResponse.utxos.length} UTXOs from wallet state`);
+          walletLogger$1.debug(`📦 Found ${utxosResponse.utxos.length} UTXOs from wallet state`);
           const utxosWithBigint = utxosResponse.utxos.map((utxo) => ({
             ...utxo,
             amount: typeof utxo.amount === "string" ? BigInt(utxo.amount) : utxo.amount,
@@ -77723,19 +77723,19 @@ var SimpleWalletImpl = class {
           }));
           return utxosWithBigint;
         }
-        walletLogger.debug(
+        walletLogger$1.debug(
           `📦 No UTXOs found with all addresses, trying with receive address only: ${address}`
         );
         const utxosResponseWithAddress = await this.wasmWallet.accountsGetUtxos({
           accountId,
           addresses: [address]
         });
-        walletLogger.debug(`accountsGetUtxos with address response`, {
+        walletLogger$1.debug(`accountsGetUtxos with address response`, {
           utxosCount: utxosResponseWithAddress.utxos?.length || 0,
           hasUtxos: !!utxosResponseWithAddress.utxos
         });
         if (utxosResponseWithAddress.utxos && utxosResponseWithAddress.utxos.length > 0) {
-          walletLogger.debug(
+          walletLogger$1.debug(
             `📦 Found ${utxosResponseWithAddress.utxos.length} UTXOs with address filter`
           );
           const utxosWithBigint = utxosResponseWithAddress.utxos.map((utxo) => ({
@@ -77745,18 +77745,18 @@ var SimpleWalletImpl = class {
           }));
           return utxosWithBigint;
         }
-        walletLogger.debug("📦 No UTXOs found with any approach");
-        walletLogger.debug(
+        walletLogger$1.debug("📦 No UTXOs found with any approach");
+        walletLogger$1.debug(
           "💡 Tip: If wallet has a balance but no UTXOs, try calling waitForUtxos() to wait for discovery"
         );
         return [];
       } catch (walletError) {
-        walletLogger.warn("Failed to get UTXOs from wallet state", walletError);
+        walletLogger$1.warn("Failed to get UTXOs from wallet state", walletError);
         return [];
       }
     } catch (error) {
-      walletLogger.error("❌ Failed to get UTXOs:", error);
-      walletLogger.debug("📦 No UTXOs found from any source");
+      walletLogger$1.error("❌ Failed to get UTXOs:", error);
+      walletLogger$1.debug("📦 No UTXOs found from any source");
       return [];
     }
   }
@@ -77771,10 +77771,10 @@ var SimpleWalletImpl = class {
    */
   async waitForSync(timeoutMs = 6e4) {
     if (this.isSynced()) {
-      walletLogger.debug("✅ Wallet is already synced");
+      walletLogger$1.debug("✅ Wallet is already synced");
       return true;
     }
-    walletLogger.debug("⏳ Waiting for wallet to sync...");
+    walletLogger$1.debug("⏳ Waiting for wallet to sync...");
     return new Promise((resolve) => {
       const cleanup = /* @__PURE__ */ __name$4(() => {
         if (timeout) clearTimeout(timeout);
@@ -77782,12 +77782,12 @@ var SimpleWalletImpl = class {
       }, "cleanup");
       const timeout = setTimeout(() => {
         cleanup();
-        walletLogger.debug("⏰ Timeout waiting for wallet sync");
+        walletLogger$1.debug("⏰ Timeout waiting for wallet sync");
         resolve(false);
       }, timeoutMs);
       const checkInterval = setInterval(() => {
         if (this.isSynced()) {
-          walletLogger.debug("✅ Wallet sync completed!");
+          walletLogger$1.debug("✅ Wallet sync completed!");
           cleanup();
           resolve(true);
         }
@@ -77802,7 +77802,7 @@ var SimpleWalletImpl = class {
       throw new Error("Wallet is locked. Unlock before getting transaction count.");
     }
     try {
-      walletLogger.debug(`📊 Getting transaction count for account: ${accountId}`);
+      walletLogger$1.debug(`📊 Getting transaction count for account: ${accountId}`);
       const request = {
         accountId,
         networkId: new NetworkId(this.network),
@@ -77812,10 +77812,10 @@ var SimpleWalletImpl = class {
       };
       const response = await this.wasmWallet.transactionsDataGet(request);
       const count = Number(response.total || 0);
-      walletLogger.debug(`✅ Transaction count: ${count}`);
+      walletLogger$1.debug(`✅ Transaction count: ${count}`);
       return count;
     } catch (error) {
-      walletLogger.error("❌ Failed to get transaction count:", error);
+      walletLogger$1.error("❌ Failed to get transaction count:", error);
       throw error;
     }
   }
@@ -77869,23 +77869,23 @@ var SimpleWalletImpl = class {
    * Cleanup resources
    */
   async cleanup() {
-    walletLogger.debug("🧹 Cleaning up wallet resources...");
+    walletLogger$1.debug("🧹 Cleaning up wallet resources...");
     this.signingEnclave.clear();
     for (const [accountId, monitor] of this.transactionMonitors) {
       try {
         await monitor.stop();
       } catch (error) {
-        walletLogger.warn(`Failed to stop monitor for account ${accountId}`, error);
+        walletLogger$1.warn(`Failed to stop monitor for account ${accountId}`, error);
       }
     }
     this.transactionMonitors.clear();
     this.transactionListeners.clear();
     this.balanceListeners.clear();
-    walletLogger.debug("✅ Wallet cleanup completed");
+    walletLogger$1.debug("✅ Wallet cleanup completed");
   }
 };
 var storageLogger = createLogger("kasstamp:wallet:storage");
-(class {
+var SimpleWalletStorageManager = class {
   static {
     __name$4(this, "SimpleWalletStorageManager");
   }
@@ -78070,8 +78070,9 @@ var storageLogger = createLogger("kasstamp:wallet:storage");
       throw error;
     }
   }
-});
-(class {
+};
+var walletStorage = new SimpleWalletStorageManager();
+var KaspaWalletFactory = class {
   static {
     __name$4(this, "KaspaWalletFactory");
   }
@@ -78353,7 +78354,7 @@ var storageLogger = createLogger("kasstamp:wallet:storage");
     const result = await this.createNewWallet(options);
     return result.wallet;
   }
-});
+};
 var monitoringLogger = createLogger("kasstamp:wallet:monitoring");
 var BalanceMonitoringService = class {
   static {
@@ -81819,7 +81820,2208 @@ var KaspaSDK = class _KaspaSDK {
     _KaspaSDK.instance = null;
   }
 };
+var react = { exports: {} };
+var react_production = {};
+/**
+ * @license React
+ * react.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var hasRequiredReact_production;
+function requireReact_production() {
+  if (hasRequiredReact_production) return react_production;
+  hasRequiredReact_production = 1;
+  var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+  function getIteratorFn(maybeIterable) {
+    if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
+    maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+    return "function" === typeof maybeIterable ? maybeIterable : null;
+  }
+  var ReactNoopUpdateQueue = {
+    isMounted: function() {
+      return false;
+    },
+    enqueueForceUpdate: function() {
+    },
+    enqueueReplaceState: function() {
+    },
+    enqueueSetState: function() {
+    }
+  }, assign = Object.assign, emptyObject = {};
+  function Component(props, context, updater) {
+    this.props = props;
+    this.context = context;
+    this.refs = emptyObject;
+    this.updater = updater || ReactNoopUpdateQueue;
+  }
+  Component.prototype.isReactComponent = {};
+  Component.prototype.setState = function(partialState, callback) {
+    if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+      throw Error(
+        "takes an object of state variables to update or a function which returns an object of state variables."
+      );
+    this.updater.enqueueSetState(this, partialState, callback, "setState");
+  };
+  Component.prototype.forceUpdate = function(callback) {
+    this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+  };
+  function ComponentDummy() {
+  }
+  ComponentDummy.prototype = Component.prototype;
+  function PureComponent(props, context, updater) {
+    this.props = props;
+    this.context = context;
+    this.refs = emptyObject;
+    this.updater = updater || ReactNoopUpdateQueue;
+  }
+  var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
+  pureComponentPrototype.constructor = PureComponent;
+  assign(pureComponentPrototype, Component.prototype);
+  pureComponentPrototype.isPureReactComponent = true;
+  var isArrayImpl = Array.isArray;
+  function noop2() {
+  }
+  var ReactSharedInternals = { H: null, A: null, T: null, S: null }, hasOwnProperty = Object.prototype.hasOwnProperty;
+  function ReactElement(type, key2, props) {
+    var refProp = props.ref;
+    return {
+      $$typeof: REACT_ELEMENT_TYPE,
+      type,
+      key: key2,
+      ref: void 0 !== refProp ? refProp : null,
+      props
+    };
+  }
+  function cloneAndReplaceKey(oldElement, newKey) {
+    return ReactElement(oldElement.type, newKey, oldElement.props);
+  }
+  function isValidElement(object) {
+    return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+  }
+  function escape2(key2) {
+    var escaperLookup = { "=": "=0", ":": "=2" };
+    return "$" + key2.replace(/[=:]/g, function(match) {
+      return escaperLookup[match];
+    });
+  }
+  var userProvidedKeyEscapeRegex = /\/+/g;
+  function getElementKey(element, index) {
+    return "object" === typeof element && null !== element && null != element.key ? escape2("" + element.key) : index.toString(36);
+  }
+  function resolveThenable(thenable) {
+    switch (thenable.status) {
+      case "fulfilled":
+        return thenable.value;
+      case "rejected":
+        throw thenable.reason;
+      default:
+        switch ("string" === typeof thenable.status ? thenable.then(noop2, noop2) : (thenable.status = "pending", thenable.then(
+          function(fulfilledValue) {
+            "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+          },
+          function(error) {
+            "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+          }
+        )), thenable.status) {
+          case "fulfilled":
+            return thenable.value;
+          case "rejected":
+            throw thenable.reason;
+        }
+    }
+    throw thenable;
+  }
+  function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+    var type = typeof children;
+    if ("undefined" === type || "boolean" === type) children = null;
+    var invokeCallback = false;
+    if (null === children) invokeCallback = true;
+    else
+      switch (type) {
+        case "bigint":
+        case "string":
+        case "number":
+          invokeCallback = true;
+          break;
+        case "object":
+          switch (children.$$typeof) {
+            case REACT_ELEMENT_TYPE:
+            case REACT_PORTAL_TYPE:
+              invokeCallback = true;
+              break;
+            case REACT_LAZY_TYPE:
+              return invokeCallback = children._init, mapIntoArray(
+                invokeCallback(children._payload),
+                array,
+                escapedPrefix,
+                nameSoFar,
+                callback
+              );
+          }
+      }
+    if (invokeCallback)
+      return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
+        return c2;
+      })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
+        callback,
+        escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
+          userProvidedKeyEscapeRegex,
+          "$&/"
+        ) + "/") + invokeCallback
+      )), array.push(callback)), 1;
+    invokeCallback = 0;
+    var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
+    if (isArrayImpl(children))
+      for (var i2 = 0; i2 < children.length; i2++)
+        nameSoFar = children[i2], type = nextNamePrefix + getElementKey(nameSoFar, i2), invokeCallback += mapIntoArray(
+          nameSoFar,
+          array,
+          escapedPrefix,
+          type,
+          callback
+        );
+    else if (i2 = getIteratorFn(children), "function" === typeof i2)
+      for (children = i2.call(children), i2 = 0; !(nameSoFar = children.next()).done; )
+        nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i2++), invokeCallback += mapIntoArray(
+          nameSoFar,
+          array,
+          escapedPrefix,
+          type,
+          callback
+        );
+    else if ("object" === type) {
+      if ("function" === typeof children.then)
+        return mapIntoArray(
+          resolveThenable(children),
+          array,
+          escapedPrefix,
+          nameSoFar,
+          callback
+        );
+      array = String(children);
+      throw Error(
+        "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+      );
+    }
+    return invokeCallback;
+  }
+  function mapChildren(children, func, context) {
+    if (null == children) return children;
+    var result = [], count = 0;
+    mapIntoArray(children, result, "", "", function(child) {
+      return func.call(context, child, count++);
+    });
+    return result;
+  }
+  function lazyInitializer(payload) {
+    if (-1 === payload._status) {
+      var ctor = payload._result;
+      ctor = ctor();
+      ctor.then(
+        function(moduleObject) {
+          if (0 === payload._status || -1 === payload._status)
+            payload._status = 1, payload._result = moduleObject;
+        },
+        function(error) {
+          if (0 === payload._status || -1 === payload._status)
+            payload._status = 2, payload._result = error;
+        }
+      );
+      -1 === payload._status && (payload._status = 0, payload._result = ctor);
+    }
+    if (1 === payload._status) return payload._result.default;
+    throw payload._result;
+  }
+  var reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+    if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+      var event = new window.ErrorEvent("error", {
+        bubbles: true,
+        cancelable: true,
+        message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+        error
+      });
+      if (!window.dispatchEvent(event)) return;
+    } else if ("object" === typeof process && "function" === typeof process.emit) {
+      process.emit("uncaughtException", error);
+      return;
+    }
+    console.error(error);
+  }, Children = {
+    map: mapChildren,
+    forEach: function(children, forEachFunc, forEachContext) {
+      mapChildren(
+        children,
+        function() {
+          forEachFunc.apply(this, arguments);
+        },
+        forEachContext
+      );
+    },
+    count: function(children) {
+      var n2 = 0;
+      mapChildren(children, function() {
+        n2++;
+      });
+      return n2;
+    },
+    toArray: function(children) {
+      return mapChildren(children, function(child) {
+        return child;
+      }) || [];
+    },
+    only: function(children) {
+      if (!isValidElement(children))
+        throw Error(
+          "React.Children.only expected to receive a single React element child."
+        );
+      return children;
+    }
+  };
+  react_production.Activity = REACT_ACTIVITY_TYPE;
+  react_production.Children = Children;
+  react_production.Component = Component;
+  react_production.Fragment = REACT_FRAGMENT_TYPE;
+  react_production.Profiler = REACT_PROFILER_TYPE;
+  react_production.PureComponent = PureComponent;
+  react_production.StrictMode = REACT_STRICT_MODE_TYPE;
+  react_production.Suspense = REACT_SUSPENSE_TYPE;
+  react_production.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+  react_production.__COMPILER_RUNTIME = {
+    __proto__: null,
+    c: function(size2) {
+      return ReactSharedInternals.H.useMemoCache(size2);
+    }
+  };
+  react_production.cache = function(fn) {
+    return function() {
+      return fn.apply(null, arguments);
+    };
+  };
+  react_production.cacheSignal = function() {
+    return null;
+  };
+  react_production.cloneElement = function(element, config, children) {
+    if (null === element || void 0 === element)
+      throw Error(
+        "The argument must be a React element, but you passed " + element + "."
+      );
+    var props = assign({}, element.props), key2 = element.key;
+    if (null != config)
+      for (propName in void 0 !== config.key && (key2 = "" + config.key), config)
+        !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+    var propName = arguments.length - 2;
+    if (1 === propName) props.children = children;
+    else if (1 < propName) {
+      for (var childArray = Array(propName), i2 = 0; i2 < propName; i2++)
+        childArray[i2] = arguments[i2 + 2];
+      props.children = childArray;
+    }
+    return ReactElement(element.type, key2, props);
+  };
+  react_production.createContext = function(defaultValue) {
+    defaultValue = {
+      $$typeof: REACT_CONTEXT_TYPE,
+      _currentValue: defaultValue,
+      _currentValue2: defaultValue,
+      _threadCount: 0,
+      Provider: null,
+      Consumer: null
+    };
+    defaultValue.Provider = defaultValue;
+    defaultValue.Consumer = {
+      $$typeof: REACT_CONSUMER_TYPE,
+      _context: defaultValue
+    };
+    return defaultValue;
+  };
+  react_production.createElement = function(type, config, children) {
+    var propName, props = {}, key2 = null;
+    if (null != config)
+      for (propName in void 0 !== config.key && (key2 = "" + config.key), config)
+        hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
+    var childrenLength = arguments.length - 2;
+    if (1 === childrenLength) props.children = children;
+    else if (1 < childrenLength) {
+      for (var childArray = Array(childrenLength), i2 = 0; i2 < childrenLength; i2++)
+        childArray[i2] = arguments[i2 + 2];
+      props.children = childArray;
+    }
+    if (type && type.defaultProps)
+      for (propName in childrenLength = type.defaultProps, childrenLength)
+        void 0 === props[propName] && (props[propName] = childrenLength[propName]);
+    return ReactElement(type, key2, props);
+  };
+  react_production.createRef = function() {
+    return { current: null };
+  };
+  react_production.forwardRef = function(render) {
+    return { $$typeof: REACT_FORWARD_REF_TYPE, render };
+  };
+  react_production.isValidElement = isValidElement;
+  react_production.lazy = function(ctor) {
+    return {
+      $$typeof: REACT_LAZY_TYPE,
+      _payload: { _status: -1, _result: ctor },
+      _init: lazyInitializer
+    };
+  };
+  react_production.memo = function(type, compare) {
+    return {
+      $$typeof: REACT_MEMO_TYPE,
+      type,
+      compare: void 0 === compare ? null : compare
+    };
+  };
+  react_production.startTransition = function(scope) {
+    var prevTransition = ReactSharedInternals.T, currentTransition = {};
+    ReactSharedInternals.T = currentTransition;
+    try {
+      var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+      null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+      "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop2, reportGlobalError);
+    } catch (error) {
+      reportGlobalError(error);
+    } finally {
+      null !== prevTransition && null !== currentTransition.types && (prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
+    }
+  };
+  react_production.unstable_useCacheRefresh = function() {
+    return ReactSharedInternals.H.useCacheRefresh();
+  };
+  react_production.use = function(usable) {
+    return ReactSharedInternals.H.use(usable);
+  };
+  react_production.useActionState = function(action, initialState2, permalink) {
+    return ReactSharedInternals.H.useActionState(action, initialState2, permalink);
+  };
+  react_production.useCallback = function(callback, deps) {
+    return ReactSharedInternals.H.useCallback(callback, deps);
+  };
+  react_production.useContext = function(Context) {
+    return ReactSharedInternals.H.useContext(Context);
+  };
+  react_production.useDebugValue = function() {
+  };
+  react_production.useDeferredValue = function(value2, initialValue) {
+    return ReactSharedInternals.H.useDeferredValue(value2, initialValue);
+  };
+  react_production.useEffect = function(create2, deps) {
+    return ReactSharedInternals.H.useEffect(create2, deps);
+  };
+  react_production.useEffectEvent = function(callback) {
+    return ReactSharedInternals.H.useEffectEvent(callback);
+  };
+  react_production.useId = function() {
+    return ReactSharedInternals.H.useId();
+  };
+  react_production.useImperativeHandle = function(ref, create2, deps) {
+    return ReactSharedInternals.H.useImperativeHandle(ref, create2, deps);
+  };
+  react_production.useInsertionEffect = function(create2, deps) {
+    return ReactSharedInternals.H.useInsertionEffect(create2, deps);
+  };
+  react_production.useLayoutEffect = function(create2, deps) {
+    return ReactSharedInternals.H.useLayoutEffect(create2, deps);
+  };
+  react_production.useMemo = function(create2, deps) {
+    return ReactSharedInternals.H.useMemo(create2, deps);
+  };
+  react_production.useOptimistic = function(passthrough, reducer) {
+    return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
+  };
+  react_production.useReducer = function(reducer, initialArg, init3) {
+    return ReactSharedInternals.H.useReducer(reducer, initialArg, init3);
+  };
+  react_production.useRef = function(initialValue) {
+    return ReactSharedInternals.H.useRef(initialValue);
+  };
+  react_production.useState = function(initialState2) {
+    return ReactSharedInternals.H.useState(initialState2);
+  };
+  react_production.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+    return ReactSharedInternals.H.useSyncExternalStore(
+      subscribe,
+      getSnapshot,
+      getServerSnapshot
+    );
+  };
+  react_production.useTransition = function() {
+    return ReactSharedInternals.H.useTransition();
+  };
+  react_production.version = "19.2.0";
+  return react_production;
+}
+var react_development = { exports: {} };
+react_development.exports;
+var hasRequiredReact_development;
+function requireReact_development() {
+  if (hasRequiredReact_development) return react_development.exports;
+  hasRequiredReact_development = 1;
+  (function(module2, exports) {
+    /**
+     * @license React
+     * react.development.js
+     *
+     * Copyright (c) Meta Platforms, Inc. and affiliates.
+     *
+     * This source code is licensed under the MIT license found in the
+     * LICENSE file in the root directory of this source tree.
+     */
+    "production" !== development && function() {
+      function defineDeprecationWarning(methodName, info) {
+        Object.defineProperty(Component.prototype, methodName, {
+          get: function() {
+            console.warn(
+              "%s(...) is deprecated in plain JavaScript React classes. %s",
+              info[0],
+              info[1]
+            );
+          }
+        });
+      }
+      function getIteratorFn(maybeIterable) {
+        if (null === maybeIterable || "object" !== typeof maybeIterable)
+          return null;
+        maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+        return "function" === typeof maybeIterable ? maybeIterable : null;
+      }
+      function warnNoop(publicInstance, callerName) {
+        publicInstance = (publicInstance = publicInstance.constructor) && (publicInstance.displayName || publicInstance.name) || "ReactClass";
+        var warningKey = publicInstance + "." + callerName;
+        didWarnStateUpdateForUnmountedComponent[warningKey] || (console.error(
+          "Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.",
+          callerName,
+          publicInstance
+        ), didWarnStateUpdateForUnmountedComponent[warningKey] = true);
+      }
+      function Component(props, context, updater) {
+        this.props = props;
+        this.context = context;
+        this.refs = emptyObject;
+        this.updater = updater || ReactNoopUpdateQueue;
+      }
+      function ComponentDummy() {
+      }
+      function PureComponent(props, context, updater) {
+        this.props = props;
+        this.context = context;
+        this.refs = emptyObject;
+        this.updater = updater || ReactNoopUpdateQueue;
+      }
+      function noop2() {
+      }
+      function testStringCoercion(value2) {
+        return "" + value2;
+      }
+      function checkKeyStringCoercion(value2) {
+        try {
+          testStringCoercion(value2);
+          var JSCompiler_inline_result = false;
+        } catch (e2) {
+          JSCompiler_inline_result = true;
+        }
+        if (JSCompiler_inline_result) {
+          JSCompiler_inline_result = console;
+          var JSCompiler_temp_const = JSCompiler_inline_result.error;
+          var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value2[Symbol.toStringTag] || value2.constructor.name || "Object";
+          JSCompiler_temp_const.call(
+            JSCompiler_inline_result,
+            "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
+            JSCompiler_inline_result$jscomp$0
+          );
+          return testStringCoercion(value2);
+        }
+      }
+      function getComponentNameFromType(type) {
+        if (null == type) return null;
+        if ("function" === typeof type)
+          return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
+        if ("string" === typeof type) return type;
+        switch (type) {
+          case REACT_FRAGMENT_TYPE:
+            return "Fragment";
+          case REACT_PROFILER_TYPE:
+            return "Profiler";
+          case REACT_STRICT_MODE_TYPE:
+            return "StrictMode";
+          case REACT_SUSPENSE_TYPE:
+            return "Suspense";
+          case REACT_SUSPENSE_LIST_TYPE:
+            return "SuspenseList";
+          case REACT_ACTIVITY_TYPE:
+            return "Activity";
+        }
+        if ("object" === typeof type)
+          switch ("number" === typeof type.tag && console.error(
+            "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
+          ), type.$$typeof) {
+            case REACT_PORTAL_TYPE:
+              return "Portal";
+            case REACT_CONTEXT_TYPE:
+              return type.displayName || "Context";
+            case REACT_CONSUMER_TYPE:
+              return (type._context.displayName || "Context") + ".Consumer";
+            case REACT_FORWARD_REF_TYPE:
+              var innerType = type.render;
+              type = type.displayName;
+              type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
+              return type;
+            case REACT_MEMO_TYPE:
+              return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
+            case REACT_LAZY_TYPE:
+              innerType = type._payload;
+              type = type._init;
+              try {
+                return getComponentNameFromType(type(innerType));
+              } catch (x) {
+              }
+          }
+        return null;
+      }
+      function getTaskName(type) {
+        if (type === REACT_FRAGMENT_TYPE) return "<>";
+        if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
+          return "<...>";
+        try {
+          var name2 = getComponentNameFromType(type);
+          return name2 ? "<" + name2 + ">" : "<...>";
+        } catch (x) {
+          return "<...>";
+        }
+      }
+      function getOwner() {
+        var dispatcher = ReactSharedInternals.A;
+        return null === dispatcher ? null : dispatcher.getOwner();
+      }
+      function UnknownOwner() {
+        return Error("react-stack-top-frame");
+      }
+      function hasValidKey(config) {
+        if (hasOwnProperty.call(config, "key")) {
+          var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+          if (getter && getter.isReactWarning) return false;
+        }
+        return void 0 !== config.key;
+      }
+      function defineKeyPropWarningGetter(props, displayName) {
+        function warnAboutAccessingKey() {
+          specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
+            "%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
+            displayName
+          ));
+        }
+        warnAboutAccessingKey.isReactWarning = true;
+        Object.defineProperty(props, "key", {
+          get: warnAboutAccessingKey,
+          configurable: true
+        });
+      }
+      function elementRefGetterWithDeprecationWarning() {
+        var componentName = getComponentNameFromType(this.type);
+        didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
+          "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
+        ));
+        componentName = this.props.ref;
+        return void 0 !== componentName ? componentName : null;
+      }
+      function ReactElement(type, key2, props, owner, debugStack, debugTask) {
+        var refProp = props.ref;
+        type = {
+          $$typeof: REACT_ELEMENT_TYPE,
+          type,
+          key: key2,
+          props,
+          _owner: owner
+        };
+        null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
+          enumerable: false,
+          get: elementRefGetterWithDeprecationWarning
+        }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
+        type._store = {};
+        Object.defineProperty(type._store, "validated", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: 0
+        });
+        Object.defineProperty(type, "_debugInfo", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: null
+        });
+        Object.defineProperty(type, "_debugStack", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: debugStack
+        });
+        Object.defineProperty(type, "_debugTask", {
+          configurable: false,
+          enumerable: false,
+          writable: true,
+          value: debugTask
+        });
+        Object.freeze && (Object.freeze(type.props), Object.freeze(type));
+        return type;
+      }
+      function cloneAndReplaceKey(oldElement, newKey) {
+        newKey = ReactElement(
+          oldElement.type,
+          newKey,
+          oldElement.props,
+          oldElement._owner,
+          oldElement._debugStack,
+          oldElement._debugTask
+        );
+        oldElement._store && (newKey._store.validated = oldElement._store.validated);
+        return newKey;
+      }
+      function validateChildKeys(node) {
+        isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+      }
+      function isValidElement(object) {
+        return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+      }
+      function escape2(key2) {
+        var escaperLookup = { "=": "=0", ":": "=2" };
+        return "$" + key2.replace(/[=:]/g, function(match) {
+          return escaperLookup[match];
+        });
+      }
+      function getElementKey(element, index) {
+        return "object" === typeof element && null !== element && null != element.key ? (checkKeyStringCoercion(element.key), escape2("" + element.key)) : index.toString(36);
+      }
+      function resolveThenable(thenable) {
+        switch (thenable.status) {
+          case "fulfilled":
+            return thenable.value;
+          case "rejected":
+            throw thenable.reason;
+          default:
+            switch ("string" === typeof thenable.status ? thenable.then(noop2, noop2) : (thenable.status = "pending", thenable.then(
+              function(fulfilledValue) {
+                "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+              },
+              function(error) {
+                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+              }
+            )), thenable.status) {
+              case "fulfilled":
+                return thenable.value;
+              case "rejected":
+                throw thenable.reason;
+            }
+        }
+        throw thenable;
+      }
+      function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+        var type = typeof children;
+        if ("undefined" === type || "boolean" === type) children = null;
+        var invokeCallback = false;
+        if (null === children) invokeCallback = true;
+        else
+          switch (type) {
+            case "bigint":
+            case "string":
+            case "number":
+              invokeCallback = true;
+              break;
+            case "object":
+              switch (children.$$typeof) {
+                case REACT_ELEMENT_TYPE:
+                case REACT_PORTAL_TYPE:
+                  invokeCallback = true;
+                  break;
+                case REACT_LAZY_TYPE:
+                  return invokeCallback = children._init, mapIntoArray(
+                    invokeCallback(children._payload),
+                    array,
+                    escapedPrefix,
+                    nameSoFar,
+                    callback
+                  );
+              }
+          }
+        if (invokeCallback) {
+          invokeCallback = children;
+          callback = callback(invokeCallback);
+          var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
+          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
+            return c2;
+          })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
+            callback,
+            escapedPrefix + (null == callback.key || invokeCallback && invokeCallback.key === callback.key ? "" : ("" + callback.key).replace(
+              userProvidedKeyEscapeRegex,
+              "$&/"
+            ) + "/") + childKey
+          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
+          return 1;
+        }
+        invokeCallback = 0;
+        childKey = "" === nameSoFar ? "." : nameSoFar + ":";
+        if (isArrayImpl(children))
+          for (var i2 = 0; i2 < children.length; i2++)
+            nameSoFar = children[i2], type = childKey + getElementKey(nameSoFar, i2), invokeCallback += mapIntoArray(
+              nameSoFar,
+              array,
+              escapedPrefix,
+              type,
+              callback
+            );
+        else if (i2 = getIteratorFn(children), "function" === typeof i2)
+          for (i2 === children.entries && (didWarnAboutMaps || console.warn(
+            "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
+          ), didWarnAboutMaps = true), children = i2.call(children), i2 = 0; !(nameSoFar = children.next()).done; )
+            nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i2++), invokeCallback += mapIntoArray(
+              nameSoFar,
+              array,
+              escapedPrefix,
+              type,
+              callback
+            );
+        else if ("object" === type) {
+          if ("function" === typeof children.then)
+            return mapIntoArray(
+              resolveThenable(children),
+              array,
+              escapedPrefix,
+              nameSoFar,
+              callback
+            );
+          array = String(children);
+          throw Error(
+            "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+          );
+        }
+        return invokeCallback;
+      }
+      function mapChildren(children, func, context) {
+        if (null == children) return children;
+        var result = [], count = 0;
+        mapIntoArray(children, result, "", "", function(child) {
+          return func.call(context, child, count++);
+        });
+        return result;
+      }
+      function lazyInitializer(payload) {
+        if (-1 === payload._status) {
+          var ioInfo = payload._ioInfo;
+          null != ioInfo && (ioInfo.start = ioInfo.end = performance.now());
+          ioInfo = payload._result;
+          var thenable = ioInfo();
+          thenable.then(
+            function(moduleObject) {
+              if (0 === payload._status || -1 === payload._status) {
+                payload._status = 1;
+                payload._result = moduleObject;
+                var _ioInfo = payload._ioInfo;
+                null != _ioInfo && (_ioInfo.end = performance.now());
+                void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
+              }
+            },
+            function(error) {
+              if (0 === payload._status || -1 === payload._status) {
+                payload._status = 2;
+                payload._result = error;
+                var _ioInfo2 = payload._ioInfo;
+                null != _ioInfo2 && (_ioInfo2.end = performance.now());
+                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+              }
+            }
+          );
+          ioInfo = payload._ioInfo;
+          if (null != ioInfo) {
+            ioInfo.value = thenable;
+            var displayName = thenable.displayName;
+            "string" === typeof displayName && (ioInfo.name = displayName);
+          }
+          -1 === payload._status && (payload._status = 0, payload._result = thenable);
+        }
+        if (1 === payload._status)
+          return ioInfo = payload._result, void 0 === ioInfo && console.error(
+            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))\n\nDid you accidentally put curly braces around the import?",
+            ioInfo
+          ), "default" in ioInfo || console.error(
+            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))",
+            ioInfo
+          ), ioInfo.default;
+        throw payload._result;
+      }
+      function resolveDispatcher() {
+        var dispatcher = ReactSharedInternals.H;
+        null === dispatcher && console.error(
+          "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
+        );
+        return dispatcher;
+      }
+      function releaseAsyncTransition() {
+        ReactSharedInternals.asyncTransitions--;
+      }
+      function enqueueTask(task) {
+        if (null === enqueueTaskImpl)
+          try {
+            var requireString = ("require" + Math.random()).slice(0, 7);
+            enqueueTaskImpl = (module2 && module2[requireString]).call(
+              module2,
+              "timers"
+            ).setImmediate;
+          } catch (_err) {
+            enqueueTaskImpl = function(callback) {
+              false === didWarnAboutMessageChannel && (didWarnAboutMessageChannel = true, "undefined" === typeof MessageChannel && console.error(
+                "This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."
+              ));
+              var channel = new MessageChannel();
+              channel.port1.onmessage = callback;
+              channel.port2.postMessage(void 0);
+            };
+          }
+        return enqueueTaskImpl(task);
+      }
+      function aggregateErrors(errors) {
+        return 1 < errors.length && "function" === typeof AggregateError ? new AggregateError(errors) : errors[0];
+      }
+      function popActScope(prevActQueue, prevActScopeDepth) {
+        prevActScopeDepth !== actScopeDepth - 1 && console.error(
+          "You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "
+        );
+        actScopeDepth = prevActScopeDepth;
+      }
+      function recursivelyFlushAsyncActWork(returnValue, resolve, reject) {
+        var queue = ReactSharedInternals.actQueue;
+        if (null !== queue)
+          if (0 !== queue.length)
+            try {
+              flushActQueue(queue);
+              enqueueTask(function() {
+                return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
+              });
+              return;
+            } catch (error) {
+              ReactSharedInternals.thrownErrors.push(error);
+            }
+          else ReactSharedInternals.actQueue = null;
+        0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
+      }
+      function flushActQueue(queue) {
+        if (!isFlushing) {
+          isFlushing = true;
+          var i2 = 0;
+          try {
+            for (; i2 < queue.length; i2++) {
+              var callback = queue[i2];
+              do {
+                ReactSharedInternals.didUsePromise = false;
+                var continuation = callback(false);
+                if (null !== continuation) {
+                  if (ReactSharedInternals.didUsePromise) {
+                    queue[i2] = callback;
+                    queue.splice(0, i2);
+                    return;
+                  }
+                  callback = continuation;
+                } else break;
+              } while (1);
+            }
+            queue.length = 0;
+          } catch (error) {
+            queue.splice(0, i2 + 1), ReactSharedInternals.thrownErrors.push(error);
+          } finally {
+            isFlushing = false;
+          }
+        }
+      }
+      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
+      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, didWarnStateUpdateForUnmountedComponent = {}, ReactNoopUpdateQueue = {
+        isMounted: function() {
+          return false;
+        },
+        enqueueForceUpdate: function(publicInstance) {
+          warnNoop(publicInstance, "forceUpdate");
+        },
+        enqueueReplaceState: function(publicInstance) {
+          warnNoop(publicInstance, "replaceState");
+        },
+        enqueueSetState: function(publicInstance) {
+          warnNoop(publicInstance, "setState");
+        }
+      }, assign = Object.assign, emptyObject = {};
+      Object.freeze(emptyObject);
+      Component.prototype.isReactComponent = {};
+      Component.prototype.setState = function(partialState, callback) {
+        if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+          throw Error(
+            "takes an object of state variables to update or a function which returns an object of state variables."
+          );
+        this.updater.enqueueSetState(this, partialState, callback, "setState");
+      };
+      Component.prototype.forceUpdate = function(callback) {
+        this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+      };
+      var deprecatedAPIs = {
+        isMounted: [
+          "isMounted",
+          "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
+        ],
+        replaceState: [
+          "replaceState",
+          "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."
+        ]
+      };
+      for (fnName in deprecatedAPIs)
+        deprecatedAPIs.hasOwnProperty(fnName) && defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
+      ComponentDummy.prototype = Component.prototype;
+      deprecatedAPIs = PureComponent.prototype = new ComponentDummy();
+      deprecatedAPIs.constructor = PureComponent;
+      assign(deprecatedAPIs, Component.prototype);
+      deprecatedAPIs.isPureReactComponent = true;
+      var isArrayImpl = Array.isArray, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = {
+        H: null,
+        A: null,
+        T: null,
+        S: null,
+        actQueue: null,
+        asyncTransitions: 0,
+        isBatchingLegacy: false,
+        didScheduleLegacyUpdate: false,
+        didUsePromise: false,
+        thrownErrors: [],
+        getCurrentStack: null,
+        recentlyCreatedOwnerStacks: 0
+      }, hasOwnProperty = Object.prototype.hasOwnProperty, createTask = console.createTask ? console.createTask : function() {
+        return null;
+      };
+      deprecatedAPIs = {
+        react_stack_bottom_frame: function(callStackForError) {
+          return callStackForError();
+        }
+      };
+      var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
+      var didWarnAboutElementRef = {};
+      var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
+        deprecatedAPIs,
+        UnknownOwner
+      )();
+      var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
+      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+        if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+          var event = new window.ErrorEvent("error", {
+            bubbles: true,
+            cancelable: true,
+            message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+            error
+          });
+          if (!window.dispatchEvent(event)) return;
+        } else if ("object" === typeof process && "function" === typeof process.emit) {
+          process.emit("uncaughtException", error);
+          return;
+        }
+        console.error(error);
+      }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
+        queueMicrotask(function() {
+          return queueMicrotask(callback);
+        });
+      } : enqueueTask;
+      deprecatedAPIs = Object.freeze({
+        __proto__: null,
+        c: function(size2) {
+          return resolveDispatcher().useMemoCache(size2);
+        }
+      });
+      var fnName = {
+        map: mapChildren,
+        forEach: function(children, forEachFunc, forEachContext) {
+          mapChildren(
+            children,
+            function() {
+              forEachFunc.apply(this, arguments);
+            },
+            forEachContext
+          );
+        },
+        count: function(children) {
+          var n2 = 0;
+          mapChildren(children, function() {
+            n2++;
+          });
+          return n2;
+        },
+        toArray: function(children) {
+          return mapChildren(children, function(child) {
+            return child;
+          }) || [];
+        },
+        only: function(children) {
+          if (!isValidElement(children))
+            throw Error(
+              "React.Children.only expected to receive a single React element child."
+            );
+          return children;
+        }
+      };
+      exports.Activity = REACT_ACTIVITY_TYPE;
+      exports.Children = fnName;
+      exports.Component = Component;
+      exports.Fragment = REACT_FRAGMENT_TYPE;
+      exports.Profiler = REACT_PROFILER_TYPE;
+      exports.PureComponent = PureComponent;
+      exports.StrictMode = REACT_STRICT_MODE_TYPE;
+      exports.Suspense = REACT_SUSPENSE_TYPE;
+      exports.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+      exports.__COMPILER_RUNTIME = deprecatedAPIs;
+      exports.act = function(callback) {
+        var prevActQueue = ReactSharedInternals.actQueue, prevActScopeDepth = actScopeDepth;
+        actScopeDepth++;
+        var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
+        try {
+          var result = callback();
+        } catch (error) {
+          ReactSharedInternals.thrownErrors.push(error);
+        }
+        if (0 < ReactSharedInternals.thrownErrors.length)
+          throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+        if (null !== result && "object" === typeof result && "function" === typeof result.then) {
+          var thenable = result;
+          queueSeveralMicrotasks(function() {
+            didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+              "You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"
+            ));
+          });
+          return {
+            then: function(resolve, reject) {
+              didAwaitActCall = true;
+              thenable.then(
+                function(returnValue) {
+                  popActScope(prevActQueue, prevActScopeDepth);
+                  if (0 === prevActScopeDepth) {
+                    try {
+                      flushActQueue(queue), enqueueTask(function() {
+                        return recursivelyFlushAsyncActWork(
+                          returnValue,
+                          resolve,
+                          reject
+                        );
+                      });
+                    } catch (error$0) {
+                      ReactSharedInternals.thrownErrors.push(error$0);
+                    }
+                    if (0 < ReactSharedInternals.thrownErrors.length) {
+                      var _thrownError = aggregateErrors(
+                        ReactSharedInternals.thrownErrors
+                      );
+                      ReactSharedInternals.thrownErrors.length = 0;
+                      reject(_thrownError);
+                    }
+                  } else resolve(returnValue);
+                },
+                function(error) {
+                  popActScope(prevActQueue, prevActScopeDepth);
+                  0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
+                    ReactSharedInternals.thrownErrors
+                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
+                }
+              );
+            }
+          };
+        }
+        var returnValue$jscomp$0 = result;
+        popActScope(prevActQueue, prevActScopeDepth);
+        0 === prevActScopeDepth && (flushActQueue(queue), 0 !== queue.length && queueSeveralMicrotasks(function() {
+          didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+            "A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:\n\nawait act(() => ...)"
+          ));
+        }), ReactSharedInternals.actQueue = null);
+        if (0 < ReactSharedInternals.thrownErrors.length)
+          throw callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+        return {
+          then: function(resolve, reject) {
+            didAwaitActCall = true;
+            0 === prevActScopeDepth ? (ReactSharedInternals.actQueue = queue, enqueueTask(function() {
+              return recursivelyFlushAsyncActWork(
+                returnValue$jscomp$0,
+                resolve,
+                reject
+              );
+            })) : resolve(returnValue$jscomp$0);
+          }
+        };
+      };
+      exports.cache = function(fn) {
+        return function() {
+          return fn.apply(null, arguments);
+        };
+      };
+      exports.cacheSignal = function() {
+        return null;
+      };
+      exports.captureOwnerStack = function() {
+        var getCurrentStack = ReactSharedInternals.getCurrentStack;
+        return null === getCurrentStack ? null : getCurrentStack();
+      };
+      exports.cloneElement = function(element, config, children) {
+        if (null === element || void 0 === element)
+          throw Error(
+            "The argument must be a React element, but you passed " + element + "."
+          );
+        var props = assign({}, element.props), key2 = element.key, owner = element._owner;
+        if (null != config) {
+          var JSCompiler_inline_result;
+          a: {
+            if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
+              config,
+              "ref"
+            ).get) && JSCompiler_inline_result.isReactWarning) {
+              JSCompiler_inline_result = false;
+              break a;
+            }
+            JSCompiler_inline_result = void 0 !== config.ref;
+          }
+          JSCompiler_inline_result && (owner = getOwner());
+          hasValidKey(config) && (checkKeyStringCoercion(config.key), key2 = "" + config.key);
+          for (propName in config)
+            !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+        }
+        var propName = arguments.length - 2;
+        if (1 === propName) props.children = children;
+        else if (1 < propName) {
+          JSCompiler_inline_result = Array(propName);
+          for (var i2 = 0; i2 < propName; i2++)
+            JSCompiler_inline_result[i2] = arguments[i2 + 2];
+          props.children = JSCompiler_inline_result;
+        }
+        props = ReactElement(
+          element.type,
+          key2,
+          props,
+          owner,
+          element._debugStack,
+          element._debugTask
+        );
+        for (key2 = 2; key2 < arguments.length; key2++)
+          validateChildKeys(arguments[key2]);
+        return props;
+      };
+      exports.createContext = function(defaultValue) {
+        defaultValue = {
+          $$typeof: REACT_CONTEXT_TYPE,
+          _currentValue: defaultValue,
+          _currentValue2: defaultValue,
+          _threadCount: 0,
+          Provider: null,
+          Consumer: null
+        };
+        defaultValue.Provider = defaultValue;
+        defaultValue.Consumer = {
+          $$typeof: REACT_CONSUMER_TYPE,
+          _context: defaultValue
+        };
+        defaultValue._currentRenderer = null;
+        defaultValue._currentRenderer2 = null;
+        return defaultValue;
+      };
+      exports.createElement = function(type, config, children) {
+        for (var i2 = 2; i2 < arguments.length; i2++)
+          validateChildKeys(arguments[i2]);
+        i2 = {};
+        var key2 = null;
+        if (null != config)
+          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
+            "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
+          )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key2 = "" + config.key), config)
+            hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i2[propName] = config[propName]);
+        var childrenLength = arguments.length - 2;
+        if (1 === childrenLength) i2.children = children;
+        else if (1 < childrenLength) {
+          for (var childArray = Array(childrenLength), _i = 0; _i < childrenLength; _i++)
+            childArray[_i] = arguments[_i + 2];
+          Object.freeze && Object.freeze(childArray);
+          i2.children = childArray;
+        }
+        if (type && type.defaultProps)
+          for (propName in childrenLength = type.defaultProps, childrenLength)
+            void 0 === i2[propName] && (i2[propName] = childrenLength[propName]);
+        key2 && defineKeyPropWarningGetter(
+          i2,
+          "function" === typeof type ? type.displayName || type.name || "Unknown" : type
+        );
+        var propName = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
+        return ReactElement(
+          type,
+          key2,
+          i2,
+          getOwner(),
+          propName ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
+          propName ? createTask(getTaskName(type)) : unknownOwnerDebugTask
+        );
+      };
+      exports.createRef = function() {
+        var refObject = { current: null };
+        Object.seal(refObject);
+        return refObject;
+      };
+      exports.forwardRef = function(render) {
+        null != render && render.$$typeof === REACT_MEMO_TYPE ? console.error(
+          "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))."
+        ) : "function" !== typeof render ? console.error(
+          "forwardRef requires a render function but was given %s.",
+          null === render ? "null" : typeof render
+        ) : 0 !== render.length && 2 !== render.length && console.error(
+          "forwardRef render functions accept exactly two parameters: props and ref. %s",
+          1 === render.length ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."
+        );
+        null != render && null != render.defaultProps && console.error(
+          "forwardRef render functions do not support defaultProps. Did you accidentally pass a React component?"
+        );
+        var elementType = { $$typeof: REACT_FORWARD_REF_TYPE, render }, ownName;
+        Object.defineProperty(elementType, "displayName", {
+          enumerable: false,
+          configurable: true,
+          get: function() {
+            return ownName;
+          },
+          set: function(name2) {
+            ownName = name2;
+            render.name || render.displayName || (Object.defineProperty(render, "name", { value: name2 }), render.displayName = name2);
+          }
+        });
+        return elementType;
+      };
+      exports.isValidElement = isValidElement;
+      exports.lazy = function(ctor) {
+        ctor = { _status: -1, _result: ctor };
+        var lazyType = {
+          $$typeof: REACT_LAZY_TYPE,
+          _payload: ctor,
+          _init: lazyInitializer
+        }, ioInfo = {
+          name: "lazy",
+          start: -1,
+          end: -1,
+          value: null,
+          owner: null,
+          debugStack: Error("react-stack-top-frame"),
+          debugTask: console.createTask ? console.createTask("lazy()") : null
+        };
+        ctor._ioInfo = ioInfo;
+        lazyType._debugInfo = [{ awaited: ioInfo }];
+        return lazyType;
+      };
+      exports.memo = function(type, compare) {
+        null == type && console.error(
+          "memo: The first argument must be a component. Instead received: %s",
+          null === type ? "null" : typeof type
+        );
+        compare = {
+          $$typeof: REACT_MEMO_TYPE,
+          type,
+          compare: void 0 === compare ? null : compare
+        };
+        var ownName;
+        Object.defineProperty(compare, "displayName", {
+          enumerable: false,
+          configurable: true,
+          get: function() {
+            return ownName;
+          },
+          set: function(name2) {
+            ownName = name2;
+            type.name || type.displayName || (Object.defineProperty(type, "name", { value: name2 }), type.displayName = name2);
+          }
+        });
+        return compare;
+      };
+      exports.startTransition = function(scope) {
+        var prevTransition = ReactSharedInternals.T, currentTransition = {};
+        currentTransition._updatedFibers = /* @__PURE__ */ new Set();
+        ReactSharedInternals.T = currentTransition;
+        try {
+          var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+          null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+          "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop2, reportGlobalError));
+        } catch (error) {
+          reportGlobalError(error);
+        } finally {
+          null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
+            "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
+          )), null !== prevTransition && null !== currentTransition.types && (null !== prevTransition.types && prevTransition.types !== currentTransition.types && console.error(
+            "We expected inner Transitions to have transferred the outer types set and that you cannot add to the outer Transition while inside the inner.This is a bug in React."
+          ), prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
+        }
+      };
+      exports.unstable_useCacheRefresh = function() {
+        return resolveDispatcher().useCacheRefresh();
+      };
+      exports.use = function(usable) {
+        return resolveDispatcher().use(usable);
+      };
+      exports.useActionState = function(action, initialState2, permalink) {
+        return resolveDispatcher().useActionState(
+          action,
+          initialState2,
+          permalink
+        );
+      };
+      exports.useCallback = function(callback, deps) {
+        return resolveDispatcher().useCallback(callback, deps);
+      };
+      exports.useContext = function(Context) {
+        var dispatcher = resolveDispatcher();
+        Context.$$typeof === REACT_CONSUMER_TYPE && console.error(
+          "Calling useContext(Context.Consumer) is not supported and will cause bugs. Did you mean to call useContext(Context) instead?"
+        );
+        return dispatcher.useContext(Context);
+      };
+      exports.useDebugValue = function(value2, formatterFn) {
+        return resolveDispatcher().useDebugValue(value2, formatterFn);
+      };
+      exports.useDeferredValue = function(value2, initialValue) {
+        return resolveDispatcher().useDeferredValue(value2, initialValue);
+      };
+      exports.useEffect = function(create2, deps) {
+        null == create2 && console.warn(
+          "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useEffect(create2, deps);
+      };
+      exports.useEffectEvent = function(callback) {
+        return resolveDispatcher().useEffectEvent(callback);
+      };
+      exports.useId = function() {
+        return resolveDispatcher().useId();
+      };
+      exports.useImperativeHandle = function(ref, create2, deps) {
+        return resolveDispatcher().useImperativeHandle(ref, create2, deps);
+      };
+      exports.useInsertionEffect = function(create2, deps) {
+        null == create2 && console.warn(
+          "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useInsertionEffect(create2, deps);
+      };
+      exports.useLayoutEffect = function(create2, deps) {
+        null == create2 && console.warn(
+          "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+        );
+        return resolveDispatcher().useLayoutEffect(create2, deps);
+      };
+      exports.useMemo = function(create2, deps) {
+        return resolveDispatcher().useMemo(create2, deps);
+      };
+      exports.useOptimistic = function(passthrough, reducer) {
+        return resolveDispatcher().useOptimistic(passthrough, reducer);
+      };
+      exports.useReducer = function(reducer, initialArg, init3) {
+        return resolveDispatcher().useReducer(reducer, initialArg, init3);
+      };
+      exports.useRef = function(initialValue) {
+        return resolveDispatcher().useRef(initialValue);
+      };
+      exports.useState = function(initialState2) {
+        return resolveDispatcher().useState(initialState2);
+      };
+      exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+        return resolveDispatcher().useSyncExternalStore(
+          subscribe,
+          getSnapshot,
+          getServerSnapshot
+        );
+      };
+      exports.useTransition = function() {
+        return resolveDispatcher().useTransition();
+      };
+      exports.version = "19.2.0";
+      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
+    }();
+  })(react_development, react_development.exports);
+  return react_development.exports;
+}
+if (development === "production") {
+  react.exports = requireReact_production();
+} else {
+  react.exports = requireReact_development();
+}
+var reactExports = react.exports;
+const walletLogger = createLogger("kasstamp:web:wallet");
+const hookLogger = createLogger("kasstamp:web:hooks");
+const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
+const getEnv = (key2, defaultValue) => {
+  if (typeof window !== "undefined") {
+    const viteEnv = __vite_import_meta_env__;
+    return viteEnv && viteEnv[key2] || defaultValue || "";
+  }
+  return defaultValue || "";
+};
+const APP_CONFIG = {
+  // Default network - use mainnet in production, testnet-10 in development
+  defaultNetwork: getEnv("VITE_DEFAULT_NETWORK", development === "production" ? "mainnet" : "testnet-10"),
+  // Priority fee for transactions (in sompi)
+  // Default: 1000 sompi = 0.00001 KAS
+  priorityFeeSompi: BigInt(getEnv("VITE_PRIORITY_FEE", "1000")),
+  // UI settings - configurable via environment variables
+  autoRefreshInterval: parseInt(getEnv("VITE_AUTO_REFRESH_INTERVAL", "30000")),
+  // 30 seconds
+  heartbeatInterval: parseInt(getEnv("VITE_HEARTBEAT_INTERVAL", "300000")),
+  // 5 minutes
+  // Connection timeouts - configurable via environment variables
+  connectionTimeout: parseInt(getEnv("VITE_CONNECTION_TIMEOUT", "15000")),
+  // 15 seconds to establish connection
+  requestTimeout: parseInt(getEnv("VITE_REQUEST_TIMEOUT", "10000")),
+  // 10 seconds for request completion
+  healthCheckInterval: parseInt(getEnv("VITE_HEALTH_CHECK_INTERVAL", "30000")),
+  // 30 seconds between health checks
+  // Feature flags
+  showDebugLogs: getEnv("VITE_DEBUG", development === "production" ? "false" : "true").toLowerCase() === "true",
+  enableAutoConnect: getEnv("VITE_AUTO_CONNECT", "true").toLowerCase() === "true"
+};
+class WalletService {
+  kaspaSDK = null;
+  currentWallet = null;
+  currentAccount = null;
+  balanceService = null;
+  transactionMonitoringService = null;
+  currentWalletName = null;
+  currentBalance = null;
+  // Wallet listener callbacks (stored for cleanup)
+  walletBalanceCallback = null;
+  walletTransactionCallback = null;
+  // Simple event system - properly typed with union type
+  eventListeners = /* @__PURE__ */ new Map();
+  constructor() {
+    walletLogger.info("🏢 React Wallet Service initialized with unified SDK");
+    if (APP_CONFIG.showDebugLogs) {
+      walletLogger.info("🔧 Wallet Service Configuration:", {
+        defaultNetwork: APP_CONFIG.defaultNetwork,
+        enableAutoConnect: APP_CONFIG.enableAutoConnect,
+        showDebugLogs: APP_CONFIG.showDebugLogs
+      });
+    }
+  }
+  /**
+   * Map string network input to Network enum (single conversion point)
+   * Simple mapping without WASM dependencies
+   */
+  mapStringToNetwork(networkString) {
+    switch (networkString) {
+      case "mainnet":
+        return "mainnet";
+      case "testnet-10":
+        return "testnet-10";
+      default:
+        throw new Error(`Invalid network: ${networkString}. Only 'mainnet' and 'testnet-10' are supported.`);
+    }
+  }
+  /**
+   * Get the SDK instance for external use
+   */
+  getSDK() {
+    return this.kaspaSDK;
+  }
+  getCurrentWallet() {
+    return this.currentWallet;
+  }
+  getState() {
+    return {
+      isConnected: !!this.kaspaSDK && this.kaspaSDK.isReady(),
+      isInitialized: !!this.kaspaSDK,
+      currentNetwork: this.kaspaSDK?.getNetwork() || "testnet-10",
+      hasWallet: !!this.currentWallet,
+      walletLocked: this.currentWallet?.locked ?? true,
+      address: this.currentAccount?.receiveAddress?.toString() || null,
+      accounts: this.currentWallet?.accounts || [],
+      walletName: this.currentWalletName,
+      balance: this.currentBalance,
+      // Return stored balance instead of null
+      lastSyncTime: /* @__PURE__ */ new Date()
+    };
+  }
+  /**
+   * Connect to Kaspa network using unified SDK
+   * @param network - Network to connect to (required: 'mainnet' or 'testnet-10')
+   */
+  async connect(network) {
+    const targetNetwork = network || APP_CONFIG.defaultNetwork;
+    if (!targetNetwork) {
+      throw new Error("Network is required for connection. Either provide it as parameter or set VITE_DEFAULT_NETWORK in .env");
+    }
+    try {
+      walletLogger.info(`🚀 Connecting to ${targetNetwork} with unified SDK...`);
+      const networkId = this.mapStringToNetwork(targetNetwork);
+      const config = {
+        network: networkId,
+        debug: APP_CONFIG.showDebugLogs
+      };
+      const walletFactory = new KaspaWalletFactory();
+      this.kaspaSDK = await KaspaSDK.init(config, walletFactory);
+      walletLogger.info("✅ Unified SDK ready!");
+      walletStorage.setNetwork(targetNetwork);
+      this.notifyListeners("connected", { network: targetNetwork });
+    } catch (error) {
+      walletLogger.error("❌ SDK connection failed:", error);
+      this.notifyListeners("error", {
+        message: error instanceof Error ? error.message : "Connection failed",
+        code: "CONNECTION_ERROR"
+      });
+      throw error;
+    }
+  }
+  /**
+   * List all available wallets using WASM SDK storage
+   */
+  async listWallets() {
+    try {
+      walletLogger.info("📋 Listing available wallets...");
+      const wallets = await walletStorage.listWallets();
+      walletLogger.info(`✅ Found ${wallets.length} wallets`);
+      return wallets;
+    } catch (error) {
+      walletLogger.error("❌ Failed to list wallets:", error);
+      throw error;
+    }
+  }
+  /**
+   * Delete a wallet from storage
+   * If the deleted wallet is currently active, disconnect it first
+   */
+  async deleteWallet(walletName) {
+    try {
+      const isActiveWallet = this.currentWalletName === walletName;
+      walletLogger.info(`🗑️ Deleting wallet: ${walletName}. Is active wallet: ${isActiveWallet}`);
+      if (isActiveWallet) {
+        walletLogger.info(`⚠️ Deleting active wallet, disconnecting first...`);
+        await this.disconnect();
+      }
+      await walletStorage.deleteWallet(walletName);
+      walletLogger.info(`✅ Wallet "${walletName}" deleted successfully`);
+    } catch (error) {
+      walletLogger.error("❌ Failed to delete wallet:", error);
+      throw error;
+    }
+  }
+  /**
+   * Rename a wallet
+   * Delegates to the wallet storage manager which handles all the binary format details
+   * If the renamed wallet is currently active, update the internal reference
+   */
+  async renameWallet(oldName, newName) {
+    try {
+      const isActiveWallet = this.currentWalletName === oldName;
+      walletLogger.info(`🔄 Rename request: "${oldName}" -> "${newName}". Is active wallet: ${isActiveWallet}`);
+      await walletStorage.renameWallet(oldName, newName);
+      if (isActiveWallet && this.currentWalletName) {
+        walletLogger.info(`📝 Updating active wallet reference from "${oldName}" to "${newName}"`);
+        this.currentWalletName = newName;
+        walletLogger.info(`📡 Firing wallet-opened event with walletName: "${newName}"`);
+        const address = this.currentAccount?.receiveAddress;
+        this.notifyListeners("wallet-opened", {
+          address: address?.toString() || "",
+          walletName: newName
+        });
+        walletLogger.info(`✅ Wallet service state updated. getState().walletName = "${this.getState().walletName}"`);
+      } else {
+        walletLogger.info(`ℹ️ Not active wallet, skipping event notification`);
+      }
+    } catch (error) {
+      walletLogger.error("❌ Failed to rename wallet:", error);
+      throw error;
+    }
+  }
+  /**
+   * Create a new wallet
+   */
+  async createWallet(walletName, walletSecret, words = 24, passphrase, network) {
+    if (!this.kaspaSDK) {
+      throw new Error("SDK not initialized");
+    }
+    walletLogger.info("💼 Creating new wallet via unified SDK...");
+    const targetNetwork = network || this.kaspaSDK.getNetwork();
+    if (!targetNetwork) {
+      throw new Error("Network is required for wallet creation");
+    }
+    const networkId = this.mapStringToNetwork(targetNetwork);
+    const result = await this.kaspaSDK.createNewWallet({
+      name: walletName,
+      walletSecret,
+      words,
+      passphrase,
+      network: networkId
+    });
+    this.currentWallet = result.wallet;
+    this.currentWalletName = walletName;
+    await this.currentWallet.unlockFromPassword(walletSecret);
+    const existingAccounts = await this.currentWallet.getExistingAccounts();
+    if (existingAccounts.length === 0) {
+      throw new Error("No accounts found in created wallet - SDK should have created one");
+    }
+    this.currentAccount = existingAccounts[0];
+    walletLogger.info(`✅ Wallet created! Address: ${this.currentAccount.receiveAddress?.toString()}`);
+    await this.setupMonitoringServices();
+    this.notifyListeners("wallet-created", {
+      address: this.currentAccount.receiveAddress?.toString() || "",
+      mnemonic: result.mnemonic,
+      walletName: this.currentWalletName || walletName
+    });
+    return result;
+  }
+  /**
+   * Import wallet from mnemonic
+   */
+  async importWallet(mnemonic, walletName, walletSecret, passphrase, network) {
+    if (!this.kaspaSDK) {
+      throw new Error("SDK not initialized");
+    }
+    walletLogger.info("📥 Importing wallet via unified SDK...");
+    const targetNetwork = network || this.kaspaSDK.getNetwork();
+    if (!targetNetwork) {
+      throw new Error("Network is required for wallet import");
+    }
+    const networkId = this.mapStringToNetwork(targetNetwork);
+    const wordCount = this.getMnemonicWordCount(mnemonic);
+    this.currentWallet = await this.kaspaSDK.importWallet(mnemonic, {
+      name: walletName,
+      words: wordCount,
+      walletSecret,
+      passphrase,
+      network: networkId
+    });
+    this.currentWalletName = walletName;
+    walletLogger.info(`🔓 Unlocking imported wallet with password...`);
+    try {
+      await this.currentWallet.unlockFromPassword(walletSecret);
+      walletLogger.info(`✅ Wallet unlocked successfully. Locked state: ${this.currentWallet.locked}`);
+    } catch (unlockError) {
+      walletLogger.error("❌ Failed to unlock wallet after import:", unlockError);
+      throw new Error(`Failed to unlock imported wallet: ${unlockError instanceof Error ? unlockError.message : String(unlockError)}`);
+    }
+    walletLogger.info(`📋 Loading accounts from imported wallet...`);
+    const existingAccounts = await this.currentWallet.getExistingAccounts();
+    walletLogger.info(`📋 Found ${existingAccounts.length} accounts`);
+    if (existingAccounts.length === 0) {
+      throw new Error("No accounts found in imported wallet - SDK should have created one");
+    }
+    this.currentAccount = existingAccounts[0];
+    walletLogger.info(`✅ Wallet imported! Address: ${this.currentAccount.receiveAddress?.toString()}`);
+    walletLogger.info(`📝 Wallet state after import:`, {
+      walletName: this.currentWalletName,
+      hasWallet: !!this.currentWallet,
+      walletLocked: this.currentWallet?.locked,
+      address: this.currentAccount?.receiveAddress?.toString()
+    });
+    await this.setupMonitoringServices();
+    this.notifyListeners("wallet-imported", {
+      address: this.currentAccount.receiveAddress?.toString() || "",
+      walletName: this.currentWalletName || walletName
+    });
+  }
+  /**
+   * Open existing wallet
+   */
+  async openExistingWallet(walletName, walletSecret) {
+    if (!this.kaspaSDK) {
+      throw new Error("SDK not initialized");
+    }
+    walletLogger.info(`🔓 Opening existing wallet: ${walletName}...`);
+    this.currentWallet = await this.kaspaSDK.openExistingWallet(walletName, walletSecret);
+    this.currentWalletName = walletName;
+    await this.currentWallet.unlockFromPassword(walletSecret);
+    const existingAccounts = await this.currentWallet.getExistingAccounts();
+    if (existingAccounts.length === 0) {
+      this.currentAccount = await this.currentWallet.deriveNextAccount(0);
+      walletLogger.info(`✅ Wallet opened! Created first account: ${this.currentAccount.receiveAddress?.toString()}`);
+    } else {
+      this.currentAccount = existingAccounts[0];
+      walletLogger.info(`✅ Wallet opened! Loaded existing account: ${this.currentAccount.receiveAddress?.toString()}`);
+    }
+    await this.setupMonitoringServices();
+    this.notifyListeners("wallet-opened", {
+      address: this.currentAccount.receiveAddress?.toString() || "",
+      walletName: this.currentWalletName || walletName
+    });
+  }
+  /**
+   * Set up monitoring services using SDK orchestration
+   */
+  async setupMonitoringServices() {
+    if (!this.kaspaSDK || !this.currentAccount) {
+      walletLogger.warn("⚠️ SDK or account not available for monitoring setup");
+      return;
+    }
+    const address = this.currentAccount.receiveAddress?.toString();
+    const wasmWallet = this.currentWallet?.wasmWallet;
+    walletLogger.info("🔧 Setting up monitoring services...");
+    if (APP_CONFIG.showDebugLogs) {
+      walletLogger.info("🔧 Address:", { address });
+      walletLogger.info("🔧 Account ID:", { accountId: this.currentAccount.accountId });
+      walletLogger.info("🔧 WASM Wallet available:", { hasWallet: !!wasmWallet });
+    }
+    if (wasmWallet && this.currentAccount.accountId) {
+      try {
+        walletLogger.info("🔧 Activating account for monitoring...");
+        await wasmWallet.accountsActivate({
+          accountIds: [this.currentAccount.accountId]
+        });
+        walletLogger.info("✅ Account activated for monitoring");
+      } catch (error) {
+        walletLogger.warn("⚠️ Failed to activate account:", error);
+      }
+    }
+    if (!this.currentWallet) {
+      throw new Error("No wallet available for service creation");
+    }
+    const services = this.kaspaSDK.createWalletServices(this.currentWallet);
+    this.balanceService = services.balanceMonitoring;
+    this.transactionMonitoringService = services.transactionMonitoring;
+    this.balanceService.on("balance-updated", (data) => {
+      walletLogger.info(`💰 Balance updated: ${data.balanceKas} KAS (${data.source})`);
+      this.currentBalance = data.balanceKas;
+      this.notifyListeners("balance-updated", { balance: data.balanceKas });
+    });
+    this.balanceService.on("error", (error) => {
+      walletLogger.error("❌ Balance monitoring error:", error);
+      this.notifyListeners("error", error);
+    });
+    await this.balanceService.startMonitoring();
+    await this.transactionMonitoringService.start();
+    if (this.currentWallet && this.currentAccount.accountId) {
+      walletLogger.info("🔧 Setting up wallet-level listeners...");
+      this.walletBalanceCallback = (balanceEvent) => {
+        walletLogger.info(`💰 [Wallet Listener] Balance changed:`, {
+          mature: balanceEvent.mature.toString(),
+          pending: balanceEvent.pending.toString(),
+          total: balanceEvent.total.toString(),
+          balanceKas: balanceEvent.balanceKas
+        });
+        this.currentBalance = balanceEvent.balanceKas;
+        this.notifyListeners("balance-updated", { balance: balanceEvent.balanceKas });
+      };
+      this.walletTransactionCallback = (txEvent) => {
+        walletLogger.info(`📝 [Wallet Listener] Transaction ${txEvent.type}:`, {
+          id: txEvent.transaction.id,
+          type: txEvent.type,
+          timestamp: txEvent.timestamp
+        });
+      };
+      this.currentWallet.onBalanceUpdate(this.walletBalanceCallback);
+      this.currentWallet.onTransactionUpdate(this.walletTransactionCallback);
+      walletLogger.info("✅ Wallet-level listeners registered");
+    }
+    walletLogger.info("✅ Monitoring services started");
+  }
+  /**
+   * Get current balance
+   */
+  async getBalance() {
+    if (!this.balanceService) {
+      throw new Error("Balance service not initialized");
+    }
+    try {
+      const { balanceKas } = await this.balanceService.getCurrentBalance();
+      return balanceKas;
+    } catch (error) {
+      walletLogger.error("❌ Failed to get balance:", error);
+      return "0";
+    }
+  }
+  /**
+   * Get transaction history
+   */
+  async getTransactionHistory() {
+    if (!this.currentWallet) {
+      walletLogger.warn("⚠️ Wallet not available");
+      return [];
+    }
+    try {
+      walletLogger.info(`📋 Getting transaction history for all accounts in wallet`);
+      if (!this.currentWallet.isSynced()) {
+        walletLogger.info("⏳ Wallet not synced, waiting for sync...");
+        const synced = await this.currentWallet.waitForSync(3e4);
+        if (!synced) {
+          walletLogger.warn("⚠️ Wallet sync timeout, proceeding anyway...");
+        }
+      }
+      const accounts = this.currentWallet.accounts;
+      walletLogger.info(`📋 Found ${accounts.length} accounts in wallet`);
+      if (accounts.length === 0) {
+        walletLogger.info("📋 No accounts found in wallet");
+        return [];
+      }
+      const transactionPromises = accounts.map(async (account) => {
+        try {
+          walletLogger.info(`📋 Getting transactions for account: ${account.accountId}`);
+          if (!this.currentWallet) {
+            walletLogger.warn("⚠️ Current wallet is null");
+            return [];
+          }
+          const accountTransactions = await this.currentWallet.getTransactionHistory(account.accountId);
+          walletLogger.info(`📋 Found ${accountTransactions.length} transactions for account ${account.accountId}`);
+          return accountTransactions;
+        } catch (error) {
+          walletLogger.warn(`⚠️ Failed to get transactions for account ${account.accountId}:`, error);
+          return [];
+        }
+      });
+      const allTransactionArrays = await Promise.all(transactionPromises);
+      const allTransactions = allTransactionArrays.flat();
+      allTransactions.sort((a2, b) => {
+        const timeA = a2.unixtimeMsec ? Number(a2.unixtimeMsec) : 0;
+        const timeB = b.unixtimeMsec ? Number(b.unixtimeMsec) : 0;
+        return timeB - timeA;
+      });
+      walletLogger.info(`📋 Total transactions from all accounts: ${allTransactions.length}`);
+      return allTransactions;
+    } catch (error) {
+      walletLogger.error("❌ Failed to get transaction history:", error);
+      return [];
+    }
+  }
+  /**
+   * Disconnect and cleanup
+   */
+  async disconnect() {
+    try {
+      if (this.currentWallet) {
+        if (this.walletBalanceCallback) {
+          this.currentWallet.removeBalanceListener(this.walletBalanceCallback);
+          walletLogger.info("🧹 Removed wallet balance listener");
+        }
+        if (this.walletTransactionCallback) {
+          this.currentWallet.removeTransactionListener(this.walletTransactionCallback);
+          walletLogger.info("🧹 Removed wallet transaction listener");
+        }
+      }
+      if (this.balanceService) {
+        await this.balanceService.stopMonitoring();
+      }
+      if (this.transactionMonitoringService) {
+        await this.transactionMonitoringService.stop();
+      }
+      if (this.kaspaSDK) {
+        await this.kaspaSDK.disconnect();
+      }
+      this.kaspaSDK = null;
+      this.currentWallet = null;
+      this.currentAccount = null;
+      this.balanceService = null;
+      this.transactionMonitoringService = null;
+      this.currentWalletName = null;
+      this.walletBalanceCallback = null;
+      this.walletTransactionCallback = null;
+      walletLogger.info("✅ React wallet service disconnected");
+      this.notifyListeners("disconnected", {});
+    } catch (error) {
+      walletLogger.error("❌ Error during disconnect:", error);
+      throw error;
+    }
+  }
+  // Event system
+  addEventListener(event, callback) {
+    if (!this.eventListeners.has(event)) {
+      this.eventListeners.set(event, []);
+    }
+    const listeners = this.eventListeners.get(event);
+    listeners?.push(callback);
+  }
+  removeEventListener(event, callback) {
+    const listeners = this.eventListeners.get(event);
+    if (listeners) {
+      const index = listeners.indexOf(callback);
+      if (index > -1) {
+        listeners.splice(index, 1);
+      }
+    }
+  }
+  notifyListeners(event, data) {
+    const listeners = this.eventListeners.get(event);
+    if (listeners) {
+      listeners.forEach((callback) => {
+        try {
+          callback(data);
+        } catch (error) {
+          walletLogger.error(`Error in event listener for ${event}:`, error);
+        }
+      });
+    }
+  }
+  /**
+   * Determine word count from mnemonic phrase
+   */
+  getMnemonicWordCount(mnemonic) {
+    const words = mnemonic.trim().split(/\s+/);
+    const wordCount = words.length;
+    if (![12, 15, 18, 21, 24].includes(wordCount)) {
+      throw new Error(`Invalid mnemonic word count: ${wordCount}. Must be 12, 15, 18, 21, or 24 words.`);
+    }
+    return wordCount;
+  }
+}
+const walletService = new WalletService();
+const initialState = {
+  isConnected: false,
+  isInitialized: false,
+  isConnecting: false,
+  currentNetwork: "",
+  hasWallet: false,
+  walletLocked: true,
+  address: null,
+  balance: null,
+  accounts: [],
+  lastSyncTime: null,
+  error: null
+};
+function UseWallet() {
+  const [state, setState] = reactExports.useState(initialState);
+  const [isConnecting, setIsConnecting] = reactExports.useState(false);
+  const eventListenersRef = reactExports.useRef([]);
+  const updateStateFromService = reactExports.useCallback(() => {
+    const serviceState = walletService.getState();
+    setState((prevState) => ({
+      ...prevState,
+      isConnected: serviceState.isConnected,
+      isInitialized: serviceState.isInitialized,
+      currentNetwork: serviceState.currentNetwork.toString(),
+      hasWallet: serviceState.hasWallet,
+      walletLocked: serviceState.walletLocked,
+      address: serviceState.address,
+      balance: serviceState.balance,
+      // Include balance from service state
+      accounts: serviceState.accounts,
+      walletName: serviceState.walletName,
+      lastSyncTime: serviceState.lastSyncTime
+    }));
+  }, []);
+  reactExports.useEffect(() => {
+    const addEventListener = (event, callback) => {
+      walletService.addEventListener(event, callback);
+      eventListenersRef.current.push({
+        event,
+        callback
+      });
+    };
+    addEventListener("connected", (data) => {
+      hookLogger.info("✅ Wallet connected:", data);
+      setIsConnecting(false);
+      setState((prevState) => ({
+        ...prevState,
+        isConnected: true,
+        isConnecting: false,
+        currentNetwork: data.network,
+        error: null
+      }));
+    });
+    addEventListener("disconnected", () => {
+      hookLogger.info("❌ Wallet disconnected");
+      setState((prevState) => ({
+        ...initialState,
+        // Preserve the network so UI shows correct network after disconnect/lock
+        currentNetwork: prevState.currentNetwork
+      }));
+    });
+    addEventListener("wallet-created", (data) => {
+      hookLogger.info("✅ Wallet created:", { address: data.address, walletName: data.walletName });
+      updateStateFromService();
+    });
+    addEventListener("wallet-imported", (data) => {
+      hookLogger.info("✅ Wallet imported:", data);
+      updateStateFromService();
+      setTimeout(() => {
+        const serviceState = walletService.getState();
+        hookLogger.info("📊 State after wallet-imported event:", {
+          walletName: serviceState.walletName,
+          hasWallet: serviceState.hasWallet,
+          walletLocked: serviceState.walletLocked,
+          address: serviceState.address
+        });
+      }, 100);
+    });
+    addEventListener("wallet-opened", (data) => {
+      hookLogger.info("✅ Wallet opened:", data);
+      updateStateFromService();
+    });
+    addEventListener("balance-updated", (data) => {
+      hookLogger.info("💰 Balance updated:", data);
+      setState((prevState) => ({
+        ...prevState,
+        balance: data.balance
+      }));
+    });
+    addEventListener("transaction-sent", (data) => {
+      hookLogger.info("💸 Transaction sent:", data);
+    });
+    addEventListener("transaction-error", (data) => {
+      hookLogger.error("❌ Transaction error:", data);
+      setState((prevState) => ({
+        ...prevState,
+        error: data.error
+      }));
+    });
+    addEventListener("error", (error) => {
+      hookLogger.error("❌ Wallet service error:", error);
+      setIsConnecting(false);
+      setState((prevState) => ({
+        ...prevState,
+        error: error?.message || "Unknown error occurred",
+        isConnecting: false
+      }));
+    });
+    updateStateFromService();
+    return () => {
+      eventListenersRef.current.forEach(({ event, callback }) => {
+        walletService.removeEventListener(event, callback);
+      });
+      eventListenersRef.current = [];
+    };
+  }, [updateStateFromService]);
+  const actions = reactExports.useMemo(() => ({
+    connect: async (network) => {
+      try {
+        setIsConnecting(true);
+        setState((prevState) => ({
+          ...prevState,
+          isConnecting: true,
+          error: null
+        }));
+        await walletService.connect(network);
+      } catch (error) {
+        setIsConnecting(false);
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to connect",
+          isConnecting: false
+        }));
+        throw error;
+      }
+    },
+    disconnect: async () => {
+      try {
+        await walletService.disconnect();
+      } catch (error) {
+        hookLogger.error("Error disconnecting:", error);
+        setState(initialState);
+        throw error;
+      }
+    },
+    createWallet: async (params) => {
+      try {
+        setState((prevState) => ({ ...prevState, error: null }));
+        const result = await walletService.createWallet(params.walletName, params.walletSecret, params.words, params.passphrase, params.network);
+        updateStateFromService();
+        return result;
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to create wallet"
+        }));
+        throw error;
+      }
+    },
+    importWallet: async (params) => {
+      try {
+        setState((prevState) => ({ ...prevState, error: null }));
+        await walletService.importWallet(params.mnemonic, params.walletName, params.walletSecret, params.passphrase, params.network);
+        updateStateFromService();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to import wallet"
+        }));
+        throw error;
+      }
+    },
+    openExistingWallet: async (walletName, walletSecret) => {
+      try {
+        setState((prevState) => ({ ...prevState, error: null }));
+        await walletService.openExistingWallet(walletName, walletSecret);
+        updateStateFromService();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to open wallet"
+        }));
+        throw error;
+      }
+    },
+    listWallets: async () => {
+      try {
+        return await walletService.listWallets();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to list wallets"
+        }));
+        throw error;
+      }
+    },
+    deleteWallet: async (walletName) => {
+      try {
+        await walletService.deleteWallet(walletName);
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to delete wallet"
+        }));
+        throw error;
+      }
+    },
+    renameWallet: async (oldName, newName) => {
+      try {
+        await walletService.renameWallet(oldName, newName);
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to rename wallet"
+        }));
+        throw error;
+      }
+    },
+    getBalance: async () => {
+      try {
+        return await walletService.getBalance();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to get balance"
+        }));
+        throw error;
+      }
+    },
+    getTransactionHistory: async () => {
+      try {
+        return await walletService.getTransactionHistory();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to get transaction history"
+        }));
+        throw error;
+      }
+    },
+    refreshBalance: async () => {
+      try {
+        const balance = await walletService.getBalance();
+        setState((prevState) => ({
+          ...prevState,
+          balance
+        }));
+      } catch (error) {
+        hookLogger.error("Error refreshing balance:", error);
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to refresh balance"
+        }));
+      }
+    }
+  }), [updateStateFromService]);
+  const finalState = {
+    ...state,
+    isConnecting
+  };
+  return [finalState, actions];
+}
 initializeLoggers();
+UseWallet();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
@@ -81848,8 +84050,6 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    await KaspaSDK.rpcClient.connect(this.chainId);
-    this.startPolling();
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
@@ -81858,8 +84058,6 @@ class KaspaSignalling {
     return { mnemonic: this.mnemonic, address: this.address };
   }
   async connect(networkName = "testnet-10") {
-    await KaspaSDK.rpcClient.connect(networkName);
-    this.startPolling();
   }
   async sendMessage(to, type, data) {
     if (!this.wallet)
