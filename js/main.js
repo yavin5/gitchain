@@ -10,11 +10,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const messageInput = document.getElementById("message");
   const sendButton = document.getElementById("send");
   const generateWalletBtn = document.getElementById("generateWallet");
-  document.getElementById("walletInfo");
-  document.getElementById("mnemonic");
-  document.getElementById("kaspaAddress");
+  const walletInfoDiv = document.getElementById("walletInfo");
+  const mnemonicDisplay = document.getElementById("mnemonic");
+  const kaspaAddress = document.getElementById("kaspaAddress");
   const connectPeersBtn = document.getElementById("connectPeers");
   const chatDiv = document.getElementById("chat");
+  let signaling = null;
   let localPeerId = "";
   const connections = /* @__PURE__ */ new Map();
   if (window.gitchain && window.gitchain.initP2P) {
@@ -57,9 +58,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   generateWalletBtn.addEventListener("click", () => {
     console.log("Clicked generate wallet button.");
+    console.log("About to instantiate KaspaSignalling.");
+    signaling = new window.gitchain.KaspaSignalling("tn-10");
+    const { mnemonic, address } = signaling.generateWallet();
+    console.log("Generated wallet: " + mnemonic + " " + address);
+    mnemonicDisplay.textContent = mnemonic;
+    kaspaAddress.textContent = address;
+    walletInfoDiv.classList.remove("hidden");
+    console.log("Kaspa wallet generated:", { mnemonic, address });
   });
   connectPeersBtn.addEventListener("click", async () => {
-    return alert("Generate a wallet first.");
+    if (!signaling) return alert("Generate a wallet first.");
+    await signaling.connect();
+    const peers = window.gitchain.getServerPeers() || [];
+    for (const peerId of peers) {
+      if (peerId !== localPeerId && !connections.has(peerId)) {
+        const conn = new window.gitchain.WebRTCConnection(signaling, localPeerId, peerId);
+        connections.set(peerId, conn);
+        console.log(`Initiated WebRTC connection to ${peerId.slice(-8)}`);
+      }
+    }
   });
   sendButton.addEventListener("click", () => {
     const msg = messageInput.value.trim();
