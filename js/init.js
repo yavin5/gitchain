@@ -10,21 +10,21 @@ await new Promise(r => {
 // 2. Import the compiled chain code (Vite outputs bundle.js)
 // ---------------------------------------------------------------
 import './bundle.js';          // <-- change if your file is chain.js
-//import { KasplexSignalling } from './bundle.js';
+import { KaspaSignalling } from './bundle.js';
 
 // ---------------------------------------------------------------
 // 3. Build the UI (inline – CSP now allows it)
 // ---------------------------------------------------------------
 document.body.insertAdjacentHTML('beforeend', `
 <div id="gitchain-ui" style="font-family:Arial;padding:1rem;max-width:600px;margin:auto;">
-  <h2>Gitchain + Kasplex Demo</h2>
+  <h2>Gitchain</h2>
 
   <label>GitHub PAT: <input id="patInput" type="text" placeholder="ghp_…"></label>
   <button id="savePat">Save PAT</button>
 
   <hr>
 
-  <button id="generateWallet">Generate Kasplex Wallet</button>
+  <button id="generateWallet">Generate Kaspa Wallet</button>
   <div id="walletInfo" style="margin-top:0.5rem;"></div>
 
   <hr>
@@ -57,7 +57,7 @@ window.viewChain = async () => {
 };
 
 // ---------------------------------------------------------------
-// 5. Kasplex wallet generation
+// 5. Kaspa wallet generation
 // ---------------------------------------------------------------
 let signalling = null;
 
@@ -66,7 +66,7 @@ document.getElementById('generateWallet').addEventListener('click', async () => 
   infoDiv.textContent = 'Generating…';
 
   try {
-    if (!signalling) signalling = new KasplexSignalling();
+    if (!signalling) signalling = new KaspaSignalling();
     const { mnemonic, address } = signalling.generateWallet();
     await signalling.connect();               // connects to testnet RPC
 
@@ -77,7 +77,7 @@ document.getElementById('generateWallet').addEventListener('click', async () => 
     `;
 
     // expose for other parts of the app
-    window.gitchain.KasplexSignallingInstance = signalling;
+    window.gitchain.KaspaSignallingInstance = signalling;
   } catch (err) {
     infoDiv.textContent = 'Error: ' + err.message;
   }
