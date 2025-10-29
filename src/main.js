@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
         console.log("About to instantiate KaspaSignalling.");
-        signaling = new window.gitchain.KaspaSignalling('tn-10');
+        signaling = new window.gitchain.KaspaSignalling('testnet-10');
         console.log("signalling: " + signaling);
         const { mnemonic, address } = signaling.generateWallet();
         console.log("Generated wallet: " + mnemonic + " " + address);
@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------
   connectPeersBtn.addEventListener('click', async () => {
     if (!signaling) return alert('Generate a wallet first.');
-    await signaling.connect();
 
     const peers = window.gitchain.getServerPeers() || [];
     for (const peerId of peers) {

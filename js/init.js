@@ -44,7 +44,8 @@ document.getElementById('generateWallet').addEventListener('click', async () => 
   infoDiv.textContent = 'Generating…';
 
   try {
-    if (!signalling) signalling = new KaspaSignalling();
+    if (!signalling) signalling = new KaspaSignalling('testnet-10');
+    await new Promise((r) => setTimeout(r, 2000));
     console.log("signalling.generateWallet()");
     const { mnemonic, address } = signalling.generateWallet();
     console.log("signalling.generateWallet() done.. " + mnemonic + " " + address);

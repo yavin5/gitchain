@@ -86,13 +86,12 @@ export class KaspaSignalling {
   listeners: ((msg: any) => void)[] = [];
   pollingInterval: any = null;
 
-  constructor(chainId = 'tn-10') {
+  constructor(chainId = 'testnet-10') {
     this.chainId = chainId;
   }
 
   async generateWallet() {
-    KaspaSDK.setNetwork(this.chainId === 'tn-10' || this.chainId === 'tn-11' ? KaspaSDK.NetworkType.Testnet : KaspaSDK.NetworkType.Mainnet);
-    await KaspaSDK.rpcClient.connect();
+    await KaspaSDK.rpcClient.connect(this.chainId);
     this.startPolling();
 
     // @ts-ignore
@@ -103,9 +102,8 @@ export class KaspaSignalling {
     return { mnemonic: this.mnemonic, address: this.address };
   }
 
-  async connect() {
-    KaspaSDK.setNetwork(this.chainId === 'tn-10' || this.chainId === 'tn-11' ? KaspaSDK.NetworkType.Testnet : KaspaSDK.NetworkType.Mainnet);
-    await KaspaSDK.rpcClient.connect();
+  async connect(networkName? = 'testnet-10') {
+    await KaspaSDK.rpcClient.connect(networkName);
     this.startPolling();
   }
 
