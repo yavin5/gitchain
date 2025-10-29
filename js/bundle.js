@@ -81848,7 +81848,7 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    await this.connect();
+    await self.connect();
     this.mnemonic = Mnemonic.random(12);
     if (!this.mnemonic)
       throw new Error("Mnemonic not generated");
