@@ -340,7 +340,7 @@ function resetLogger() {
 __name$9(resetLogger, "resetLogger");
 function initializeLoggers() {
   {
-    setGlobalLogLevel(LogLevel.WARN);
+    setGlobalLogLevel(LogLevel.DEBUG);
   }
 }
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
@@ -33051,7 +33051,11 @@ function commonjsRequire(path) {
   throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
 }
 var core = { exports: {} };
-const __viteBrowserExternal = {};
+const __viteBrowserExternal = new Proxy({}, {
+  get(_, key2) {
+    throw new Error(`Module "" has been externalized for browser compatibility. Cannot access ".${key2}" in client code.  See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
+  }
+});
 const __viteBrowserExternal$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: __viteBrowserExternal
@@ -76568,11 +76572,11 @@ async function initializeCompressionPlatform() {
   }
   if (capabilities.hasFileSystem) {
     try {
-      const zlib = await __vitePreload(() => Promise.resolve().then(() => __viteBrowserExternal$1), true ? void 0 : void 0);
+      const zlib = await __vitePreload(() => import("./assets/__vite-browser-external_zlib-Cf8Jdtym.js"), true ? [] : void 0);
       const { promisify } = await __vitePreload(async () => {
-        const { promisify: promisify2 } = await Promise.resolve().then(() => __viteBrowserExternal$1);
+        const { promisify: promisify2 } = await import("./assets/__vite-browser-external_util-pV4bfyhx.js");
         return { promisify: promisify2 };
-      }, true ? void 0 : void 0);
+      }, true ? [] : void 0);
       const gzipAsync = promisify(zlib.gzip);
       const gunzipAsync = promisify(zlib.gunzip);
       return {
@@ -81821,7 +81825,7 @@ var KaspaSDK = class _KaspaSDK {
   }
 };
 const walletLogger = createLogger("kasstamp:web:wallet");
-const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
+const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": true, "MODE": "production", "PROD": false, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
 const getEnv = (key2, defaultValue) => {
   if (typeof window !== "undefined") {
     const viteEnv = __vite_import_meta_env__;
