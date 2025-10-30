@@ -82332,14 +82332,7 @@ class WalletService {
   }
 }
 new WalletService();
-function UseWallet() {
-  const finalState = {
-    //isConnecting,
-  };
-  return [finalState, actions];
-}
 initializeLoggers();
-UseWallet();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];

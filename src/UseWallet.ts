@@ -66,6 +66,10 @@ const initialState: WalletState = {
   error: null,
 };
 
+const actions = {
+// TODO: add all those wallet action functions in here.
+}
+
 export function UseWallet(): [WalletState, WalletActions] {
   const finalState: WalletState = {
     //isConnecting,
