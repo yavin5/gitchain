@@ -67,7 +67,7 @@ export default defineConfig({
   define: {
     global: 'globalThis',
     // Explicitly set NODE_ENV based on Vite mode
-    'process.env.NODE_ENV': 'development',
+    'process.env.NODE_ENV': '"development"',
   },
   resolve: {
     alias: {
