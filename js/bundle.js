@@ -2758,11 +2758,11 @@ class HashMD {
     if (len % 4)
       throw new Error("_sha2: outputLen must be aligned to 32bit");
     const outLen = len / 4;
-    const state = this.get();
-    if (outLen > state.length)
+    const state2 = this.get();
+    if (outLen > state2.length)
       throw new Error("_sha2: outputLen bigger than state");
     for (let i2 = 0; i2 < outLen; i2++)
-      oview.setUint32(4 * i2, state[i2], isLE2);
+      oview.setUint32(4 * i2, state2[i2], isLE2);
   }
   digest() {
     const { buffer, outputLen } = this;
@@ -22038,9 +22038,9 @@ class RTCPeerConnectionMultiaddrConnection extends AbstractMultiaddrConnection {
   constructor(init3) {
     super(init3);
     this.peerConnection = init3.peerConnection;
-    const initialState2 = init3.peerConnection.connectionState;
+    const initialState = init3.peerConnection.connectionState;
     this.peerConnection.onconnectionstatechange = () => {
-      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState2);
+      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState);
       if (this.peerConnection.connectionState === "disconnected" || this.peerConnection.connectionState === "failed" || this.peerConnection.connectionState === "closed") {
         this.onTransportClosed();
         this.peerConnection.close();
@@ -25168,7 +25168,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
     }
   }
   /** Create a new stream */
-  _newStream(streamId, state, direction) {
+  _newStream(streamId, state2, direction) {
     if (this.streams.find((s2) => s2.streamId === streamId) != null) {
       throw new InvalidParametersError$1("Stream already exists with that id");
     }
@@ -25176,7 +25176,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
       ...this.streamOptions,
       id: `${streamId}`,
       streamId,
-      state,
+      state: state2,
       direction,
       sendFrame: this.sendFrame.bind(this),
       log: this.log.newScope(`${direction}:${streamId}`),
@@ -35140,21 +35140,21 @@ function requireSha3() {
             outputLength: 512
           }),
           _doReset: function() {
-            var state = this._state = [];
+            var state2 = this._state = [];
             for (var i2 = 0; i2 < 25; i2++) {
-              state[i2] = new X64Word.init();
+              state2[i2] = new X64Word.init();
             }
             this.blockSize = (1600 - 2 * this.cfg.outputLength) / 32;
           },
           _doProcessBlock: function(M, offset) {
-            var state = this._state;
+            var state2 = this._state;
             var nBlockSizeLanes = this.blockSize / 2;
             for (var i2 = 0; i2 < nBlockSizeLanes; i2++) {
               var M2i = M[offset + 2 * i2];
               var M2i1 = M[offset + 2 * i2 + 1];
               M2i = (M2i << 8 | M2i >>> 24) & 16711935 | (M2i << 24 | M2i >>> 8) & 4278255360;
               M2i1 = (M2i1 << 8 | M2i1 >>> 24) & 16711935 | (M2i1 << 24 | M2i1 >>> 8) & 4278255360;
-              var lane = state[i2];
+              var lane = state2[i2];
               lane.high ^= M2i1;
               lane.low ^= M2i;
             }
@@ -35162,7 +35162,7 @@ function requireSha3() {
               for (var x = 0; x < 5; x++) {
                 var tMsw = 0, tLsw = 0;
                 for (var y = 0; y < 5; y++) {
-                  var lane = state[x + 5 * y];
+                  var lane = state2[x + 5 * y];
                   tMsw ^= lane.high;
                   tLsw ^= lane.low;
                 }
@@ -35178,7 +35178,7 @@ function requireSha3() {
                 var tMsw = Tx4.high ^ (Tx1Msw << 1 | Tx1Lsw >>> 31);
                 var tLsw = Tx4.low ^ (Tx1Lsw << 1 | Tx1Msw >>> 31);
                 for (var y = 0; y < 5; y++) {
-                  var lane = state[x + 5 * y];
+                  var lane = state2[x + 5 * y];
                   lane.high ^= tMsw;
                   lane.low ^= tLsw;
                 }
@@ -35186,7 +35186,7 @@ function requireSha3() {
               for (var laneIndex = 1; laneIndex < 25; laneIndex++) {
                 var tMsw;
                 var tLsw;
-                var lane = state[laneIndex];
+                var lane = state2[laneIndex];
                 var laneMsw = lane.high;
                 var laneLsw = lane.low;
                 var rhoOffset = RHO_OFFSETS[laneIndex];
@@ -35202,13 +35202,13 @@ function requireSha3() {
                 TPiLane.low = tLsw;
               }
               var T0 = T[0];
-              var state0 = state[0];
+              var state0 = state2[0];
               T0.high = state0.high;
               T0.low = state0.low;
               for (var x = 0; x < 5; x++) {
                 for (var y = 0; y < 5; y++) {
                   var laneIndex = x + 5 * y;
-                  var lane = state[laneIndex];
+                  var lane = state2[laneIndex];
                   var TLane = T[laneIndex];
                   var Tx1Lane = T[(x + 1) % 5 + 5 * y];
                   var Tx2Lane = T[(x + 2) % 5 + 5 * y];
@@ -35216,7 +35216,7 @@ function requireSha3() {
                   lane.low = TLane.low ^ ~Tx1Lane.low & Tx2Lane.low;
                 }
               }
-              var lane = state[0];
+              var lane = state2[0];
               var roundConstant = ROUND_CONSTANTS[round];
               lane.high ^= roundConstant.high;
               lane.low ^= roundConstant.low;
@@ -35232,12 +35232,12 @@ function requireSha3() {
             dataWords[(Math2.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits >>> 5) - 1] |= 128;
             data.sigBytes = dataWords.length * 4;
             this._process();
-            var state = this._state;
+            var state2 = this._state;
             var outputLengthBytes = this.cfg.outputLength / 8;
             var outputLengthLanes = outputLengthBytes / 8;
             var hashWords = [];
             for (var i2 = 0; i2 < outputLengthLanes; i2++) {
-              var lane = state[i2];
+              var lane = state2[i2];
               var laneMsw = lane.high;
               var laneLsw = lane.low;
               laneMsw = (laneMsw << 8 | laneMsw >>> 24) & 16711935 | (laneMsw << 24 | laneMsw >>> 8) & 4278255360;
@@ -35249,9 +35249,9 @@ function requireSha3() {
           },
           clone: function() {
             var clone = Hasher2.clone.call(this);
-            var state = clone._state = this._state.slice(0);
+            var state2 = clone._state = this._state.slice(0);
             for (var i2 = 0; i2 < 25; i2++) {
-              state[i2] = state[i2].clone();
+              state2[i2] = state2[i2].clone();
             }
             return clone;
           }
@@ -48174,42 +48174,42 @@ function getArrayU8FromWasm0(ptr, len) {
   return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function makeMutClosure(arg0, arg1, dtor, f2) {
-  const state = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state.cnt++;
-    const a2 = state.a;
-    state.a = 0;
+    state2.cnt++;
+    const a2 = state2.a;
+    state2.a = 0;
     try {
-      return f2(a2, state.b, ...args);
+      return f2(a2, state2.b, ...args);
     } finally {
-      if (--state.cnt === 0) {
-        wasm.__wbindgen_export_4.get(state.dtor)(a2, state.b);
-        CLOSURE_DTORS.unregister(state);
+      if (--state2.cnt === 0) {
+        wasm.__wbindgen_export_4.get(state2.dtor)(a2, state2.b);
+        CLOSURE_DTORS.unregister(state2);
       } else {
-        state.a = a2;
+        state2.a = a2;
       }
     }
   }, "real");
-  real.original = state;
-  CLOSURE_DTORS.register(real, state, state);
+  real.original = state2;
+  CLOSURE_DTORS.register(real, state2, state2);
   return real;
 }
 function makeClosure(arg0, arg1, dtor, f2) {
-  const state = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state.cnt++;
+    state2.cnt++;
     try {
-      return f2(state.a, state.b, ...args);
+      return f2(state2.a, state2.b, ...args);
     } finally {
-      if (--state.cnt === 0) {
-        wasm.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
-        state.a = 0;
-        CLOSURE_DTORS.unregister(state);
+      if (--state2.cnt === 0) {
+        wasm.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
+        state2.a = 0;
+        CLOSURE_DTORS.unregister(state2);
       }
     }
   }, "real");
-  real.original = state;
-  CLOSURE_DTORS.register(real, state, state);
+  real.original = state2;
+  CLOSURE_DTORS.register(real, state2, state2);
   return real;
 }
 function debugString(val) {
@@ -50363,8 +50363,8 @@ var init_kaspa = __esm({
     __name$8(getArrayU8FromWasm0, "getArrayU8FromWasm0");
     CLOSURE_DTORS = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
-    }, "unregister") } : new FinalizationRegistry((state) => {
-      wasm.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
+    }, "unregister") } : new FinalizationRegistry((state2) => {
+      wasm.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
     });
     __name$8(makeMutClosure, "makeMutClosure");
     __name$8(makeClosure, "makeClosure");
@@ -62026,42 +62026,42 @@ function getArrayU8FromWasm02(ptr, len) {
   return getUint8ArrayMemory02().subarray(ptr / 1, ptr / 1 + len);
 }
 function makeMutClosure2(arg0, arg1, dtor, f2) {
-  const state = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state.cnt++;
-    const a2 = state.a;
-    state.a = 0;
+    state2.cnt++;
+    const a2 = state2.a;
+    state2.a = 0;
     try {
-      return f2(a2, state.b, ...args);
+      return f2(a2, state2.b, ...args);
     } finally {
-      if (--state.cnt === 0) {
-        wasm2.__wbindgen_export_4.get(state.dtor)(a2, state.b);
-        CLOSURE_DTORS2.unregister(state);
+      if (--state2.cnt === 0) {
+        wasm2.__wbindgen_export_4.get(state2.dtor)(a2, state2.b);
+        CLOSURE_DTORS2.unregister(state2);
       } else {
-        state.a = a2;
+        state2.a = a2;
       }
     }
   }, "real");
-  real.original = state;
-  CLOSURE_DTORS2.register(real, state, state);
+  real.original = state2;
+  CLOSURE_DTORS2.register(real, state2, state2);
   return real;
 }
 function makeClosure2(arg0, arg1, dtor, f2) {
-  const state = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state.cnt++;
+    state2.cnt++;
     try {
-      return f2(state.a, state.b, ...args);
+      return f2(state2.a, state2.b, ...args);
     } finally {
-      if (--state.cnt === 0) {
-        wasm2.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
-        state.a = 0;
-        CLOSURE_DTORS2.unregister(state);
+      if (--state2.cnt === 0) {
+        wasm2.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
+        state2.a = 0;
+        CLOSURE_DTORS2.unregister(state2);
       }
     }
   }, "real");
-  real.original = state;
-  CLOSURE_DTORS2.register(real, state, state);
+  real.original = state2;
+  CLOSURE_DTORS2.register(real, state2, state2);
   return real;
 }
 function debugString2(val) {
@@ -64215,8 +64215,8 @@ var init_kaspa2 = __esm({
     __name$8(getArrayU8FromWasm02, "getArrayU8FromWasm0");
     CLOSURE_DTORS2 = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
-    }, "unregister") } : new FinalizationRegistry((state) => {
-      wasm2.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
+    }, "unregister") } : new FinalizationRegistry((state2) => {
+      wasm2.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
     });
     __name$8(makeMutClosure2, "makeMutClosure");
     __name$8(makeClosure2, "makeClosure");
@@ -81820,1433 +81820,7 @@ var KaspaSDK = class _KaspaSDK {
     _KaspaSDK.instance = null;
   }
 };
-var react = { exports: {} };
-var react_production = {};
-/**
- * @license React
- * react.production.js
- *
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-var hasRequiredReact_production;
-function requireReact_production() {
-  if (hasRequiredReact_production) return react_production;
-  hasRequiredReact_production = 1;
-  var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
-  function getIteratorFn(maybeIterable) {
-    if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
-    maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
-    return "function" === typeof maybeIterable ? maybeIterable : null;
-  }
-  var ReactNoopUpdateQueue = {
-    isMounted: function() {
-      return false;
-    },
-    enqueueForceUpdate: function() {
-    },
-    enqueueReplaceState: function() {
-    },
-    enqueueSetState: function() {
-    }
-  }, assign = Object.assign, emptyObject = {};
-  function Component(props, context, updater) {
-    this.props = props;
-    this.context = context;
-    this.refs = emptyObject;
-    this.updater = updater || ReactNoopUpdateQueue;
-  }
-  Component.prototype.isReactComponent = {};
-  Component.prototype.setState = function(partialState, callback) {
-    if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
-      throw Error(
-        "takes an object of state variables to update or a function which returns an object of state variables."
-      );
-    this.updater.enqueueSetState(this, partialState, callback, "setState");
-  };
-  Component.prototype.forceUpdate = function(callback) {
-    this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
-  };
-  function ComponentDummy() {
-  }
-  ComponentDummy.prototype = Component.prototype;
-  function PureComponent(props, context, updater) {
-    this.props = props;
-    this.context = context;
-    this.refs = emptyObject;
-    this.updater = updater || ReactNoopUpdateQueue;
-  }
-  var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
-  pureComponentPrototype.constructor = PureComponent;
-  assign(pureComponentPrototype, Component.prototype);
-  pureComponentPrototype.isPureReactComponent = true;
-  var isArrayImpl = Array.isArray;
-  function noop2() {
-  }
-  var ReactSharedInternals = { H: null, A: null, T: null, S: null }, hasOwnProperty = Object.prototype.hasOwnProperty;
-  function ReactElement(type, key2, props) {
-    var refProp = props.ref;
-    return {
-      $$typeof: REACT_ELEMENT_TYPE,
-      type,
-      key: key2,
-      ref: void 0 !== refProp ? refProp : null,
-      props
-    };
-  }
-  function cloneAndReplaceKey(oldElement, newKey) {
-    return ReactElement(oldElement.type, newKey, oldElement.props);
-  }
-  function isValidElement(object) {
-    return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
-  }
-  function escape2(key2) {
-    var escaperLookup = { "=": "=0", ":": "=2" };
-    return "$" + key2.replace(/[=:]/g, function(match) {
-      return escaperLookup[match];
-    });
-  }
-  var userProvidedKeyEscapeRegex = /\/+/g;
-  function getElementKey(element, index) {
-    return "object" === typeof element && null !== element && null != element.key ? escape2("" + element.key) : index.toString(36);
-  }
-  function resolveThenable(thenable) {
-    switch (thenable.status) {
-      case "fulfilled":
-        return thenable.value;
-      case "rejected":
-        throw thenable.reason;
-      default:
-        switch ("string" === typeof thenable.status ? thenable.then(noop2, noop2) : (thenable.status = "pending", thenable.then(
-          function(fulfilledValue) {
-            "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
-          },
-          function(error) {
-            "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-          }
-        )), thenable.status) {
-          case "fulfilled":
-            return thenable.value;
-          case "rejected":
-            throw thenable.reason;
-        }
-    }
-    throw thenable;
-  }
-  function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
-    var type = typeof children;
-    if ("undefined" === type || "boolean" === type) children = null;
-    var invokeCallback = false;
-    if (null === children) invokeCallback = true;
-    else
-      switch (type) {
-        case "bigint":
-        case "string":
-        case "number":
-          invokeCallback = true;
-          break;
-        case "object":
-          switch (children.$$typeof) {
-            case REACT_ELEMENT_TYPE:
-            case REACT_PORTAL_TYPE:
-              invokeCallback = true;
-              break;
-            case REACT_LAZY_TYPE:
-              return invokeCallback = children._init, mapIntoArray(
-                invokeCallback(children._payload),
-                array,
-                escapedPrefix,
-                nameSoFar,
-                callback
-              );
-          }
-      }
-    if (invokeCallback)
-      return callback = callback(children), invokeCallback = "" === nameSoFar ? "." + getElementKey(children, 0) : nameSoFar, isArrayImpl(callback) ? (escapedPrefix = "", null != invokeCallback && (escapedPrefix = invokeCallback.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
-        return c2;
-      })) : null != callback && (isValidElement(callback) && (callback = cloneAndReplaceKey(
-        callback,
-        escapedPrefix + (null == callback.key || children && children.key === callback.key ? "" : ("" + callback.key).replace(
-          userProvidedKeyEscapeRegex,
-          "$&/"
-        ) + "/") + invokeCallback
-      )), array.push(callback)), 1;
-    invokeCallback = 0;
-    var nextNamePrefix = "" === nameSoFar ? "." : nameSoFar + ":";
-    if (isArrayImpl(children))
-      for (var i2 = 0; i2 < children.length; i2++)
-        nameSoFar = children[i2], type = nextNamePrefix + getElementKey(nameSoFar, i2), invokeCallback += mapIntoArray(
-          nameSoFar,
-          array,
-          escapedPrefix,
-          type,
-          callback
-        );
-    else if (i2 = getIteratorFn(children), "function" === typeof i2)
-      for (children = i2.call(children), i2 = 0; !(nameSoFar = children.next()).done; )
-        nameSoFar = nameSoFar.value, type = nextNamePrefix + getElementKey(nameSoFar, i2++), invokeCallback += mapIntoArray(
-          nameSoFar,
-          array,
-          escapedPrefix,
-          type,
-          callback
-        );
-    else if ("object" === type) {
-      if ("function" === typeof children.then)
-        return mapIntoArray(
-          resolveThenable(children),
-          array,
-          escapedPrefix,
-          nameSoFar,
-          callback
-        );
-      array = String(children);
-      throw Error(
-        "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
-      );
-    }
-    return invokeCallback;
-  }
-  function mapChildren(children, func, context) {
-    if (null == children) return children;
-    var result = [], count = 0;
-    mapIntoArray(children, result, "", "", function(child) {
-      return func.call(context, child, count++);
-    });
-    return result;
-  }
-  function lazyInitializer(payload) {
-    if (-1 === payload._status) {
-      var ctor = payload._result;
-      ctor = ctor();
-      ctor.then(
-        function(moduleObject) {
-          if (0 === payload._status || -1 === payload._status)
-            payload._status = 1, payload._result = moduleObject;
-        },
-        function(error) {
-          if (0 === payload._status || -1 === payload._status)
-            payload._status = 2, payload._result = error;
-        }
-      );
-      -1 === payload._status && (payload._status = 0, payload._result = ctor);
-    }
-    if (1 === payload._status) return payload._result.default;
-    throw payload._result;
-  }
-  var reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
-    if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
-      var event = new window.ErrorEvent("error", {
-        bubbles: true,
-        cancelable: true,
-        message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-        error
-      });
-      if (!window.dispatchEvent(event)) return;
-    } else if ("object" === typeof process && "function" === typeof process.emit) {
-      process.emit("uncaughtException", error);
-      return;
-    }
-    console.error(error);
-  }, Children = {
-    map: mapChildren,
-    forEach: function(children, forEachFunc, forEachContext) {
-      mapChildren(
-        children,
-        function() {
-          forEachFunc.apply(this, arguments);
-        },
-        forEachContext
-      );
-    },
-    count: function(children) {
-      var n2 = 0;
-      mapChildren(children, function() {
-        n2++;
-      });
-      return n2;
-    },
-    toArray: function(children) {
-      return mapChildren(children, function(child) {
-        return child;
-      }) || [];
-    },
-    only: function(children) {
-      if (!isValidElement(children))
-        throw Error(
-          "React.Children.only expected to receive a single React element child."
-        );
-      return children;
-    }
-  };
-  react_production.Activity = REACT_ACTIVITY_TYPE;
-  react_production.Children = Children;
-  react_production.Component = Component;
-  react_production.Fragment = REACT_FRAGMENT_TYPE;
-  react_production.Profiler = REACT_PROFILER_TYPE;
-  react_production.PureComponent = PureComponent;
-  react_production.StrictMode = REACT_STRICT_MODE_TYPE;
-  react_production.Suspense = REACT_SUSPENSE_TYPE;
-  react_production.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
-  react_production.__COMPILER_RUNTIME = {
-    __proto__: null,
-    c: function(size2) {
-      return ReactSharedInternals.H.useMemoCache(size2);
-    }
-  };
-  react_production.cache = function(fn) {
-    return function() {
-      return fn.apply(null, arguments);
-    };
-  };
-  react_production.cacheSignal = function() {
-    return null;
-  };
-  react_production.cloneElement = function(element, config, children) {
-    if (null === element || void 0 === element)
-      throw Error(
-        "The argument must be a React element, but you passed " + element + "."
-      );
-    var props = assign({}, element.props), key2 = element.key;
-    if (null != config)
-      for (propName in void 0 !== config.key && (key2 = "" + config.key), config)
-        !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
-    var propName = arguments.length - 2;
-    if (1 === propName) props.children = children;
-    else if (1 < propName) {
-      for (var childArray = Array(propName), i2 = 0; i2 < propName; i2++)
-        childArray[i2] = arguments[i2 + 2];
-      props.children = childArray;
-    }
-    return ReactElement(element.type, key2, props);
-  };
-  react_production.createContext = function(defaultValue) {
-    defaultValue = {
-      $$typeof: REACT_CONTEXT_TYPE,
-      _currentValue: defaultValue,
-      _currentValue2: defaultValue,
-      _threadCount: 0,
-      Provider: null,
-      Consumer: null
-    };
-    defaultValue.Provider = defaultValue;
-    defaultValue.Consumer = {
-      $$typeof: REACT_CONSUMER_TYPE,
-      _context: defaultValue
-    };
-    return defaultValue;
-  };
-  react_production.createElement = function(type, config, children) {
-    var propName, props = {}, key2 = null;
-    if (null != config)
-      for (propName in void 0 !== config.key && (key2 = "" + config.key), config)
-        hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (props[propName] = config[propName]);
-    var childrenLength = arguments.length - 2;
-    if (1 === childrenLength) props.children = children;
-    else if (1 < childrenLength) {
-      for (var childArray = Array(childrenLength), i2 = 0; i2 < childrenLength; i2++)
-        childArray[i2] = arguments[i2 + 2];
-      props.children = childArray;
-    }
-    if (type && type.defaultProps)
-      for (propName in childrenLength = type.defaultProps, childrenLength)
-        void 0 === props[propName] && (props[propName] = childrenLength[propName]);
-    return ReactElement(type, key2, props);
-  };
-  react_production.createRef = function() {
-    return { current: null };
-  };
-  react_production.forwardRef = function(render) {
-    return { $$typeof: REACT_FORWARD_REF_TYPE, render };
-  };
-  react_production.isValidElement = isValidElement;
-  react_production.lazy = function(ctor) {
-    return {
-      $$typeof: REACT_LAZY_TYPE,
-      _payload: { _status: -1, _result: ctor },
-      _init: lazyInitializer
-    };
-  };
-  react_production.memo = function(type, compare) {
-    return {
-      $$typeof: REACT_MEMO_TYPE,
-      type,
-      compare: void 0 === compare ? null : compare
-    };
-  };
-  react_production.startTransition = function(scope) {
-    var prevTransition = ReactSharedInternals.T, currentTransition = {};
-    ReactSharedInternals.T = currentTransition;
-    try {
-      var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
-      null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
-      "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && returnValue.then(noop2, reportGlobalError);
-    } catch (error) {
-      reportGlobalError(error);
-    } finally {
-      null !== prevTransition && null !== currentTransition.types && (prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
-    }
-  };
-  react_production.unstable_useCacheRefresh = function() {
-    return ReactSharedInternals.H.useCacheRefresh();
-  };
-  react_production.use = function(usable) {
-    return ReactSharedInternals.H.use(usable);
-  };
-  react_production.useActionState = function(action, initialState2, permalink) {
-    return ReactSharedInternals.H.useActionState(action, initialState2, permalink);
-  };
-  react_production.useCallback = function(callback, deps) {
-    return ReactSharedInternals.H.useCallback(callback, deps);
-  };
-  react_production.useContext = function(Context) {
-    return ReactSharedInternals.H.useContext(Context);
-  };
-  react_production.useDebugValue = function() {
-  };
-  react_production.useDeferredValue = function(value2, initialValue) {
-    return ReactSharedInternals.H.useDeferredValue(value2, initialValue);
-  };
-  react_production.useEffect = function(create2, deps) {
-    return ReactSharedInternals.H.useEffect(create2, deps);
-  };
-  react_production.useEffectEvent = function(callback) {
-    return ReactSharedInternals.H.useEffectEvent(callback);
-  };
-  react_production.useId = function() {
-    return ReactSharedInternals.H.useId();
-  };
-  react_production.useImperativeHandle = function(ref, create2, deps) {
-    return ReactSharedInternals.H.useImperativeHandle(ref, create2, deps);
-  };
-  react_production.useInsertionEffect = function(create2, deps) {
-    return ReactSharedInternals.H.useInsertionEffect(create2, deps);
-  };
-  react_production.useLayoutEffect = function(create2, deps) {
-    return ReactSharedInternals.H.useLayoutEffect(create2, deps);
-  };
-  react_production.useMemo = function(create2, deps) {
-    return ReactSharedInternals.H.useMemo(create2, deps);
-  };
-  react_production.useOptimistic = function(passthrough, reducer) {
-    return ReactSharedInternals.H.useOptimistic(passthrough, reducer);
-  };
-  react_production.useReducer = function(reducer, initialArg, init3) {
-    return ReactSharedInternals.H.useReducer(reducer, initialArg, init3);
-  };
-  react_production.useRef = function(initialValue) {
-    return ReactSharedInternals.H.useRef(initialValue);
-  };
-  react_production.useState = function(initialState2) {
-    return ReactSharedInternals.H.useState(initialState2);
-  };
-  react_production.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
-    return ReactSharedInternals.H.useSyncExternalStore(
-      subscribe,
-      getSnapshot,
-      getServerSnapshot
-    );
-  };
-  react_production.useTransition = function() {
-    return ReactSharedInternals.H.useTransition();
-  };
-  react_production.version = "19.2.0";
-  return react_production;
-}
-var react_development = { exports: {} };
-react_development.exports;
-var hasRequiredReact_development;
-function requireReact_development() {
-  if (hasRequiredReact_development) return react_development.exports;
-  hasRequiredReact_development = 1;
-  (function(module2, exports) {
-    /**
-     * @license React
-     * react.development.js
-     *
-     * Copyright (c) Meta Platforms, Inc. and affiliates.
-     *
-     * This source code is licensed under the MIT license found in the
-     * LICENSE file in the root directory of this source tree.
-     */
-    "production" !== development && function() {
-      function defineDeprecationWarning(methodName, info) {
-        Object.defineProperty(Component.prototype, methodName, {
-          get: function() {
-            console.warn(
-              "%s(...) is deprecated in plain JavaScript React classes. %s",
-              info[0],
-              info[1]
-            );
-          }
-        });
-      }
-      function getIteratorFn(maybeIterable) {
-        if (null === maybeIterable || "object" !== typeof maybeIterable)
-          return null;
-        maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
-        return "function" === typeof maybeIterable ? maybeIterable : null;
-      }
-      function warnNoop(publicInstance, callerName) {
-        publicInstance = (publicInstance = publicInstance.constructor) && (publicInstance.displayName || publicInstance.name) || "ReactClass";
-        var warningKey = publicInstance + "." + callerName;
-        didWarnStateUpdateForUnmountedComponent[warningKey] || (console.error(
-          "Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.",
-          callerName,
-          publicInstance
-        ), didWarnStateUpdateForUnmountedComponent[warningKey] = true);
-      }
-      function Component(props, context, updater) {
-        this.props = props;
-        this.context = context;
-        this.refs = emptyObject;
-        this.updater = updater || ReactNoopUpdateQueue;
-      }
-      function ComponentDummy() {
-      }
-      function PureComponent(props, context, updater) {
-        this.props = props;
-        this.context = context;
-        this.refs = emptyObject;
-        this.updater = updater || ReactNoopUpdateQueue;
-      }
-      function noop2() {
-      }
-      function testStringCoercion(value2) {
-        return "" + value2;
-      }
-      function checkKeyStringCoercion(value2) {
-        try {
-          testStringCoercion(value2);
-          var JSCompiler_inline_result = false;
-        } catch (e2) {
-          JSCompiler_inline_result = true;
-        }
-        if (JSCompiler_inline_result) {
-          JSCompiler_inline_result = console;
-          var JSCompiler_temp_const = JSCompiler_inline_result.error;
-          var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value2[Symbol.toStringTag] || value2.constructor.name || "Object";
-          JSCompiler_temp_const.call(
-            JSCompiler_inline_result,
-            "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
-            JSCompiler_inline_result$jscomp$0
-          );
-          return testStringCoercion(value2);
-        }
-      }
-      function getComponentNameFromType(type) {
-        if (null == type) return null;
-        if ("function" === typeof type)
-          return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
-        if ("string" === typeof type) return type;
-        switch (type) {
-          case REACT_FRAGMENT_TYPE:
-            return "Fragment";
-          case REACT_PROFILER_TYPE:
-            return "Profiler";
-          case REACT_STRICT_MODE_TYPE:
-            return "StrictMode";
-          case REACT_SUSPENSE_TYPE:
-            return "Suspense";
-          case REACT_SUSPENSE_LIST_TYPE:
-            return "SuspenseList";
-          case REACT_ACTIVITY_TYPE:
-            return "Activity";
-        }
-        if ("object" === typeof type)
-          switch ("number" === typeof type.tag && console.error(
-            "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
-          ), type.$$typeof) {
-            case REACT_PORTAL_TYPE:
-              return "Portal";
-            case REACT_CONTEXT_TYPE:
-              return type.displayName || "Context";
-            case REACT_CONSUMER_TYPE:
-              return (type._context.displayName || "Context") + ".Consumer";
-            case REACT_FORWARD_REF_TYPE:
-              var innerType = type.render;
-              type = type.displayName;
-              type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
-              return type;
-            case REACT_MEMO_TYPE:
-              return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
-            case REACT_LAZY_TYPE:
-              innerType = type._payload;
-              type = type._init;
-              try {
-                return getComponentNameFromType(type(innerType));
-              } catch (x) {
-              }
-          }
-        return null;
-      }
-      function getTaskName(type) {
-        if (type === REACT_FRAGMENT_TYPE) return "<>";
-        if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
-          return "<...>";
-        try {
-          var name2 = getComponentNameFromType(type);
-          return name2 ? "<" + name2 + ">" : "<...>";
-        } catch (x) {
-          return "<...>";
-        }
-      }
-      function getOwner() {
-        var dispatcher = ReactSharedInternals.A;
-        return null === dispatcher ? null : dispatcher.getOwner();
-      }
-      function UnknownOwner() {
-        return Error("react-stack-top-frame");
-      }
-      function hasValidKey(config) {
-        if (hasOwnProperty.call(config, "key")) {
-          var getter = Object.getOwnPropertyDescriptor(config, "key").get;
-          if (getter && getter.isReactWarning) return false;
-        }
-        return void 0 !== config.key;
-      }
-      function defineKeyPropWarningGetter(props, displayName) {
-        function warnAboutAccessingKey() {
-          specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
-            "%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
-            displayName
-          ));
-        }
-        warnAboutAccessingKey.isReactWarning = true;
-        Object.defineProperty(props, "key", {
-          get: warnAboutAccessingKey,
-          configurable: true
-        });
-      }
-      function elementRefGetterWithDeprecationWarning() {
-        var componentName = getComponentNameFromType(this.type);
-        didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
-          "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
-        ));
-        componentName = this.props.ref;
-        return void 0 !== componentName ? componentName : null;
-      }
-      function ReactElement(type, key2, props, owner, debugStack, debugTask) {
-        var refProp = props.ref;
-        type = {
-          $$typeof: REACT_ELEMENT_TYPE,
-          type,
-          key: key2,
-          props,
-          _owner: owner
-        };
-        null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
-          enumerable: false,
-          get: elementRefGetterWithDeprecationWarning
-        }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
-        type._store = {};
-        Object.defineProperty(type._store, "validated", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: 0
-        });
-        Object.defineProperty(type, "_debugInfo", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: null
-        });
-        Object.defineProperty(type, "_debugStack", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: debugStack
-        });
-        Object.defineProperty(type, "_debugTask", {
-          configurable: false,
-          enumerable: false,
-          writable: true,
-          value: debugTask
-        });
-        Object.freeze && (Object.freeze(type.props), Object.freeze(type));
-        return type;
-      }
-      function cloneAndReplaceKey(oldElement, newKey) {
-        newKey = ReactElement(
-          oldElement.type,
-          newKey,
-          oldElement.props,
-          oldElement._owner,
-          oldElement._debugStack,
-          oldElement._debugTask
-        );
-        oldElement._store && (newKey._store.validated = oldElement._store.validated);
-        return newKey;
-      }
-      function validateChildKeys(node) {
-        isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
-      }
-      function isValidElement(object) {
-        return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
-      }
-      function escape2(key2) {
-        var escaperLookup = { "=": "=0", ":": "=2" };
-        return "$" + key2.replace(/[=:]/g, function(match) {
-          return escaperLookup[match];
-        });
-      }
-      function getElementKey(element, index) {
-        return "object" === typeof element && null !== element && null != element.key ? (checkKeyStringCoercion(element.key), escape2("" + element.key)) : index.toString(36);
-      }
-      function resolveThenable(thenable) {
-        switch (thenable.status) {
-          case "fulfilled":
-            return thenable.value;
-          case "rejected":
-            throw thenable.reason;
-          default:
-            switch ("string" === typeof thenable.status ? thenable.then(noop2, noop2) : (thenable.status = "pending", thenable.then(
-              function(fulfilledValue) {
-                "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
-              },
-              function(error) {
-                "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-              }
-            )), thenable.status) {
-              case "fulfilled":
-                return thenable.value;
-              case "rejected":
-                throw thenable.reason;
-            }
-        }
-        throw thenable;
-      }
-      function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
-        var type = typeof children;
-        if ("undefined" === type || "boolean" === type) children = null;
-        var invokeCallback = false;
-        if (null === children) invokeCallback = true;
-        else
-          switch (type) {
-            case "bigint":
-            case "string":
-            case "number":
-              invokeCallback = true;
-              break;
-            case "object":
-              switch (children.$$typeof) {
-                case REACT_ELEMENT_TYPE:
-                case REACT_PORTAL_TYPE:
-                  invokeCallback = true;
-                  break;
-                case REACT_LAZY_TYPE:
-                  return invokeCallback = children._init, mapIntoArray(
-                    invokeCallback(children._payload),
-                    array,
-                    escapedPrefix,
-                    nameSoFar,
-                    callback
-                  );
-              }
-          }
-        if (invokeCallback) {
-          invokeCallback = children;
-          callback = callback(invokeCallback);
-          var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
-          isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c2) {
-            return c2;
-          })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
-            callback,
-            escapedPrefix + (null == callback.key || invokeCallback && invokeCallback.key === callback.key ? "" : ("" + callback.key).replace(
-              userProvidedKeyEscapeRegex,
-              "$&/"
-            ) + "/") + childKey
-          ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
-          return 1;
-        }
-        invokeCallback = 0;
-        childKey = "" === nameSoFar ? "." : nameSoFar + ":";
-        if (isArrayImpl(children))
-          for (var i2 = 0; i2 < children.length; i2++)
-            nameSoFar = children[i2], type = childKey + getElementKey(nameSoFar, i2), invokeCallback += mapIntoArray(
-              nameSoFar,
-              array,
-              escapedPrefix,
-              type,
-              callback
-            );
-        else if (i2 = getIteratorFn(children), "function" === typeof i2)
-          for (i2 === children.entries && (didWarnAboutMaps || console.warn(
-            "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
-          ), didWarnAboutMaps = true), children = i2.call(children), i2 = 0; !(nameSoFar = children.next()).done; )
-            nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i2++), invokeCallback += mapIntoArray(
-              nameSoFar,
-              array,
-              escapedPrefix,
-              type,
-              callback
-            );
-        else if ("object" === type) {
-          if ("function" === typeof children.then)
-            return mapIntoArray(
-              resolveThenable(children),
-              array,
-              escapedPrefix,
-              nameSoFar,
-              callback
-            );
-          array = String(children);
-          throw Error(
-            "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
-          );
-        }
-        return invokeCallback;
-      }
-      function mapChildren(children, func, context) {
-        if (null == children) return children;
-        var result = [], count = 0;
-        mapIntoArray(children, result, "", "", function(child) {
-          return func.call(context, child, count++);
-        });
-        return result;
-      }
-      function lazyInitializer(payload) {
-        if (-1 === payload._status) {
-          var ioInfo = payload._ioInfo;
-          null != ioInfo && (ioInfo.start = ioInfo.end = performance.now());
-          ioInfo = payload._result;
-          var thenable = ioInfo();
-          thenable.then(
-            function(moduleObject) {
-              if (0 === payload._status || -1 === payload._status) {
-                payload._status = 1;
-                payload._result = moduleObject;
-                var _ioInfo = payload._ioInfo;
-                null != _ioInfo && (_ioInfo.end = performance.now());
-                void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
-              }
-            },
-            function(error) {
-              if (0 === payload._status || -1 === payload._status) {
-                payload._status = 2;
-                payload._result = error;
-                var _ioInfo2 = payload._ioInfo;
-                null != _ioInfo2 && (_ioInfo2.end = performance.now());
-                void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
-              }
-            }
-          );
-          ioInfo = payload._ioInfo;
-          if (null != ioInfo) {
-            ioInfo.value = thenable;
-            var displayName = thenable.displayName;
-            "string" === typeof displayName && (ioInfo.name = displayName);
-          }
-          -1 === payload._status && (payload._status = 0, payload._result = thenable);
-        }
-        if (1 === payload._status)
-          return ioInfo = payload._result, void 0 === ioInfo && console.error(
-            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))\n\nDid you accidentally put curly braces around the import?",
-            ioInfo
-          ), "default" in ioInfo || console.error(
-            "lazy: Expected the result of a dynamic import() call. Instead received: %s\n\nYour code should look like: \n  const MyComponent = lazy(() => import('./MyComponent'))",
-            ioInfo
-          ), ioInfo.default;
-        throw payload._result;
-      }
-      function resolveDispatcher() {
-        var dispatcher = ReactSharedInternals.H;
-        null === dispatcher && console.error(
-          "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
-        );
-        return dispatcher;
-      }
-      function releaseAsyncTransition() {
-        ReactSharedInternals.asyncTransitions--;
-      }
-      function enqueueTask(task) {
-        if (null === enqueueTaskImpl)
-          try {
-            var requireString = ("require" + Math.random()).slice(0, 7);
-            enqueueTaskImpl = (module2 && module2[requireString]).call(
-              module2,
-              "timers"
-            ).setImmediate;
-          } catch (_err) {
-            enqueueTaskImpl = function(callback) {
-              false === didWarnAboutMessageChannel && (didWarnAboutMessageChannel = true, "undefined" === typeof MessageChannel && console.error(
-                "This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."
-              ));
-              var channel = new MessageChannel();
-              channel.port1.onmessage = callback;
-              channel.port2.postMessage(void 0);
-            };
-          }
-        return enqueueTaskImpl(task);
-      }
-      function aggregateErrors(errors) {
-        return 1 < errors.length && "function" === typeof AggregateError ? new AggregateError(errors) : errors[0];
-      }
-      function popActScope(prevActQueue, prevActScopeDepth) {
-        prevActScopeDepth !== actScopeDepth - 1 && console.error(
-          "You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "
-        );
-        actScopeDepth = prevActScopeDepth;
-      }
-      function recursivelyFlushAsyncActWork(returnValue, resolve, reject) {
-        var queue = ReactSharedInternals.actQueue;
-        if (null !== queue)
-          if (0 !== queue.length)
-            try {
-              flushActQueue(queue);
-              enqueueTask(function() {
-                return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
-              });
-              return;
-            } catch (error) {
-              ReactSharedInternals.thrownErrors.push(error);
-            }
-          else ReactSharedInternals.actQueue = null;
-        0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
-      }
-      function flushActQueue(queue) {
-        if (!isFlushing) {
-          isFlushing = true;
-          var i2 = 0;
-          try {
-            for (; i2 < queue.length; i2++) {
-              var callback = queue[i2];
-              do {
-                ReactSharedInternals.didUsePromise = false;
-                var continuation = callback(false);
-                if (null !== continuation) {
-                  if (ReactSharedInternals.didUsePromise) {
-                    queue[i2] = callback;
-                    queue.splice(0, i2);
-                    return;
-                  }
-                  callback = continuation;
-                } else break;
-              } while (1);
-            }
-            queue.length = 0;
-          } catch (error) {
-            queue.splice(0, i2 + 1), ReactSharedInternals.thrownErrors.push(error);
-          } finally {
-            isFlushing = false;
-          }
-        }
-      }
-      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = Symbol.for("react.memo"), REACT_LAZY_TYPE = Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = Symbol.for("react.activity"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, didWarnStateUpdateForUnmountedComponent = {}, ReactNoopUpdateQueue = {
-        isMounted: function() {
-          return false;
-        },
-        enqueueForceUpdate: function(publicInstance) {
-          warnNoop(publicInstance, "forceUpdate");
-        },
-        enqueueReplaceState: function(publicInstance) {
-          warnNoop(publicInstance, "replaceState");
-        },
-        enqueueSetState: function(publicInstance) {
-          warnNoop(publicInstance, "setState");
-        }
-      }, assign = Object.assign, emptyObject = {};
-      Object.freeze(emptyObject);
-      Component.prototype.isReactComponent = {};
-      Component.prototype.setState = function(partialState, callback) {
-        if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
-          throw Error(
-            "takes an object of state variables to update or a function which returns an object of state variables."
-          );
-        this.updater.enqueueSetState(this, partialState, callback, "setState");
-      };
-      Component.prototype.forceUpdate = function(callback) {
-        this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
-      };
-      var deprecatedAPIs = {
-        isMounted: [
-          "isMounted",
-          "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
-        ],
-        replaceState: [
-          "replaceState",
-          "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."
-        ]
-      };
-      for (fnName in deprecatedAPIs)
-        deprecatedAPIs.hasOwnProperty(fnName) && defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
-      ComponentDummy.prototype = Component.prototype;
-      deprecatedAPIs = PureComponent.prototype = new ComponentDummy();
-      deprecatedAPIs.constructor = PureComponent;
-      assign(deprecatedAPIs, Component.prototype);
-      deprecatedAPIs.isPureReactComponent = true;
-      var isArrayImpl = Array.isArray, REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference"), ReactSharedInternals = {
-        H: null,
-        A: null,
-        T: null,
-        S: null,
-        actQueue: null,
-        asyncTransitions: 0,
-        isBatchingLegacy: false,
-        didScheduleLegacyUpdate: false,
-        didUsePromise: false,
-        thrownErrors: [],
-        getCurrentStack: null,
-        recentlyCreatedOwnerStacks: 0
-      }, hasOwnProperty = Object.prototype.hasOwnProperty, createTask = console.createTask ? console.createTask : function() {
-        return null;
-      };
-      deprecatedAPIs = {
-        react_stack_bottom_frame: function(callStackForError) {
-          return callStackForError();
-        }
-      };
-      var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
-      var didWarnAboutElementRef = {};
-      var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
-        deprecatedAPIs,
-        UnknownOwner
-      )();
-      var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
-      var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
-        if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
-          var event = new window.ErrorEvent("error", {
-            bubbles: true,
-            cancelable: true,
-            message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
-            error
-          });
-          if (!window.dispatchEvent(event)) return;
-        } else if ("object" === typeof process && "function" === typeof process.emit) {
-          process.emit("uncaughtException", error);
-          return;
-        }
-        console.error(error);
-      }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
-        queueMicrotask(function() {
-          return queueMicrotask(callback);
-        });
-      } : enqueueTask;
-      deprecatedAPIs = Object.freeze({
-        __proto__: null,
-        c: function(size2) {
-          return resolveDispatcher().useMemoCache(size2);
-        }
-      });
-      var fnName = {
-        map: mapChildren,
-        forEach: function(children, forEachFunc, forEachContext) {
-          mapChildren(
-            children,
-            function() {
-              forEachFunc.apply(this, arguments);
-            },
-            forEachContext
-          );
-        },
-        count: function(children) {
-          var n2 = 0;
-          mapChildren(children, function() {
-            n2++;
-          });
-          return n2;
-        },
-        toArray: function(children) {
-          return mapChildren(children, function(child) {
-            return child;
-          }) || [];
-        },
-        only: function(children) {
-          if (!isValidElement(children))
-            throw Error(
-              "React.Children.only expected to receive a single React element child."
-            );
-          return children;
-        }
-      };
-      exports.Activity = REACT_ACTIVITY_TYPE;
-      exports.Children = fnName;
-      exports.Component = Component;
-      exports.Fragment = REACT_FRAGMENT_TYPE;
-      exports.Profiler = REACT_PROFILER_TYPE;
-      exports.PureComponent = PureComponent;
-      exports.StrictMode = REACT_STRICT_MODE_TYPE;
-      exports.Suspense = REACT_SUSPENSE_TYPE;
-      exports.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
-      exports.__COMPILER_RUNTIME = deprecatedAPIs;
-      exports.act = function(callback) {
-        var prevActQueue = ReactSharedInternals.actQueue, prevActScopeDepth = actScopeDepth;
-        actScopeDepth++;
-        var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
-        try {
-          var result = callback();
-        } catch (error) {
-          ReactSharedInternals.thrownErrors.push(error);
-        }
-        if (0 < ReactSharedInternals.thrownErrors.length)
-          throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
-        if (null !== result && "object" === typeof result && "function" === typeof result.then) {
-          var thenable = result;
-          queueSeveralMicrotasks(function() {
-            didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
-              "You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"
-            ));
-          });
-          return {
-            then: function(resolve, reject) {
-              didAwaitActCall = true;
-              thenable.then(
-                function(returnValue) {
-                  popActScope(prevActQueue, prevActScopeDepth);
-                  if (0 === prevActScopeDepth) {
-                    try {
-                      flushActQueue(queue), enqueueTask(function() {
-                        return recursivelyFlushAsyncActWork(
-                          returnValue,
-                          resolve,
-                          reject
-                        );
-                      });
-                    } catch (error$0) {
-                      ReactSharedInternals.thrownErrors.push(error$0);
-                    }
-                    if (0 < ReactSharedInternals.thrownErrors.length) {
-                      var _thrownError = aggregateErrors(
-                        ReactSharedInternals.thrownErrors
-                      );
-                      ReactSharedInternals.thrownErrors.length = 0;
-                      reject(_thrownError);
-                    }
-                  } else resolve(returnValue);
-                },
-                function(error) {
-                  popActScope(prevActQueue, prevActScopeDepth);
-                  0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
-                    ReactSharedInternals.thrownErrors
-                  ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
-                }
-              );
-            }
-          };
-        }
-        var returnValue$jscomp$0 = result;
-        popActScope(prevActQueue, prevActScopeDepth);
-        0 === prevActScopeDepth && (flushActQueue(queue), 0 !== queue.length && queueSeveralMicrotasks(function() {
-          didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
-            "A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:\n\nawait act(() => ...)"
-          ));
-        }), ReactSharedInternals.actQueue = null);
-        if (0 < ReactSharedInternals.thrownErrors.length)
-          throw callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
-        return {
-          then: function(resolve, reject) {
-            didAwaitActCall = true;
-            0 === prevActScopeDepth ? (ReactSharedInternals.actQueue = queue, enqueueTask(function() {
-              return recursivelyFlushAsyncActWork(
-                returnValue$jscomp$0,
-                resolve,
-                reject
-              );
-            })) : resolve(returnValue$jscomp$0);
-          }
-        };
-      };
-      exports.cache = function(fn) {
-        return function() {
-          return fn.apply(null, arguments);
-        };
-      };
-      exports.cacheSignal = function() {
-        return null;
-      };
-      exports.captureOwnerStack = function() {
-        var getCurrentStack = ReactSharedInternals.getCurrentStack;
-        return null === getCurrentStack ? null : getCurrentStack();
-      };
-      exports.cloneElement = function(element, config, children) {
-        if (null === element || void 0 === element)
-          throw Error(
-            "The argument must be a React element, but you passed " + element + "."
-          );
-        var props = assign({}, element.props), key2 = element.key, owner = element._owner;
-        if (null != config) {
-          var JSCompiler_inline_result;
-          a: {
-            if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
-              config,
-              "ref"
-            ).get) && JSCompiler_inline_result.isReactWarning) {
-              JSCompiler_inline_result = false;
-              break a;
-            }
-            JSCompiler_inline_result = void 0 !== config.ref;
-          }
-          JSCompiler_inline_result && (owner = getOwner());
-          hasValidKey(config) && (checkKeyStringCoercion(config.key), key2 = "" + config.key);
-          for (propName in config)
-            !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
-        }
-        var propName = arguments.length - 2;
-        if (1 === propName) props.children = children;
-        else if (1 < propName) {
-          JSCompiler_inline_result = Array(propName);
-          for (var i2 = 0; i2 < propName; i2++)
-            JSCompiler_inline_result[i2] = arguments[i2 + 2];
-          props.children = JSCompiler_inline_result;
-        }
-        props = ReactElement(
-          element.type,
-          key2,
-          props,
-          owner,
-          element._debugStack,
-          element._debugTask
-        );
-        for (key2 = 2; key2 < arguments.length; key2++)
-          validateChildKeys(arguments[key2]);
-        return props;
-      };
-      exports.createContext = function(defaultValue) {
-        defaultValue = {
-          $$typeof: REACT_CONTEXT_TYPE,
-          _currentValue: defaultValue,
-          _currentValue2: defaultValue,
-          _threadCount: 0,
-          Provider: null,
-          Consumer: null
-        };
-        defaultValue.Provider = defaultValue;
-        defaultValue.Consumer = {
-          $$typeof: REACT_CONSUMER_TYPE,
-          _context: defaultValue
-        };
-        defaultValue._currentRenderer = null;
-        defaultValue._currentRenderer2 = null;
-        return defaultValue;
-      };
-      exports.createElement = function(type, config, children) {
-        for (var i2 = 2; i2 < arguments.length; i2++)
-          validateChildKeys(arguments[i2]);
-        i2 = {};
-        var key2 = null;
-        if (null != config)
-          for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
-            "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
-          )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key2 = "" + config.key), config)
-            hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i2[propName] = config[propName]);
-        var childrenLength = arguments.length - 2;
-        if (1 === childrenLength) i2.children = children;
-        else if (1 < childrenLength) {
-          for (var childArray = Array(childrenLength), _i = 0; _i < childrenLength; _i++)
-            childArray[_i] = arguments[_i + 2];
-          Object.freeze && Object.freeze(childArray);
-          i2.children = childArray;
-        }
-        if (type && type.defaultProps)
-          for (propName in childrenLength = type.defaultProps, childrenLength)
-            void 0 === i2[propName] && (i2[propName] = childrenLength[propName]);
-        key2 && defineKeyPropWarningGetter(
-          i2,
-          "function" === typeof type ? type.displayName || type.name || "Unknown" : type
-        );
-        var propName = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
-        return ReactElement(
-          type,
-          key2,
-          i2,
-          getOwner(),
-          propName ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
-          propName ? createTask(getTaskName(type)) : unknownOwnerDebugTask
-        );
-      };
-      exports.createRef = function() {
-        var refObject = { current: null };
-        Object.seal(refObject);
-        return refObject;
-      };
-      exports.forwardRef = function(render) {
-        null != render && render.$$typeof === REACT_MEMO_TYPE ? console.error(
-          "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))."
-        ) : "function" !== typeof render ? console.error(
-          "forwardRef requires a render function but was given %s.",
-          null === render ? "null" : typeof render
-        ) : 0 !== render.length && 2 !== render.length && console.error(
-          "forwardRef render functions accept exactly two parameters: props and ref. %s",
-          1 === render.length ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."
-        );
-        null != render && null != render.defaultProps && console.error(
-          "forwardRef render functions do not support defaultProps. Did you accidentally pass a React component?"
-        );
-        var elementType = { $$typeof: REACT_FORWARD_REF_TYPE, render }, ownName;
-        Object.defineProperty(elementType, "displayName", {
-          enumerable: false,
-          configurable: true,
-          get: function() {
-            return ownName;
-          },
-          set: function(name2) {
-            ownName = name2;
-            render.name || render.displayName || (Object.defineProperty(render, "name", { value: name2 }), render.displayName = name2);
-          }
-        });
-        return elementType;
-      };
-      exports.isValidElement = isValidElement;
-      exports.lazy = function(ctor) {
-        ctor = { _status: -1, _result: ctor };
-        var lazyType = {
-          $$typeof: REACT_LAZY_TYPE,
-          _payload: ctor,
-          _init: lazyInitializer
-        }, ioInfo = {
-          name: "lazy",
-          start: -1,
-          end: -1,
-          value: null,
-          owner: null,
-          debugStack: Error("react-stack-top-frame"),
-          debugTask: console.createTask ? console.createTask("lazy()") : null
-        };
-        ctor._ioInfo = ioInfo;
-        lazyType._debugInfo = [{ awaited: ioInfo }];
-        return lazyType;
-      };
-      exports.memo = function(type, compare) {
-        null == type && console.error(
-          "memo: The first argument must be a component. Instead received: %s",
-          null === type ? "null" : typeof type
-        );
-        compare = {
-          $$typeof: REACT_MEMO_TYPE,
-          type,
-          compare: void 0 === compare ? null : compare
-        };
-        var ownName;
-        Object.defineProperty(compare, "displayName", {
-          enumerable: false,
-          configurable: true,
-          get: function() {
-            return ownName;
-          },
-          set: function(name2) {
-            ownName = name2;
-            type.name || type.displayName || (Object.defineProperty(type, "name", { value: name2 }), type.displayName = name2);
-          }
-        });
-        return compare;
-      };
-      exports.startTransition = function(scope) {
-        var prevTransition = ReactSharedInternals.T, currentTransition = {};
-        currentTransition._updatedFibers = /* @__PURE__ */ new Set();
-        ReactSharedInternals.T = currentTransition;
-        try {
-          var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
-          null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
-          "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop2, reportGlobalError));
-        } catch (error) {
-          reportGlobalError(error);
-        } finally {
-          null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
-            "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
-          )), null !== prevTransition && null !== currentTransition.types && (null !== prevTransition.types && prevTransition.types !== currentTransition.types && console.error(
-            "We expected inner Transitions to have transferred the outer types set and that you cannot add to the outer Transition while inside the inner.This is a bug in React."
-          ), prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
-        }
-      };
-      exports.unstable_useCacheRefresh = function() {
-        return resolveDispatcher().useCacheRefresh();
-      };
-      exports.use = function(usable) {
-        return resolveDispatcher().use(usable);
-      };
-      exports.useActionState = function(action, initialState2, permalink) {
-        return resolveDispatcher().useActionState(
-          action,
-          initialState2,
-          permalink
-        );
-      };
-      exports.useCallback = function(callback, deps) {
-        return resolveDispatcher().useCallback(callback, deps);
-      };
-      exports.useContext = function(Context) {
-        var dispatcher = resolveDispatcher();
-        Context.$$typeof === REACT_CONSUMER_TYPE && console.error(
-          "Calling useContext(Context.Consumer) is not supported and will cause bugs. Did you mean to call useContext(Context) instead?"
-        );
-        return dispatcher.useContext(Context);
-      };
-      exports.useDebugValue = function(value2, formatterFn) {
-        return resolveDispatcher().useDebugValue(value2, formatterFn);
-      };
-      exports.useDeferredValue = function(value2, initialValue) {
-        return resolveDispatcher().useDeferredValue(value2, initialValue);
-      };
-      exports.useEffect = function(create2, deps) {
-        null == create2 && console.warn(
-          "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useEffect(create2, deps);
-      };
-      exports.useEffectEvent = function(callback) {
-        return resolveDispatcher().useEffectEvent(callback);
-      };
-      exports.useId = function() {
-        return resolveDispatcher().useId();
-      };
-      exports.useImperativeHandle = function(ref, create2, deps) {
-        return resolveDispatcher().useImperativeHandle(ref, create2, deps);
-      };
-      exports.useInsertionEffect = function(create2, deps) {
-        null == create2 && console.warn(
-          "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useInsertionEffect(create2, deps);
-      };
-      exports.useLayoutEffect = function(create2, deps) {
-        null == create2 && console.warn(
-          "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
-        );
-        return resolveDispatcher().useLayoutEffect(create2, deps);
-      };
-      exports.useMemo = function(create2, deps) {
-        return resolveDispatcher().useMemo(create2, deps);
-      };
-      exports.useOptimistic = function(passthrough, reducer) {
-        return resolveDispatcher().useOptimistic(passthrough, reducer);
-      };
-      exports.useReducer = function(reducer, initialArg, init3) {
-        return resolveDispatcher().useReducer(reducer, initialArg, init3);
-      };
-      exports.useRef = function(initialValue) {
-        return resolveDispatcher().useRef(initialValue);
-      };
-      exports.useState = function(initialState2) {
-        return resolveDispatcher().useState(initialState2);
-      };
-      exports.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
-        return resolveDispatcher().useSyncExternalStore(
-          subscribe,
-          getSnapshot,
-          getServerSnapshot
-        );
-      };
-      exports.useTransition = function() {
-        return resolveDispatcher().useTransition();
-      };
-      exports.version = "19.2.0";
-      "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
-    }();
-  })(react_development, react_development.exports);
-  return react_development.exports;
-}
-if (development === "production") {
-  react.exports = requireReact_production();
-} else {
-  react.exports = requireReact_development();
-}
-var reactExports = react.exports;
 const walletLogger = createLogger("kasstamp:web:wallet");
-const hookLogger = createLogger("kasstamp:web:hooks");
 const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
 const getEnv = (key2, defaultValue) => {
   if (typeof window !== "undefined") {
@@ -83757,263 +82331,8 @@ class WalletService {
     return wordCount;
   }
 }
-const walletService = new WalletService();
-const initialState = {
-  isConnected: false,
-  isInitialized: false,
-  isConnecting: false,
-  currentNetwork: "",
-  hasWallet: false,
-  walletLocked: true,
-  address: null,
-  balance: null,
-  accounts: [],
-  lastSyncTime: null,
-  error: null
-};
+new WalletService();
 function UseWallet() {
-  const [state, setState] = reactExports.useState(initialState);
-  const [isConnecting, setIsConnecting] = reactExports.useState(false);
-  const eventListenersRef = reactExports.useRef([]);
-  const updateStateFromService = reactExports.useCallback(() => {
-    const serviceState = walletService.getState();
-    setState((prevState) => ({
-      ...prevState,
-      isConnected: serviceState.isConnected,
-      isInitialized: serviceState.isInitialized,
-      currentNetwork: serviceState.currentNetwork.toString(),
-      hasWallet: serviceState.hasWallet,
-      walletLocked: serviceState.walletLocked,
-      address: serviceState.address,
-      balance: serviceState.balance,
-      // Include balance from service state
-      accounts: serviceState.accounts,
-      walletName: serviceState.walletName,
-      lastSyncTime: serviceState.lastSyncTime
-    }));
-  }, []);
-  reactExports.useEffect(() => {
-    const addEventListener = (event, callback) => {
-      walletService.addEventListener(event, callback);
-      eventListenersRef.current.push({
-        event,
-        callback
-      });
-    };
-    addEventListener("connected", (data) => {
-      hookLogger.info("✅ Wallet connected:", data);
-      setIsConnecting(false);
-      setState((prevState) => ({
-        ...prevState,
-        isConnected: true,
-        isConnecting: false,
-        currentNetwork: data.network,
-        error: null
-      }));
-    });
-    addEventListener("disconnected", () => {
-      hookLogger.info("❌ Wallet disconnected");
-      setState((prevState) => ({
-        ...initialState,
-        // Preserve the network so UI shows correct network after disconnect/lock
-        currentNetwork: prevState.currentNetwork
-      }));
-    });
-    addEventListener("wallet-created", (data) => {
-      hookLogger.info("✅ Wallet created:", { address: data.address, walletName: data.walletName });
-      updateStateFromService();
-    });
-    addEventListener("wallet-imported", (data) => {
-      hookLogger.info("✅ Wallet imported:", data);
-      updateStateFromService();
-      setTimeout(() => {
-        const serviceState = walletService.getState();
-        hookLogger.info("📊 State after wallet-imported event:", {
-          walletName: serviceState.walletName,
-          hasWallet: serviceState.hasWallet,
-          walletLocked: serviceState.walletLocked,
-          address: serviceState.address
-        });
-      }, 100);
-    });
-    addEventListener("wallet-opened", (data) => {
-      hookLogger.info("✅ Wallet opened:", data);
-      updateStateFromService();
-    });
-    addEventListener("balance-updated", (data) => {
-      hookLogger.info("💰 Balance updated:", data);
-      setState((prevState) => ({
-        ...prevState,
-        balance: data.balance
-      }));
-    });
-    addEventListener("transaction-sent", (data) => {
-      hookLogger.info("💸 Transaction sent:", data);
-    });
-    addEventListener("transaction-error", (data) => {
-      hookLogger.error("❌ Transaction error:", data);
-      setState((prevState) => ({
-        ...prevState,
-        error: data.error
-      }));
-    });
-    addEventListener("error", (error) => {
-      hookLogger.error("❌ Wallet service error:", error);
-      setIsConnecting(false);
-      setState((prevState) => ({
-        ...prevState,
-        error: error?.message || "Unknown error occurred",
-        isConnecting: false
-      }));
-    });
-    updateStateFromService();
-    return () => {
-      eventListenersRef.current.forEach(({ event, callback }) => {
-        walletService.removeEventListener(event, callback);
-      });
-      eventListenersRef.current = [];
-    };
-  }, [updateStateFromService]);
-  const actions = reactExports.useMemo(() => ({
-    connect: async (network) => {
-      try {
-        setIsConnecting(true);
-        setState((prevState) => ({
-          ...prevState,
-          isConnecting: true,
-          error: null
-        }));
-        await walletService.connect(network);
-      } catch (error) {
-        setIsConnecting(false);
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to connect",
-          isConnecting: false
-        }));
-        throw error;
-      }
-    },
-    disconnect: async () => {
-      try {
-        await walletService.disconnect();
-      } catch (error) {
-        hookLogger.error("Error disconnecting:", error);
-        setState(initialState);
-        throw error;
-      }
-    },
-    createWallet: async (params) => {
-      try {
-        setState((prevState) => ({ ...prevState, error: null }));
-        const result = await walletService.createWallet(params.walletName, params.walletSecret, params.words, params.passphrase, params.network);
-        updateStateFromService();
-        return result;
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to create wallet"
-        }));
-        throw error;
-      }
-    },
-    importWallet: async (params) => {
-      try {
-        setState((prevState) => ({ ...prevState, error: null }));
-        await walletService.importWallet(params.mnemonic, params.walletName, params.walletSecret, params.passphrase, params.network);
-        updateStateFromService();
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to import wallet"
-        }));
-        throw error;
-      }
-    },
-    openExistingWallet: async (walletName, walletSecret) => {
-      try {
-        setState((prevState) => ({ ...prevState, error: null }));
-        await walletService.openExistingWallet(walletName, walletSecret);
-        updateStateFromService();
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to open wallet"
-        }));
-        throw error;
-      }
-    },
-    listWallets: async () => {
-      try {
-        return await walletService.listWallets();
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to list wallets"
-        }));
-        throw error;
-      }
-    },
-    deleteWallet: async (walletName) => {
-      try {
-        await walletService.deleteWallet(walletName);
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to delete wallet"
-        }));
-        throw error;
-      }
-    },
-    renameWallet: async (oldName, newName) => {
-      try {
-        await walletService.renameWallet(oldName, newName);
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to rename wallet"
-        }));
-        throw error;
-      }
-    },
-    getBalance: async () => {
-      try {
-        return await walletService.getBalance();
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to get balance"
-        }));
-        throw error;
-      }
-    },
-    getTransactionHistory: async () => {
-      try {
-        return await walletService.getTransactionHistory();
-      } catch (error) {
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to get transaction history"
-        }));
-        throw error;
-      }
-    },
-    refreshBalance: async () => {
-      try {
-        const balance = await walletService.getBalance();
-        setState((prevState) => ({
-          ...prevState,
-          balance
-        }));
-      } catch (error) {
-        hookLogger.error("Error refreshing balance:", error);
-        setState((prevState) => ({
-          ...prevState,
-          error: error instanceof Error ? error.message : "Failed to refresh balance"
-        }));
-      }
-    }
-  }), [updateStateFromService]);
   const finalState = {
     ...state,
     isConnecting
@@ -84224,26 +82543,26 @@ function verifyTxn(txn) {
     return false;
   }
 }
-async function processTxn(txn, state) {
+async function processTxn(txn, state2) {
   const txid = bytesToHex(keccak256Bytes(fromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
   if (!verifyTxn(txn))
     return { valid: false, txid };
-  if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce)
+  if ((state2.nonces[txn.from] || 0) + 1 !== txn.nonce)
     return { valid: false, txid };
-  if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount)
+  if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state2.balances[txn.from] || 0) < txn.amount)
     return { valid: false, txid };
   if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to))
     return { valid: false, txid };
-  state.pending.push(txn);
+  state2.pending.push(txn);
   return { valid: true, txid };
 }
-async function createBlock(state) {
-  if (state.pending.length === 0)
+async function createBlock(state2) {
+  if (state2.pending.length === 0)
     return null;
   const validTxns = [];
-  const newBalances = { ...state.balances };
-  const newNonces = { ...state.nonces };
-  for (const txn of state.pending) {
+  const newBalances = { ...state2.balances };
+  const newNonces = { ...state2.nonces };
+  for (const txn of state2.pending) {
     if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
       if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
         newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
@@ -84254,18 +82573,18 @@ async function createBlock(state) {
     }
   }
   if (validTxns.length === 0) {
-    state.pending = [];
+    state2.pending = [];
     return null;
   }
-  const nextIndex = state.chain.length;
-  const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : "0";
+  const nextIndex = state2.chain.length;
+  const previousHash = state2.chain.length > 0 ? state2.chain[state2.chain.length - 1].hash : "0";
   const timestamp = (/* @__PURE__ */ new Date()).toISOString();
   const hash3 = calculateHash(nextIndex, previousHash, timestamp, validTxns);
   const newBlock = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash: hash3 };
-  state.chain.push(newBlock);
-  state.pending = [];
-  state.balances = newBalances;
-  state.nonces = newNonces;
+  state2.chain.push(newBlock);
+  state2.pending = [];
+  state2.balances = newBalances;
+  state2.nonces = newNonces;
   return nextIndex;
 }
 function getGithubAccessToken() {
@@ -84646,17 +82965,17 @@ async function processTxns() {
   const processingMessage = document.getElementById("processing-message");
   processingMessage.classList.add("visible");
   let stateData = await fetchState();
-  let state = stateData?.content;
-  if (!state) {
+  let state2 = stateData?.content;
+  if (!state2) {
     console.log("No state found, initializing");
-    state = {
+    state2 = {
       chain: [createOriginalBlock()],
       pending: [],
       balances: { [ADMIN_ADDRESS]: 1e6 },
       nonces: {},
       lastProcessedDate: (/* @__PURE__ */ new Date(0)).toISOString()
     };
-    const success = await updateState(state, null, "Initialize state");
+    const success = await updateState(state2, null, "Initialize state");
     if (!success) {
       console.log("Failed to initialize state");
       output.textContent += "\nFailed to initialize.";
@@ -84664,18 +82983,18 @@ async function processTxns() {
       return;
     }
     stateData = await fetchState();
-    state = stateData.content;
+    state2 = stateData.content;
   }
   console.log("Fetching open issues");
   const issuesRes = await fetch(`${ISSUES_URL}?state=open&sort=created&direction=asc&per_page=100`, {
     headers: { "Authorization": `token ${getGithubAccessToken()}`, "Accept": "application/vnd.github.v3+json" }
   });
   const issues = await issuesRes.json();
-  let newLastDate = state.lastProcessedDate;
+  let newLastDate = state2.lastProcessedDate;
   for (const issue of issues) {
     if (!issue.title.toLowerCase().startsWith("tx"))
       continue;
-    if (new Date(issue.created_at) <= new Date(state.lastProcessedDate))
+    if (new Date(issue.created_at) <= new Date(state2.lastProcessedDate))
       continue;
     let txn;
     try {
@@ -84697,9 +83016,9 @@ async function processTxns() {
       continue;
     }
     console.log("Processing transaction from issue:", issue.number);
-    const { valid, txid } = await processTxn(txn, state);
+    const { valid, txid } = await processTxn(txn, state2);
     console.log(`Transaction ID: ${txid}, valid: ${valid}`);
-    const blockIndex = valid ? await createBlock(state) : null;
+    const blockIndex = valid ? await createBlock(state2) : null;
     await closeIssueWithComment(issue.number, blockIndex, valid);
     if (valid && blockIndex !== null) {
       console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
@@ -84710,7 +83029,7 @@ Processed txn ${txid} from issue #${issue.number} in block ${blockIndex}`;
       output.textContent += `
 Rejected invalid txn from issue #${issue.number}`;
     }
-    const success = await updateState(state, stateData.sha, `Process issue #${issue.number}`);
+    const success = await updateState(state2, stateData.sha, `Process issue #${issue.number}`);
     if (!success) {
       console.log("Failed to update state after issue:", issue.number);
       output.textContent += `
@@ -84719,16 +83038,16 @@ Failed to update state after issue #${issue.number}`;
       return;
     }
     stateData = await fetchState();
-    state = stateData.content;
+    state2 = stateData.content;
     const issueCreated = issue.created_at;
     if (new Date(issueCreated) > new Date(newLastDate)) {
       newLastDate = issueCreated;
     }
   }
-  if (newLastDate !== state.lastProcessedDate) {
+  if (newLastDate !== state2.lastProcessedDate) {
     console.log("Updating last processed date:", newLastDate);
-    state.lastProcessedDate = newLastDate;
-    await updateState(state, stateData.sha, "Update last processed date");
+    state2.lastProcessedDate = newLastDate;
+    await updateState(state2, stateData.sha, "Update last processed date");
   }
   console.log("processTxns completed");
   processingMessage.classList.remove("visible");
@@ -84736,17 +83055,17 @@ Failed to update state after issue #${issue.number}`;
 async function viewChain() {
   console.log("Entering viewChain");
   const output = document.getElementById("output");
-  const state = await fetchState();
-  if (!state || !state.content.chain || state.content.chain.length === 0) {
+  const state2 = await fetchState();
+  if (!state2 || !state2.content.chain || state2.content.chain.length === 0) {
     console.log("No transactions in chain");
     output.textContent = "No transactions in the chain yet.";
     return;
   }
-  const chain = state.content.chain;
-  const balances = state.content.balances;
+  const chain = state2.content.chain;
+  const balances = state2.content.balances;
   let text = `Chain length: ${chain.length}
-Pending txns: ${state.content.pending.length}
-Last processed: ${state.content.lastProcessedDate}
+Pending txns: ${state2.content.pending.length}
+Last processed: ${state2.content.lastProcessedDate}
 Balances:
 `;
   for (const [addr, bal] of Object.entries(balances)) {
