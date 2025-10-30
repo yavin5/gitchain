@@ -13,6 +13,7 @@ const getEnv = (key: string, defaultValue?: string): string => {
 };
 
 // Application Configuration
+let development = 'testnet-10';
 export const APP_CONFIG = {
   // Default network - use mainnet in production, testnet-10 in development
   defaultNetwork: getEnv(
