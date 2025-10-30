@@ -82334,7 +82334,7 @@ class WalletService {
 new WalletService();
 function UseWallet() {
   const finalState = {
-    isConnecting
+    //isConnecting,
   };
   return [finalState, actions];
 }

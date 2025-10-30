@@ -68,7 +68,7 @@ const initialState: WalletState = {
 
 export function UseWallet(): [WalletState, WalletActions] {
   const finalState: WalletState = {
-    isConnecting,
+    //isConnecting,
   };
 
   return [finalState, actions];
