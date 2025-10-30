@@ -81830,8 +81830,7 @@ const getEnv = (key2, defaultValue) => {
   return defaultValue || "";
 };
 const APP_CONFIG = {
-  // Default network - use mainnet in production, testnet-10 in development
-  defaultNetwork: getEnv("VITE_DEFAULT_NETWORK", "testnet-10"),
+  defaultNetwork: "testnet-10",
   // Priority fee for transactions (in sompi)
   // Default: 1000 sompi = 0.00001 KAS
   priorityFeeSompi: BigInt(getEnv("VITE_PRIORITY_FEE", "1000")),
@@ -81848,7 +81847,7 @@ const APP_CONFIG = {
   healthCheckInterval: parseInt(getEnv("VITE_HEALTH_CHECK_INTERVAL", "30000")),
   // 30 seconds between health checks
   // Feature flags
-  showDebugLogs: getEnv("VITE_DEBUG", "true").toLowerCase() === "true",
+  showDebugLogs: getEnv("VITE_DEBUG", development === "production" ? "false" : "true").toLowerCase() === "true",
   enableAutoConnect: getEnv("VITE_AUTO_CONNECT", "true").toLowerCase() === "true"
 };
 class WalletService {
@@ -81918,9 +81917,6 @@ class WalletService {
    */
   async connect(network) {
     const targetNetwork = network || APP_CONFIG.defaultNetwork;
-    if (!targetNetwork) {
-      throw new Error("Network is required for connection. Either provide it as parameter or set VITE_DEFAULT_NETWORK in .env");
-    }
     try {
       walletLogger.info(`🚀 Connecting to ${targetNetwork} with unified SDK...`);
       const networkId = this.mapStringToNetwork(targetNetwork);

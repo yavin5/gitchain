@@ -13,13 +13,8 @@ const getEnv = (key: string, defaultValue?: string): string => {
 };
 
 // Application Configuration
-let development = 'testnet-10';
 export const APP_CONFIG = {
-  // Default network - use mainnet in production, testnet-10 in development
-  defaultNetwork: getEnv(
-    'VITE_DEFAULT_NETWORK',
-    process.env.NODE_ENV === 'production' ? 'mainnet' : 'testnet-10'
-  ),
+  defaultNetwork: 'testnet-10',
 
   // Priority fee for transactions (in sompi)
   // Default: 1000 sompi = 0.00001 KAS
