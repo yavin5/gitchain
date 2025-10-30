@@ -81831,7 +81831,7 @@ const getEnv = (key2, defaultValue) => {
 };
 const APP_CONFIG = {
   // Default network - use mainnet in production, testnet-10 in development
-  defaultNetwork: getEnv("VITE_DEFAULT_NETWORK", development === "production" ? "mainnet" : "testnet-10"),
+  defaultNetwork: getEnv("VITE_DEFAULT_NETWORK", "testnet-10"),
   // Priority fee for transactions (in sompi)
   // Default: 1000 sompi = 0.00001 KAS
   priorityFeeSompi: BigInt(getEnv("VITE_PRIORITY_FEE", "1000")),
@@ -81848,7 +81848,7 @@ const APP_CONFIG = {
   healthCheckInterval: parseInt(getEnv("VITE_HEALTH_CHECK_INTERVAL", "30000")),
   // 30 seconds between health checks
   // Feature flags
-  showDebugLogs: getEnv("VITE_DEBUG", development === "production" ? "false" : "true").toLowerCase() === "true",
+  showDebugLogs: getEnv("VITE_DEBUG", "true").toLowerCase() === "true",
   enableAutoConnect: getEnv("VITE_AUTO_CONNECT", "true").toLowerCase() === "true"
 };
 class WalletService {
