@@ -2758,11 +2758,11 @@ class HashMD {
     if (len % 4)
       throw new Error("_sha2: outputLen must be aligned to 32bit");
     const outLen = len / 4;
-    const state2 = this.get();
-    if (outLen > state2.length)
+    const state = this.get();
+    if (outLen > state.length)
       throw new Error("_sha2: outputLen bigger than state");
     for (let i2 = 0; i2 < outLen; i2++)
-      oview.setUint32(4 * i2, state2[i2], isLE2);
+      oview.setUint32(4 * i2, state[i2], isLE2);
   }
   digest() {
     const { buffer, outputLen } = this;
@@ -25168,7 +25168,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
     }
   }
   /** Create a new stream */
-  _newStream(streamId, state2, direction) {
+  _newStream(streamId, state, direction) {
     if (this.streams.find((s2) => s2.streamId === streamId) != null) {
       throw new InvalidParametersError$1("Stream already exists with that id");
     }
@@ -25176,7 +25176,7 @@ class YamuxMuxer extends AbstractStreamMuxer {
       ...this.streamOptions,
       id: `${streamId}`,
       streamId,
-      state: state2,
+      state,
       direction,
       sendFrame: this.sendFrame.bind(this),
       log: this.log.newScope(`${direction}:${streamId}`),
@@ -35144,21 +35144,21 @@ function requireSha3() {
             outputLength: 512
           }),
           _doReset: function() {
-            var state2 = this._state = [];
+            var state = this._state = [];
             for (var i2 = 0; i2 < 25; i2++) {
-              state2[i2] = new X64Word.init();
+              state[i2] = new X64Word.init();
             }
             this.blockSize = (1600 - 2 * this.cfg.outputLength) / 32;
           },
           _doProcessBlock: function(M, offset) {
-            var state2 = this._state;
+            var state = this._state;
             var nBlockSizeLanes = this.blockSize / 2;
             for (var i2 = 0; i2 < nBlockSizeLanes; i2++) {
               var M2i = M[offset + 2 * i2];
               var M2i1 = M[offset + 2 * i2 + 1];
               M2i = (M2i << 8 | M2i >>> 24) & 16711935 | (M2i << 24 | M2i >>> 8) & 4278255360;
               M2i1 = (M2i1 << 8 | M2i1 >>> 24) & 16711935 | (M2i1 << 24 | M2i1 >>> 8) & 4278255360;
-              var lane = state2[i2];
+              var lane = state[i2];
               lane.high ^= M2i1;
               lane.low ^= M2i;
             }
@@ -35166,7 +35166,7 @@ function requireSha3() {
               for (var x = 0; x < 5; x++) {
                 var tMsw = 0, tLsw = 0;
                 for (var y = 0; y < 5; y++) {
-                  var lane = state2[x + 5 * y];
+                  var lane = state[x + 5 * y];
                   tMsw ^= lane.high;
                   tLsw ^= lane.low;
                 }
@@ -35182,7 +35182,7 @@ function requireSha3() {
                 var tMsw = Tx4.high ^ (Tx1Msw << 1 | Tx1Lsw >>> 31);
                 var tLsw = Tx4.low ^ (Tx1Lsw << 1 | Tx1Msw >>> 31);
                 for (var y = 0; y < 5; y++) {
-                  var lane = state2[x + 5 * y];
+                  var lane = state[x + 5 * y];
                   lane.high ^= tMsw;
                   lane.low ^= tLsw;
                 }
@@ -35190,7 +35190,7 @@ function requireSha3() {
               for (var laneIndex = 1; laneIndex < 25; laneIndex++) {
                 var tMsw;
                 var tLsw;
-                var lane = state2[laneIndex];
+                var lane = state[laneIndex];
                 var laneMsw = lane.high;
                 var laneLsw = lane.low;
                 var rhoOffset = RHO_OFFSETS[laneIndex];
@@ -35206,13 +35206,13 @@ function requireSha3() {
                 TPiLane.low = tLsw;
               }
               var T0 = T[0];
-              var state0 = state2[0];
+              var state0 = state[0];
               T0.high = state0.high;
               T0.low = state0.low;
               for (var x = 0; x < 5; x++) {
                 for (var y = 0; y < 5; y++) {
                   var laneIndex = x + 5 * y;
-                  var lane = state2[laneIndex];
+                  var lane = state[laneIndex];
                   var TLane = T[laneIndex];
                   var Tx1Lane = T[(x + 1) % 5 + 5 * y];
                   var Tx2Lane = T[(x + 2) % 5 + 5 * y];
@@ -35220,7 +35220,7 @@ function requireSha3() {
                   lane.low = TLane.low ^ ~Tx1Lane.low & Tx2Lane.low;
                 }
               }
-              var lane = state2[0];
+              var lane = state[0];
               var roundConstant = ROUND_CONSTANTS[round];
               lane.high ^= roundConstant.high;
               lane.low ^= roundConstant.low;
@@ -35236,12 +35236,12 @@ function requireSha3() {
             dataWords[(Math2.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits >>> 5) - 1] |= 128;
             data.sigBytes = dataWords.length * 4;
             this._process();
-            var state2 = this._state;
+            var state = this._state;
             var outputLengthBytes = this.cfg.outputLength / 8;
             var outputLengthLanes = outputLengthBytes / 8;
             var hashWords = [];
             for (var i2 = 0; i2 < outputLengthLanes; i2++) {
-              var lane = state2[i2];
+              var lane = state[i2];
               var laneMsw = lane.high;
               var laneLsw = lane.low;
               laneMsw = (laneMsw << 8 | laneMsw >>> 24) & 16711935 | (laneMsw << 24 | laneMsw >>> 8) & 4278255360;
@@ -35253,9 +35253,9 @@ function requireSha3() {
           },
           clone: function() {
             var clone = Hasher2.clone.call(this);
-            var state2 = clone._state = this._state.slice(0);
+            var state = clone._state = this._state.slice(0);
             for (var i2 = 0; i2 < 25; i2++) {
-              state2[i2] = state2[i2].clone();
+              state[i2] = state[i2].clone();
             }
             return clone;
           }
@@ -48178,42 +48178,42 @@ function getArrayU8FromWasm0(ptr, len) {
   return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function makeMutClosure(arg0, arg1, dtor, f2) {
-  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state2.cnt++;
-    const a2 = state2.a;
-    state2.a = 0;
+    state.cnt++;
+    const a2 = state.a;
+    state.a = 0;
     try {
-      return f2(a2, state2.b, ...args);
+      return f2(a2, state.b, ...args);
     } finally {
-      if (--state2.cnt === 0) {
-        wasm.__wbindgen_export_4.get(state2.dtor)(a2, state2.b);
-        CLOSURE_DTORS.unregister(state2);
+      if (--state.cnt === 0) {
+        wasm.__wbindgen_export_4.get(state.dtor)(a2, state.b);
+        CLOSURE_DTORS.unregister(state);
       } else {
-        state2.a = a2;
+        state.a = a2;
       }
     }
   }, "real");
-  real.original = state2;
-  CLOSURE_DTORS.register(real, state2, state2);
+  real.original = state;
+  CLOSURE_DTORS.register(real, state, state);
   return real;
 }
 function makeClosure(arg0, arg1, dtor, f2) {
-  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state2.cnt++;
+    state.cnt++;
     try {
-      return f2(state2.a, state2.b, ...args);
+      return f2(state.a, state.b, ...args);
     } finally {
-      if (--state2.cnt === 0) {
-        wasm.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
-        state2.a = 0;
-        CLOSURE_DTORS.unregister(state2);
+      if (--state.cnt === 0) {
+        wasm.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
+        state.a = 0;
+        CLOSURE_DTORS.unregister(state);
       }
     }
   }, "real");
-  real.original = state2;
-  CLOSURE_DTORS.register(real, state2, state2);
+  real.original = state;
+  CLOSURE_DTORS.register(real, state, state);
   return real;
 }
 function debugString(val) {
@@ -50367,8 +50367,8 @@ var init_kaspa = __esm({
     __name$8(getArrayU8FromWasm0, "getArrayU8FromWasm0");
     CLOSURE_DTORS = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
-    }, "unregister") } : new FinalizationRegistry((state2) => {
-      wasm.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
+    }, "unregister") } : new FinalizationRegistry((state) => {
+      wasm.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
     });
     __name$8(makeMutClosure, "makeMutClosure");
     __name$8(makeClosure, "makeClosure");
@@ -62030,42 +62030,42 @@ function getArrayU8FromWasm02(ptr, len) {
   return getUint8ArrayMemory02().subarray(ptr / 1, ptr / 1 + len);
 }
 function makeMutClosure2(arg0, arg1, dtor, f2) {
-  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state2.cnt++;
-    const a2 = state2.a;
-    state2.a = 0;
+    state.cnt++;
+    const a2 = state.a;
+    state.a = 0;
     try {
-      return f2(a2, state2.b, ...args);
+      return f2(a2, state.b, ...args);
     } finally {
-      if (--state2.cnt === 0) {
-        wasm2.__wbindgen_export_4.get(state2.dtor)(a2, state2.b);
-        CLOSURE_DTORS2.unregister(state2);
+      if (--state.cnt === 0) {
+        wasm2.__wbindgen_export_4.get(state.dtor)(a2, state.b);
+        CLOSURE_DTORS2.unregister(state);
       } else {
-        state2.a = a2;
+        state.a = a2;
       }
     }
   }, "real");
-  real.original = state2;
-  CLOSURE_DTORS2.register(real, state2, state2);
+  real.original = state;
+  CLOSURE_DTORS2.register(real, state, state);
   return real;
 }
 function makeClosure2(arg0, arg1, dtor, f2) {
-  const state2 = { a: arg0, b: arg1, cnt: 1, dtor };
+  const state = { a: arg0, b: arg1, cnt: 1, dtor };
   const real = /* @__PURE__ */ __name$8((...args) => {
-    state2.cnt++;
+    state.cnt++;
     try {
-      return f2(state2.a, state2.b, ...args);
+      return f2(state.a, state.b, ...args);
     } finally {
-      if (--state2.cnt === 0) {
-        wasm2.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
-        state2.a = 0;
-        CLOSURE_DTORS2.unregister(state2);
+      if (--state.cnt === 0) {
+        wasm2.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
+        state.a = 0;
+        CLOSURE_DTORS2.unregister(state);
       }
     }
   }, "real");
-  real.original = state2;
-  CLOSURE_DTORS2.register(real, state2, state2);
+  real.original = state;
+  CLOSURE_DTORS2.register(real, state, state);
   return real;
 }
 function debugString2(val) {
@@ -64219,8 +64219,8 @@ var init_kaspa2 = __esm({
     __name$8(getArrayU8FromWasm02, "getArrayU8FromWasm0");
     CLOSURE_DTORS2 = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
-    }, "unregister") } : new FinalizationRegistry((state2) => {
-      wasm2.__wbindgen_export_4.get(state2.dtor)(state2.a, state2.b);
+    }, "unregister") } : new FinalizationRegistry((state) => {
+      wasm2.__wbindgen_export_4.get(state.dtor)(state.a, state.b);
     });
     __name$8(makeMutClosure2, "makeMutClosure");
     __name$8(makeClosure2, "makeClosure");
@@ -82334,7 +82334,6 @@ class WalletService {
 new WalletService();
 function UseWallet() {
   const finalState = {
-    ...state,
     isConnecting
   };
   return [finalState, actions];
@@ -82543,26 +82542,26 @@ function verifyTxn(txn) {
     return false;
   }
 }
-async function processTxn(txn, state2) {
+async function processTxn(txn, state) {
   const txid = bytesToHex(keccak256Bytes(fromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
   if (!verifyTxn(txn))
     return { valid: false, txid };
-  if ((state2.nonces[txn.from] || 0) + 1 !== txn.nonce)
+  if ((state.nonces[txn.from] || 0) + 1 !== txn.nonce)
     return { valid: false, txid };
-  if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state2.balances[txn.from] || 0) < txn.amount)
+  if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase() && (state.balances[txn.from] || 0) < txn.amount)
     return { valid: false, txid };
   if (!/^0x[a-fA-F0-9]{40}$/.test(txn.from) || !/^0x[a-fA-F0-9]{40}$/.test(txn.to))
     return { valid: false, txid };
-  state2.pending.push(txn);
+  state.pending.push(txn);
   return { valid: true, txid };
 }
-async function createBlock(state2) {
-  if (state2.pending.length === 0)
+async function createBlock(state) {
+  if (state.pending.length === 0)
     return null;
   const validTxns = [];
-  const newBalances = { ...state2.balances };
-  const newNonces = { ...state2.nonces };
-  for (const txn of state2.pending) {
+  const newBalances = { ...state.balances };
+  const newNonces = { ...state.nonces };
+  for (const txn of state.pending) {
     if (verifyTxn(txn) && (newNonces[txn.from] || 0) + 1 === txn.nonce && (txn.from.toLowerCase() === ADMIN_ADDRESS.toLowerCase() || (newBalances[txn.from] || 0) >= txn.amount)) {
       if (txn.from.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
         newBalances[txn.from] = (newBalances[txn.from] || 0) - txn.amount;
@@ -82573,18 +82572,18 @@ async function createBlock(state2) {
     }
   }
   if (validTxns.length === 0) {
-    state2.pending = [];
+    state.pending = [];
     return null;
   }
-  const nextIndex = state2.chain.length;
-  const previousHash = state2.chain.length > 0 ? state2.chain[state2.chain.length - 1].hash : "0";
+  const nextIndex = state.chain.length;
+  const previousHash = state.chain.length > 0 ? state.chain[state.chain.length - 1].hash : "0";
   const timestamp = (/* @__PURE__ */ new Date()).toISOString();
   const hash3 = calculateHash(nextIndex, previousHash, timestamp, validTxns);
   const newBlock = { index: nextIndex, previousHash, timestamp, transactions: validTxns, hash: hash3 };
-  state2.chain.push(newBlock);
-  state2.pending = [];
-  state2.balances = newBalances;
-  state2.nonces = newNonces;
+  state.chain.push(newBlock);
+  state.pending = [];
+  state.balances = newBalances;
+  state.nonces = newNonces;
   return nextIndex;
 }
 function getGithubAccessToken() {
@@ -82965,17 +82964,17 @@ async function processTxns() {
   const processingMessage = document.getElementById("processing-message");
   processingMessage.classList.add("visible");
   let stateData = await fetchState();
-  let state2 = stateData?.content;
-  if (!state2) {
+  let state = stateData?.content;
+  if (!state) {
     console.log("No state found, initializing");
-    state2 = {
+    state = {
       chain: [createOriginalBlock()],
       pending: [],
       balances: { [ADMIN_ADDRESS]: 1e6 },
       nonces: {},
       lastProcessedDate: (/* @__PURE__ */ new Date(0)).toISOString()
     };
-    const success = await updateState(state2, null, "Initialize state");
+    const success = await updateState(state, null, "Initialize state");
     if (!success) {
       console.log("Failed to initialize state");
       output.textContent += "\nFailed to initialize.";
@@ -82983,18 +82982,18 @@ async function processTxns() {
       return;
     }
     stateData = await fetchState();
-    state2 = stateData.content;
+    state = stateData.content;
   }
   console.log("Fetching open issues");
   const issuesRes = await fetch(`${ISSUES_URL}?state=open&sort=created&direction=asc&per_page=100`, {
     headers: { "Authorization": `token ${getGithubAccessToken()}`, "Accept": "application/vnd.github.v3+json" }
   });
   const issues = await issuesRes.json();
-  let newLastDate = state2.lastProcessedDate;
+  let newLastDate = state.lastProcessedDate;
   for (const issue of issues) {
     if (!issue.title.toLowerCase().startsWith("tx"))
       continue;
-    if (new Date(issue.created_at) <= new Date(state2.lastProcessedDate))
+    if (new Date(issue.created_at) <= new Date(state.lastProcessedDate))
       continue;
     let txn;
     try {
@@ -83016,9 +83015,9 @@ async function processTxns() {
       continue;
     }
     console.log("Processing transaction from issue:", issue.number);
-    const { valid, txid } = await processTxn(txn, state2);
+    const { valid, txid } = await processTxn(txn, state);
     console.log(`Transaction ID: ${txid}, valid: ${valid}`);
-    const blockIndex = valid ? await createBlock(state2) : null;
+    const blockIndex = valid ? await createBlock(state) : null;
     await closeIssueWithComment(issue.number, blockIndex, valid);
     if (valid && blockIndex !== null) {
       console.log(`Transaction ID: ${txid} settled in block ${blockIndex}`);
@@ -83029,7 +83028,7 @@ Processed txn ${txid} from issue #${issue.number} in block ${blockIndex}`;
       output.textContent += `
 Rejected invalid txn from issue #${issue.number}`;
     }
-    const success = await updateState(state2, stateData.sha, `Process issue #${issue.number}`);
+    const success = await updateState(state, stateData.sha, `Process issue #${issue.number}`);
     if (!success) {
       console.log("Failed to update state after issue:", issue.number);
       output.textContent += `
@@ -83038,16 +83037,16 @@ Failed to update state after issue #${issue.number}`;
       return;
     }
     stateData = await fetchState();
-    state2 = stateData.content;
+    state = stateData.content;
     const issueCreated = issue.created_at;
     if (new Date(issueCreated) > new Date(newLastDate)) {
       newLastDate = issueCreated;
     }
   }
-  if (newLastDate !== state2.lastProcessedDate) {
+  if (newLastDate !== state.lastProcessedDate) {
     console.log("Updating last processed date:", newLastDate);
-    state2.lastProcessedDate = newLastDate;
-    await updateState(state2, stateData.sha, "Update last processed date");
+    state.lastProcessedDate = newLastDate;
+    await updateState(state, stateData.sha, "Update last processed date");
   }
   console.log("processTxns completed");
   processingMessage.classList.remove("visible");
@@ -83055,17 +83054,17 @@ Failed to update state after issue #${issue.number}`;
 async function viewChain() {
   console.log("Entering viewChain");
   const output = document.getElementById("output");
-  const state2 = await fetchState();
-  if (!state2 || !state2.content.chain || state2.content.chain.length === 0) {
+  const state = await fetchState();
+  if (!state || !state.content.chain || state.content.chain.length === 0) {
     console.log("No transactions in chain");
     output.textContent = "No transactions in the chain yet.";
     return;
   }
-  const chain = state2.content.chain;
-  const balances = state2.content.balances;
+  const chain = state.content.chain;
+  const balances = state.content.balances;
   let text = `Chain length: ${chain.length}
-Pending txns: ${state2.content.pending.length}
-Last processed: ${state2.content.lastProcessedDate}
+Pending txns: ${state.content.pending.length}
+Last processed: ${state.content.lastProcessedDate}
 Balances:
 `;
   for (const [addr, bal] of Object.entries(balances)) {

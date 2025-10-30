@@ -67,9 +67,7 @@ const initialState: WalletState = {
 };
 
 export function UseWallet(): [WalletState, WalletActions] {
-  // Merge isConnecting state
   const finalState: WalletState = {
-    ...state,
     isConnecting,
   };
 
