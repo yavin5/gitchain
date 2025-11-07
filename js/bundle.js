@@ -75811,22 +75811,6 @@ async function getBalance() {
   return module2.Balance;
 }
 __name$8(getBalance, "getBalance");
-var index_default = {
-  initKaspaWasm,
-  getKaspaWasm,
-  getRpcClient,
-  getResolver,
-  getEncoding,
-  getNetworkId,
-  getInitSync,
-  getUtxoContext,
-  getUtxoProcessor,
-  getUtxoEntry,
-  getUtxoEntries,
-  getUtxoEntryReference,
-  getBalance,
-  detectPlatform
-};
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value2) => __defProp$7(target, "name", { value: value2, configurable: true });
 var emitterLogger = createLogger("kasstamp:rpc:events");
@@ -82567,7 +82551,9 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    index_default(`https://${OWNER}.github.io/${REPO}/`);
+    undefined = function() {
+      return `https://${OWNER}.github.io/${REPO}/`;
+    };
     await KaspaSDK.init({
       network: "testnet-10",
       debug: true
