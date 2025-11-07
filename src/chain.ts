@@ -100,12 +100,13 @@ export class KaspaSignalling {
 
     try {
       const defaultWalletName = `Testnet Wallet`;
+      const seedWords = undefined;
 
       const result = await walletActions.createWallet({
-        walletName: createForm.walletName || defaultWalletName,
-        walletSecret: createForm.walletSecret,
-        words: createForm.words,
-        passphrase: createForm.useBip39 ? createForm.passphrase || undefined : undefined,
+        walletName: defaultWalletName,
+        walletSecret: undefined,
+        words: seedWords,
+        passphrase: undefined,
       });
 
       if (!result.mnemonic) throw new Error('Mnemonic not generated');

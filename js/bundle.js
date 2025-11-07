@@ -82553,11 +82553,12 @@ class KaspaSignalling {
   async generateWallet() {
     try {
       const defaultWalletName = `Testnet Wallet`;
+      const seedWords = void 0;
       const result = await walletActions.createWallet({
-        walletName: createForm.walletName || defaultWalletName,
-        walletSecret: createForm.walletSecret,
-        words: createForm.words,
-        passphrase: createForm.useBip39 ? createForm.passphrase || void 0 : void 0
+        walletName: defaultWalletName,
+        walletSecret: void 0,
+        words: seedWords,
+        passphrase: void 0
       });
       if (!result.mnemonic)
         throw new Error("Mnemonic not generated");
