@@ -82578,6 +82578,7 @@ class KaspaSignalling {
     }
   }
   async connect(networkName = "testnet-10") {
+    console.log("Connecting to network: " + networkName);
   }
   async sendMessage(to, type, data) {
     if (!this.wallet)

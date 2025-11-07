@@ -128,7 +128,8 @@ export class KaspaSignalling {
     }
   }
 
-  async connect(networkName? = 'testnet-10') {
+  async connect(networkName = 'testnet-10') {
+    console.log("Connecting to network: " + networkName);
     //await KaspaSDK.rpcClient.connect(networkName);
     //this.startPolling();
   }
