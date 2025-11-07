@@ -98,12 +98,26 @@ export class KaspaSignalling {
     //await KaspaSDK.rpcClient.connect(this.chainId);
     //this.startPolling();
 
-    // @ts-ignore
-    this.mnemonic = Mnemonic.random(12);
-    if (!this.mnemonic) throw new Error('Mnemonic not generated');
-    this.wallet = Wallet.fromMnemonic(this.mnemonic);
-    this.address = this.wallet.getAddress().toString();
-    return { mnemonic: this.mnemonic, address: this.address };
+    try {
+      const defaultWalletName = `Testnet Wallet`;
+
+      const result = await walletActions.createWallet({
+        walletName: createForm.walletName || defaultWalletName,
+        walletSecret: createForm.walletSecret,
+        words: createForm.words,
+        passphrase: createForm.useBip39 ? createForm.passphrase || undefined : undefined,
+      });
+
+      if (!result.mnemonic) throw new Error('Mnemonic not generated');
+      alert("Seed words: " + result.mnemonic);
+      if (!result.address) alert ("result doesn't have an address.");
+      else alert("address: " + result.address);
+
+      return { mnemonic: result.mnemonic, address: result.address | Null };
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
+    }
   }
 
   async connect(networkName? = 'testnet-10') {

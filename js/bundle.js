@@ -340,7 +340,7 @@ function resetLogger() {
 __name$9(resetLogger, "resetLogger");
 function initializeLoggers() {
   {
-    setGlobalLogLevel(LogLevel.DEBUG);
+    setGlobalLogLevel(LogLevel.WARN);
   }
 }
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
@@ -22038,9 +22038,9 @@ class RTCPeerConnectionMultiaddrConnection extends AbstractMultiaddrConnection {
   constructor(init3) {
     super(init3);
     this.peerConnection = init3.peerConnection;
-    const initialState = init3.peerConnection.connectionState;
+    const initialState2 = init3.peerConnection.connectionState;
     this.peerConnection.onconnectionstatechange = () => {
-      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState);
+      this.log.trace("peer connection state change %s initial state %s", this.peerConnection.connectionState, initialState2);
       if (this.peerConnection.connectionState === "disconnected" || this.peerConnection.connectionState === "failed" || this.peerConnection.connectionState === "closed") {
         this.onTransportClosed();
         this.peerConnection.close();
@@ -33051,11 +33051,7 @@ function commonjsRequire(path) {
   throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
 }
 var core = { exports: {} };
-const __viteBrowserExternal = new Proxy({}, {
-  get(_, key2) {
-    throw new Error(`Module "" has been externalized for browser compatibility. Cannot access ".${key2}" in client code.  See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.`);
-  }
-});
+const __viteBrowserExternal = {};
 const __viteBrowserExternal$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: __viteBrowserExternal
@@ -47996,7 +47992,7 @@ __export(kaspa_exports, {
   Keypair: () => Keypair,
   Language: () => Language,
   MkdtempSyncOptions: () => MkdtempSyncOptions,
-  Mnemonic: () => Mnemonic$1,
+  Mnemonic: () => Mnemonic,
   NetServerOptions: () => NetServerOptions,
   NetworkId: () => NetworkId,
   NetworkType: () => NetworkType,
@@ -48041,7 +48037,7 @@ __export(kaspa_exports, {
   UtxoEntry: () => UtxoEntry,
   UtxoEntryReference: () => UtxoEntryReference,
   UtxoProcessor: () => UtxoProcessor,
-  Wallet: () => Wallet$1,
+  Wallet: () => Wallet,
   WalletDescriptor: () => WalletDescriptor,
   WasiOptions: () => WasiOptions,
   WriteFileSyncOptions: () => WriteFileSyncOptions,
@@ -50326,7 +50322,7 @@ async function __wbg_init(module_or_path) {
   const { instance, module: module2 } = await __wbg_load(await module_or_path, imports);
   return __wbg_finalize_init(instance, module2);
 }
-var wasm, heap, heap_next, WASM_VECTOR_LEN, cachedUint8ArrayMemory0, cachedTextEncoder, encodeString, cachedDataViewMemory0, cachedTextDecoder, CLOSURE_DTORS, stack_pointer, AccountsDiscoveryKind, AddressVersion, CommitRevealAddressKind, ConnectStrategy, Encoding, FeeSource, Language, NetworkType, NewAddressKind, Opcodes, SighashType, __wbindgen_enum_BinaryType, __wbindgen_enum_IdbCursorDirection, __wbindgen_enum_IdbRequestReadyState, __wbindgen_enum_IdbTransactionMode, __wbindgen_enum_RequestCredentials, __wbindgen_enum_RequestMode, AbortableFinalization, Abortable, AbortedFinalization, Aborted, AccountKindFinalization, AccountKind, AddressFinalization, Address, AgentConstructorOptionsFinalization, AgentConstructorOptions, AppendFileOptionsFinalization, AppendFileOptions, AssertionErrorOptionsFinalization, AssertionErrorOptions, BalanceFinalization, Balance, BalanceStringsFinalization, BalanceStrings, ConsoleConstructorOptionsFinalization, ConsoleConstructorOptions, CreateHookCallbacksFinalization, CreateHookCallbacks, CreateReadStreamOptionsFinalization, CreateReadStreamOptions, CreateWriteStreamOptionsFinalization, CreateWriteStreamOptions, CryptoBoxFinalization, CryptoBox, CryptoBoxPrivateKeyFinalization, CryptoBoxPrivateKey, CryptoBoxPublicKeyFinalization, CryptoBoxPublicKey, DerivationPathFinalization, DerivationPath, FormatInputPathObjectFinalization, FormatInputPathObject, GeneratorFinalization, Generator, GeneratorSummaryFinalization, GeneratorSummary, GetNameOptionsFinalization, GetNameOptions, HashFinalization, Hash, HeaderFinalization, Header, KeypairFinalization, Keypair, MkdtempSyncOptionsFinalization, MkdtempSyncOptions, MnemonicFinalization, Mnemonic$1, NetServerOptionsFinalization, NetServerOptions, NetworkIdFinalization, NetworkId, NodeDescriptorFinalization, NodeDescriptor, PSKBFinalization, PSKB, PSKTFinalization, PSKT, PaymentOutputFinalization, PaymentOutput, PaymentOutputsFinalization, PaymentOutputs, PendingTransactionFinalization, PendingTransaction, PipeOptionsFinalization, PipeOptions, PoWFinalization, PoW, PrivateKeyFinalization, PrivateKey, PrivateKeyGeneratorFinalization, PrivateKeyGenerator, ProcessSendOptionsFinalization, ProcessSendOptions, PrvKeyDataInfoFinalization, PrvKeyDataInfo, PublicKeyFinalization, PublicKey, PublicKeyGeneratorFinalization, PublicKeyGenerator, ReadStreamFinalization, ReadStream, ResolverFinalization, Resolver, RpcClientFinalization, RpcClient, ScriptBuilderFinalization, ScriptBuilder, ScriptPublicKeyFinalization, ScriptPublicKey, SetAadOptionsFinalization, SetAadOptions, SigHashTypeFinalization, SigHashType, StorageFinalization, Storage, StreamTransformOptionsFinalization, StreamTransformOptions, TransactionFinalization, Transaction, TransactionInputFinalization, TransactionInput, TransactionOutpointFinalization, TransactionOutpoint, TransactionOutputFinalization, TransactionOutput, TransactionRecordFinalization, TransactionRecord, TransactionRecordNotificationFinalization, TransactionRecordNotification, TransactionSigningHashFinalization, TransactionSigningHash, TransactionSigningHashECDSAFinalization, TransactionSigningHashECDSA, TransactionUtxoEntryFinalization, TransactionUtxoEntry, UserInfoOptionsFinalization, UserInfoOptions, UtxoContextFinalization, UtxoContext, UtxoEntriesFinalization, UtxoEntries, UtxoEntryFinalization, UtxoEntry, UtxoEntryReferenceFinalization, UtxoEntryReference, UtxoProcessorFinalization, UtxoProcessor, WalletFinalization, Wallet$1, WalletDescriptorFinalization, WalletDescriptor, WasiOptionsFinalization, WasiOptions, WriteFileSyncOptionsFinalization, WriteFileSyncOptions, WriteStreamFinalization, WriteStream, XOnlyPublicKeyFinalization, XOnlyPublicKey, XPrvFinalization, XPrv, XPubFinalization, XPub, kaspa_default;
+var wasm, heap, heap_next, WASM_VECTOR_LEN, cachedUint8ArrayMemory0, cachedTextEncoder, encodeString, cachedDataViewMemory0, cachedTextDecoder, CLOSURE_DTORS, stack_pointer, AccountsDiscoveryKind, AddressVersion, CommitRevealAddressKind, ConnectStrategy, Encoding, FeeSource, Language, NetworkType, NewAddressKind, Opcodes, SighashType, __wbindgen_enum_BinaryType, __wbindgen_enum_IdbCursorDirection, __wbindgen_enum_IdbRequestReadyState, __wbindgen_enum_IdbTransactionMode, __wbindgen_enum_RequestCredentials, __wbindgen_enum_RequestMode, AbortableFinalization, Abortable, AbortedFinalization, Aborted, AccountKindFinalization, AccountKind, AddressFinalization, Address, AgentConstructorOptionsFinalization, AgentConstructorOptions, AppendFileOptionsFinalization, AppendFileOptions, AssertionErrorOptionsFinalization, AssertionErrorOptions, BalanceFinalization, Balance, BalanceStringsFinalization, BalanceStrings, ConsoleConstructorOptionsFinalization, ConsoleConstructorOptions, CreateHookCallbacksFinalization, CreateHookCallbacks, CreateReadStreamOptionsFinalization, CreateReadStreamOptions, CreateWriteStreamOptionsFinalization, CreateWriteStreamOptions, CryptoBoxFinalization, CryptoBox, CryptoBoxPrivateKeyFinalization, CryptoBoxPrivateKey, CryptoBoxPublicKeyFinalization, CryptoBoxPublicKey, DerivationPathFinalization, DerivationPath, FormatInputPathObjectFinalization, FormatInputPathObject, GeneratorFinalization, Generator, GeneratorSummaryFinalization, GeneratorSummary, GetNameOptionsFinalization, GetNameOptions, HashFinalization, Hash, HeaderFinalization, Header, KeypairFinalization, Keypair, MkdtempSyncOptionsFinalization, MkdtempSyncOptions, MnemonicFinalization, Mnemonic, NetServerOptionsFinalization, NetServerOptions, NetworkIdFinalization, NetworkId, NodeDescriptorFinalization, NodeDescriptor, PSKBFinalization, PSKB, PSKTFinalization, PSKT, PaymentOutputFinalization, PaymentOutput, PaymentOutputsFinalization, PaymentOutputs, PendingTransactionFinalization, PendingTransaction, PipeOptionsFinalization, PipeOptions, PoWFinalization, PoW, PrivateKeyFinalization, PrivateKey, PrivateKeyGeneratorFinalization, PrivateKeyGenerator, ProcessSendOptionsFinalization, ProcessSendOptions, PrvKeyDataInfoFinalization, PrvKeyDataInfo, PublicKeyFinalization, PublicKey, PublicKeyGeneratorFinalization, PublicKeyGenerator, ReadStreamFinalization, ReadStream, ResolverFinalization, Resolver, RpcClientFinalization, RpcClient, ScriptBuilderFinalization, ScriptBuilder, ScriptPublicKeyFinalization, ScriptPublicKey, SetAadOptionsFinalization, SetAadOptions, SigHashTypeFinalization, SigHashType, StorageFinalization, Storage, StreamTransformOptionsFinalization, StreamTransformOptions, TransactionFinalization, Transaction, TransactionInputFinalization, TransactionInput, TransactionOutpointFinalization, TransactionOutpoint, TransactionOutputFinalization, TransactionOutput, TransactionRecordFinalization, TransactionRecord, TransactionRecordNotificationFinalization, TransactionRecordNotification, TransactionSigningHashFinalization, TransactionSigningHash, TransactionSigningHashECDSAFinalization, TransactionSigningHashECDSA, TransactionUtxoEntryFinalization, TransactionUtxoEntry, UserInfoOptionsFinalization, UserInfoOptions, UtxoContextFinalization, UtxoContext, UtxoEntriesFinalization, UtxoEntries, UtxoEntryFinalization, UtxoEntry, UtxoEntryReferenceFinalization, UtxoEntryReference, UtxoProcessorFinalization, UtxoProcessor, WalletFinalization, Wallet, WalletDescriptorFinalization, WalletDescriptor, WasiOptionsFinalization, WasiOptions, WriteFileSyncOptionsFinalization, WriteFileSyncOptions, WriteStreamFinalization, WriteStream, XOnlyPublicKeyFinalization, XOnlyPublicKey, XPrvFinalization, XPrv, XPubFinalization, XPub, kaspa_default;
 var init_kaspa = __esm({
   "web/kaspa.js"() {
     heap = new Array(128).fill(void 0);
@@ -53601,7 +53597,7 @@ var init_kaspa = __esm({
     MnemonicFinalization = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
     }, "unregister") } : new FinalizationRegistry((ptr) => wasm.__wbg_mnemonic_free(ptr >>> 0, 1));
-    Mnemonic$1 = class _Mnemonic {
+    Mnemonic = class _Mnemonic {
       static {
         __name$8(this, "Mnemonic");
       }
@@ -60160,7 +60156,7 @@ var init_kaspa = __esm({
     WalletFinalization = typeof FinalizationRegistry === "undefined" ? { register: /* @__PURE__ */ __name$8(() => {
     }, "register"), unregister: /* @__PURE__ */ __name$8(() => {
     }, "unregister") } : new FinalizationRegistry((ptr) => wasm.__wbg_wallet_free(ptr >>> 0, 1));
-    Wallet$1 = class {
+    Wallet = class {
       static {
         __name$8(this, "Wallet");
       }
@@ -76572,11 +76568,11 @@ async function initializeCompressionPlatform() {
   }
   if (capabilities.hasFileSystem) {
     try {
-      const zlib = await __vitePreload(() => import("./assets/__vite-browser-external_zlib-Cf8Jdtym.js"), true ? [] : void 0);
+      const zlib = await __vitePreload(() => Promise.resolve().then(() => __viteBrowserExternal$1), true ? void 0 : void 0);
       const { promisify } = await __vitePreload(async () => {
-        const { promisify: promisify2 } = await import("./assets/__vite-browser-external_util-pV4bfyhx.js");
+        const { promisify: promisify2 } = await Promise.resolve().then(() => __viteBrowserExternal$1);
         return { promisify: promisify2 };
-      }, true ? [] : void 0);
+      }, true ? void 0 : void 0);
       const gzipAsync = promisify(zlib.gzip);
       const gunzipAsync = promisify(zlib.gunzip);
       return {
@@ -76758,7 +76754,7 @@ function generateSalt() {
 }
 __name$4(generateSalt, "generateSalt");
 function derivePrivateKey(mnemonic, bip39Passphrase, accountIndex, addressIndex, isReceive) {
-  const mnemonicObj = new Mnemonic$1(mnemonic);
+  const mnemonicObj = new Mnemonic(mnemonic);
   const seedHex = mnemonicObj.toSeed(bip39Passphrase);
   const xprv = new XPrv(seedHex);
   const privateKeyGen = new PrivateKeyGenerator(
@@ -76772,7 +76768,7 @@ function derivePrivateKey(mnemonic, bip39Passphrase, accountIndex, addressIndex,
 }
 __name$4(derivePrivateKey, "derivePrivateKey");
 function deriveMultipleKeys(mnemonic, bip39Passphrase, derivations) {
-  const mnemonicObj = new Mnemonic$1(mnemonic);
+  const mnemonicObj = new Mnemonic(mnemonic);
   const seedHex = mnemonicObj.toSeed(bip39Passphrase);
   const xprv = new XPrv(seedHex);
   const keysByAccount = /* @__PURE__ */ new Map();
@@ -77917,7 +77913,7 @@ var SimpleWalletStorageManager = class {
       throw new Error("Network not set. Call setNetwork() before listing wallets.");
     }
     await this.initialize();
-    const tempWallet = new Wallet$1({
+    const tempWallet = new Wallet({
       resident: true,
       // Don't persist this temporary wallet
       networkId: this.currentNetwork
@@ -78125,12 +78121,12 @@ var KaspaWalletFactory = class {
       throw new Error("Network is required for wallet creation");
     }
     const networkString = this.networkToString(options.network);
-    if (!Wallet$1) {
+    if (!Wallet) {
       throw new Error("Wallet class not available - WASM may not be properly initialized");
     }
-    const mnemonic = Mnemonic$1.random(options.words);
+    const mnemonic = Mnemonic.random(options.words);
     const mnemonicPhrase = mnemonic.phrase;
-    const wasmWalletInstance = new Wallet$1({
+    const wasmWalletInstance = new Wallet({
       resident: false,
       networkId: networkString,
       resolver: new Resolver()
@@ -78227,10 +78223,10 @@ var KaspaWalletFactory = class {
       throw new Error("Network is required for wallet creation");
     }
     const networkString = this.networkToString(options.network);
-    if (!Wallet$1) {
+    if (!Wallet) {
       throw new Error("Wallet class not available - WASM may not be properly initialized");
     }
-    const wasmWalletInstance = new Wallet$1({
+    const wasmWalletInstance = new Wallet({
       resident: false,
       networkId: networkString,
       resolver: new Resolver()
@@ -78324,7 +78320,7 @@ var KaspaWalletFactory = class {
       filename: filenameWithNetwork,
       accountDescriptors: true
     };
-    const wasmWalletInstance = new Wallet$1({
+    const wasmWalletInstance = new Wallet({
       resident: false,
       networkId: networkString,
       resolver: new Resolver()
@@ -81825,7 +81821,8 @@ var KaspaSDK = class _KaspaSDK {
   }
 };
 const walletLogger = createLogger("kasstamp:web:wallet");
-const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": true, "MODE": "production", "PROD": false, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
+const hookLogger = createLogger("kasstamp:web:hooks");
+const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
 const getEnv = (key2, defaultValue) => {
   if (typeof window !== "undefined") {
     const viteEnv = __vite_import_meta_env__;
@@ -82331,8 +82328,201 @@ class WalletService {
     return wordCount;
   }
 }
-new WalletService();
+const walletService = new WalletService();
+const initialState = {
+  isConnected: false,
+  isInitialized: false,
+  isConnecting: false,
+  currentNetwork: "",
+  hasWallet: false,
+  walletLocked: true,
+  address: null,
+  balance: null,
+  accounts: [],
+  lastSyncTime: null,
+  error: null
+};
+function UseWallet() {
+  let setState;
+  let setIsConnecting;
+  const updateStateFromService = () => {
+    const serviceState = walletService.getState();
+    setState((prevState) => ({
+      ...prevState,
+      isConnected: serviceState.isConnected,
+      isInitialized: serviceState.isInitialized,
+      currentNetwork: serviceState.currentNetwork.toString(),
+      hasWallet: serviceState.hasWallet,
+      walletLocked: serviceState.walletLocked,
+      address: serviceState.address,
+      balance: serviceState.balance,
+      // Include balance from service state
+      accounts: serviceState.accounts,
+      walletName: serviceState.walletName,
+      lastSyncTime: serviceState.lastSyncTime
+    }));
+  };
+  let actions = {
+    connect: async (network) => {
+      try {
+        setIsConnecting = () => false;
+        setState = (prevState) => ({
+          ...prevState,
+          isConnecting: true,
+          error: null
+        });
+        await walletService.connect(network);
+      } catch (error) {
+        setIsConnecting = () => false;
+        setState = (prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to connect",
+          isConnecting: false
+        });
+        throw error;
+      }
+    },
+    disconnect: async () => {
+      try {
+        await walletService.disconnect();
+      } catch (error) {
+        hookLogger.error("Error disconnecting:", error);
+        setState(initialState);
+        throw error;
+      }
+    },
+    createWallet: async (params) => {
+      try {
+        setState = (prevState) => ({
+          ...prevState,
+          isConnecting: true,
+          error: null
+        });
+        const result = await walletService.createWallet(params.walletName, params.walletSecret, params.words, params.passphrase, params.network);
+        updateStateFromService();
+        return result;
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to create wallet"
+        }));
+        throw error;
+      }
+    },
+    importWallet: async (params) => {
+      try {
+        setState((prevState) => ({ ...prevState, error: null }));
+        await walletService.importWallet(params.mnemonic, params.walletName, params.walletSecret, params.passphrase, params.network);
+        updateStateFromService();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to import wallet"
+        }));
+        throw error;
+      }
+    },
+    openExistingWallet: async (walletName, walletSecret) => {
+      try {
+        setState((prevState) => ({ ...prevState, error: null }));
+        await walletService.openExistingWallet(walletName, walletSecret);
+        updateStateFromService();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to open wallet"
+        }));
+        throw error;
+      }
+    },
+    listWallets: async () => {
+      try {
+        return await walletService.listWallets();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to list wallets"
+        }));
+        throw error;
+      }
+    },
+    deleteWallet: async (walletName) => {
+      try {
+        await walletService.deleteWallet(walletName);
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to delete wallet"
+        }));
+        throw error;
+      }
+    },
+    renameWallet: async (oldName, newName) => {
+      try {
+        await walletService.renameWallet(oldName, newName);
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to rename wallet"
+        }));
+        throw error;
+      }
+    },
+    getBalance: async () => {
+      try {
+        return await walletService.getBalance();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to get balance"
+        }));
+        throw error;
+      }
+    },
+    getTransactionHistory: async () => {
+      try {
+        return await walletService.getTransactionHistory();
+      } catch (error) {
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to get transaction history"
+        }));
+        throw error;
+      }
+    },
+    refreshBalance: async () => {
+      try {
+        const balance = await walletService.getBalance();
+        setState((prevState) => ({
+          ...prevState,
+          balance
+        }));
+      } catch (error) {
+        hookLogger.error("Error refreshing balance:", error);
+        setState((prevState) => ({
+          ...prevState,
+          error: error instanceof Error ? error.message : "Failed to refresh balance"
+        }));
+      }
+    }
+  };
+  const finalState = {
+    isConnected: false,
+    isInitialized: false,
+    isConnecting: false,
+    currentNetwork: "",
+    hasWallet: false,
+    walletLocked: false,
+    address: null,
+    balance: null,
+    accounts: [],
+    lastSyncTime: null,
+    error: null
+  };
+  return [finalState, actions];
+}
 initializeLoggers();
+const [walletState, walletActions] = UseWallet();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
@@ -82361,12 +82551,25 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    this.mnemonic = Mnemonic.random(12);
-    if (!this.mnemonic)
-      throw new Error("Mnemonic not generated");
-    this.wallet = Wallet.fromMnemonic(this.mnemonic);
-    this.address = this.wallet.getAddress().toString();
-    return { mnemonic: this.mnemonic, address: this.address };
+    try {
+      const defaultWalletName = `Testnet Wallet`;
+      const result = await walletActions.createWallet({
+        walletName: createForm.walletName || defaultWalletName,
+        walletSecret: createForm.walletSecret,
+        words: createForm.words,
+        passphrase: createForm.useBip39 ? createForm.passphrase || void 0 : void 0
+      });
+      if (!result.mnemonic)
+        throw new Error("Mnemonic not generated");
+      alert("Seed words: " + result.mnemonic);
+      if (!result.address)
+        alert("result doesn't have an address.");
+      else
+        alert("address: " + result.address);
+      return { mnemonic: result.mnemonic, address: result.address | Null };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create wallet: " + err);
+    }
   }
   async connect(networkName = "testnet-10") {
   }
