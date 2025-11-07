@@ -98,6 +98,12 @@ export class KaspaSignalling {
     //await KaspaSDK.rpcClient.connect(this.chainId);
     //this.startPolling();
 
+    // Initialize SDK
+    const sdk = await KaspaSDK.init({
+      network: Network.Testnet,
+      debug: true,
+    });
+
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = undefined;

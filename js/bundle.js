@@ -82551,6 +82551,10 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
+    await KaspaSDK.init({
+      network: Network.Testnet,
+      debug: true
+    });
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = void 0;
