@@ -197,7 +197,7 @@ export function UseWallet(): [WalletState, WalletActions] {
         try {
           await walletService.deleteWallet(walletName);
         } catch (error) {
-          setState((prevState) => ({
+          setState((prevState: any) => ({
             ...prevState,
             error: error instanceof Error ? error.message : 'Failed to delete wallet',
           }));
