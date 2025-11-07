@@ -82568,7 +82568,7 @@ class KaspaSignalling {
         alert("address: " + result.address);
       return { mnemonic: result.mnemonic, address: result.address | Null };
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create wallet: " + err);
+      console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
     }
   }
   async connect(networkName = "testnet-10") {
