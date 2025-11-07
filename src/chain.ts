@@ -101,6 +101,7 @@ export class KaspaSignalling {
     // Initialize SDK
     const sdk = await KaspaSDK.init({
       network: 'testnet-10',
+      nodeUrl: `https://${OWNER}.github.io/${REPO}`,
       debug: true,
     });
 
@@ -110,17 +111,17 @@ export class KaspaSignalling {
 
       const result = await walletActions.createWallet({
         walletName: defaultWalletName,
-        walletSecret: undefined,
+        walletSecret: '',
         words: seedWords,
         passphrase: undefined,
       });
 
       if (!result.mnemonic) throw new Error('Mnemonic not generated');
       alert("Seed words: " + result.mnemonic);
-      if (!result.address) alert ("result doesn't have an address.");
-      else alert("address: " + result.address);
+      if (!result.wallet.accounts[0]) alert ("result doesn't have an address.");
+      else alert("address: " + result.wallet.accounts[0]);
 
-      return { mnemonic: result.mnemonic, address: result.address | Null };
+      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
 
     } catch (err) {
       console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);

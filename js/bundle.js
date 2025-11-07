@@ -82553,6 +82553,7 @@ class KaspaSignalling {
   async generateWallet() {
     await KaspaSDK.init({
       network: "testnet-10",
+      nodeUrl: `https://${OWNER}.github.io/${REPO}`,
       debug: true
     });
     try {
@@ -82560,18 +82561,18 @@ class KaspaSignalling {
       const seedWords = void 0;
       const result = await walletActions.createWallet({
         walletName: defaultWalletName,
-        walletSecret: void 0,
+        walletSecret: "",
         words: seedWords,
         passphrase: void 0
       });
       if (!result.mnemonic)
         throw new Error("Mnemonic not generated");
       alert("Seed words: " + result.mnemonic);
-      if (!result.address)
+      if (!result.wallet.accounts[0])
         alert("result doesn't have an address.");
       else
-        alert("address: " + result.address);
-      return { mnemonic: result.mnemonic, address: result.address | Null };
+        alert("address: " + result.wallet.accounts[0]);
+      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
     } catch (err) {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
     }
