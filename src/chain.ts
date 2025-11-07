@@ -100,7 +100,7 @@ export class KaspaSignalling {
 
     // Initialize SDK
     const sdk = await KaspaSDK.init({
-      network: Network.Testnet,
+      network: 'testnet-10',
       debug: true,
     });
 

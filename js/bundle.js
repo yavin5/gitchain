@@ -82552,7 +82552,7 @@ class KaspaSignalling {
   }
   async generateWallet() {
     await KaspaSDK.init({
-      network: Network.Testnet,
+      network: "testnet-10",
       debug: true
     });
     try {
