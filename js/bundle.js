@@ -75811,129 +75811,6 @@ async function getBalance() {
   return module2.Balance;
 }
 __name$8(getBalance, "getBalance");
-var index_default = {
-  initKaspaWasm,
-  getKaspaWasm,
-  getRpcClient,
-  getResolver,
-  getEncoding,
-  getNetworkId,
-  getInitSync,
-  getUtxoContext,
-  getUtxoProcessor,
-  getUtxoEntry,
-  getUtxoEntries,
-  getUtxoEntryReference,
-  getBalance,
-  detectPlatform
-};
-const WASM = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  get Address() {
-    return Address;
-  },
-  get ConnectStrategy() {
-    return ConnectStrategy;
-  },
-  get Encoding() {
-    return Encoding;
-  },
-  get Generator() {
-    return Generator;
-  },
-  get GeneratorSummary() {
-    return GeneratorSummary;
-  },
-  get Mnemonic() {
-    return Mnemonic;
-  },
-  get NetworkId() {
-    return NetworkId;
-  },
-  get NetworkType() {
-    return NetworkType;
-  },
-  get PaymentOutput() {
-    return PaymentOutput;
-  },
-  get PaymentOutputs() {
-    return PaymentOutputs;
-  },
-  get PendingTransaction() {
-    return PendingTransaction;
-  },
-  get PrivateKey() {
-    return PrivateKey;
-  },
-  get PrivateKeyGenerator() {
-    return PrivateKeyGenerator;
-  },
-  get PublicKeyGenerator() {
-    return PublicKeyGenerator;
-  },
-  get Resolver() {
-    return Resolver;
-  },
-  get RpcClient() {
-    return RpcClient;
-  },
-  get UtxoContext() {
-    return UtxoContext;
-  },
-  get UtxoEntry() {
-    return UtxoEntry;
-  },
-  get UtxoEntryReference() {
-    return UtxoEntryReference;
-  },
-  get UtxoProcessor() {
-    return UtxoProcessor;
-  },
-  get Wallet() {
-    return Wallet;
-  },
-  get XPrv() {
-    return XPrv;
-  },
-  addressFromScriptPublicKey,
-  calculateStorageMass,
-  calculateTransactionFee,
-  calculateTransactionMass,
-  createAddress,
-  createTransaction,
-  createTransactions,
-  default: index_default,
-  detectPlatform,
-  estimateTransactions,
-  getAddress,
-  getBalance,
-  getEncoding,
-  getGenerator,
-  getInitSync,
-  getKaspaWasm,
-  getNetworkId,
-  getPaymentOutput,
-  getPendingTransaction,
-  getPrivateKeyGenerator,
-  getPublicKeyGenerator,
-  getResolver,
-  getRpcClient,
-  getUtxoContext,
-  getUtxoEntries,
-  getUtxoEntry,
-  getUtxoEntryReference,
-  getUtxoProcessor,
-  initKaspaWasm,
-  isBrowser,
-  isNode,
-  isWebWorker,
-  kaspaToSompi,
-  maximumStandardTransactionMass,
-  payToAddressScript,
-  sompiToKaspaString,
-  sompiToKaspaStringWithSuffix,
-  updateTransactionMass
-}, Symbol.toStringTag, { value: "Module" }));
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value2) => __defProp$7(target, "name", { value: value2, configurable: true });
 var emitterLogger = createLogger("kasstamp:rpc:events");
@@ -82660,9 +82537,6 @@ const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
 const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
-undefined ||= function() {
-  return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
-};
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
@@ -82678,6 +82552,7 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
+    await initKaspaWasm();
     await KaspaSDK.init({
       network: "testnet-10",
       debug: true

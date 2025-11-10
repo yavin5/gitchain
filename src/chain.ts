@@ -53,7 +53,7 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
-import * as WASM from '@kasstamp/kaspa_wasm_sdk';
+import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 console.log(WASM);
 //var w = WASM;
 //import { WalletService, walletService } from './WalletService';
@@ -77,9 +77,9 @@ const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = '/gitchain/tx/1.0.0';
 const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
-(WASM as any).getWasmUrl ||= function () {
-  return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
-};
+//(WASM as any).getWasmUrl ||= function () {
+//  return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
+//};
 
 // Global P2P state
 let libp2p: any = null;
@@ -105,7 +105,7 @@ export class KaspaSignalling {
   async generateWallet() {
     //await KaspaSDK.rpcClient.connect(this.chainId);
     //this.startPolling();
-
+    await initKaspaWasm();
     const sdk = await KaspaSDK.init({
       network: 'testnet-10',
       debug: true,
