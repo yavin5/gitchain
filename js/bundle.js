@@ -82551,7 +82551,7 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    undefined ||= function() {
+    undefined = function() {
       return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
     };
     await KaspaSDK.init({
