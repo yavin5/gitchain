@@ -102,9 +102,6 @@ export class KaspaSignalling {
   }
 
   async generateWallet() {
-    //await KaspaSDK.rpcClient.connect(this.chainId);
-    //this.startPolling();
-    KaspaSDK.default({ module_or_path: `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm` });
     await initKaspaWasm();
     const sdk = await KaspaSDK.init({
       network: 'testnet-10',
