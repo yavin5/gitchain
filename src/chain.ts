@@ -101,7 +101,8 @@ export class KaspaSignalling {
     //this.startPolling();
 
     // Initialize SDK
-    WASM[getWasmUrl] = function() { return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm` };
+    let getWasmUrl = function() { return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm` };
+    WASM.push(getWasmUrl);
     const sdk = await KaspaSDK.init({
       network: 'testnet-10',
       debug: true,

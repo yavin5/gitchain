@@ -75681,7 +75681,7 @@ __name$8(detectPlatform, "detectPlatform");
 init_kaspa();
 var wasmModule = null;
 var isInitialized = false;
-function getWasmUrl$1() {
+function getWasmUrl() {
   const platform = detectPlatform();
   if (platform === "node") {
     return new URL("/assets/kaspa_bg-DfnGiCXH.wasm", import.meta.url).href;
@@ -75689,7 +75689,7 @@ function getWasmUrl$1() {
     return new URL("/assets/kaspa_bg-DfnGiCXH.wasm", import.meta.url).href;
   }
 }
-__name$8(getWasmUrl$1, "getWasmUrl");
+__name$8(getWasmUrl, "getWasmUrl");
 async function loadWasmModule() {
   if (wasmModule) {
     return wasmModule;
@@ -75715,7 +75715,7 @@ async function initKaspaWasm() {
   }
   const module2 = await loadWasmModule();
   if (typeof module2.default === "function") {
-    const wasmBinaryUrl = getWasmUrl$1();
+    const wasmBinaryUrl = getWasmUrl();
     await module2.default({ module_or_path: wasmBinaryUrl });
   }
   isInitialized = true;
@@ -75811,129 +75811,6 @@ async function getBalance() {
   return module2.Balance;
 }
 __name$8(getBalance, "getBalance");
-var index_default = {
-  initKaspaWasm,
-  getKaspaWasm,
-  getRpcClient,
-  getResolver,
-  getEncoding,
-  getNetworkId,
-  getInitSync,
-  getUtxoContext,
-  getUtxoProcessor,
-  getUtxoEntry,
-  getUtxoEntries,
-  getUtxoEntryReference,
-  getBalance,
-  detectPlatform
-};
-const WASM = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  get Address() {
-    return Address;
-  },
-  get ConnectStrategy() {
-    return ConnectStrategy;
-  },
-  get Encoding() {
-    return Encoding;
-  },
-  get Generator() {
-    return Generator;
-  },
-  get GeneratorSummary() {
-    return GeneratorSummary;
-  },
-  get Mnemonic() {
-    return Mnemonic;
-  },
-  get NetworkId() {
-    return NetworkId;
-  },
-  get NetworkType() {
-    return NetworkType;
-  },
-  get PaymentOutput() {
-    return PaymentOutput;
-  },
-  get PaymentOutputs() {
-    return PaymentOutputs;
-  },
-  get PendingTransaction() {
-    return PendingTransaction;
-  },
-  get PrivateKey() {
-    return PrivateKey;
-  },
-  get PrivateKeyGenerator() {
-    return PrivateKeyGenerator;
-  },
-  get PublicKeyGenerator() {
-    return PublicKeyGenerator;
-  },
-  get Resolver() {
-    return Resolver;
-  },
-  get RpcClient() {
-    return RpcClient;
-  },
-  get UtxoContext() {
-    return UtxoContext;
-  },
-  get UtxoEntry() {
-    return UtxoEntry;
-  },
-  get UtxoEntryReference() {
-    return UtxoEntryReference;
-  },
-  get UtxoProcessor() {
-    return UtxoProcessor;
-  },
-  get Wallet() {
-    return Wallet;
-  },
-  get XPrv() {
-    return XPrv;
-  },
-  addressFromScriptPublicKey,
-  calculateStorageMass,
-  calculateTransactionFee,
-  calculateTransactionMass,
-  createAddress,
-  createTransaction,
-  createTransactions,
-  default: index_default,
-  detectPlatform,
-  estimateTransactions,
-  getAddress,
-  getBalance,
-  getEncoding,
-  getGenerator,
-  getInitSync,
-  getKaspaWasm,
-  getNetworkId,
-  getPaymentOutput,
-  getPendingTransaction,
-  getPrivateKeyGenerator,
-  getPublicKeyGenerator,
-  getResolver,
-  getRpcClient,
-  getUtxoContext,
-  getUtxoEntries,
-  getUtxoEntry,
-  getUtxoEntryReference,
-  getUtxoProcessor,
-  initKaspaWasm,
-  isBrowser,
-  isNode,
-  isWebWorker,
-  kaspaToSompi,
-  maximumStandardTransactionMass,
-  payToAddressScript,
-  sompiToKaspaString,
-  sompiToKaspaStringWithSuffix,
-  updateTransactionMass
-}, Symbol.toStringTag, { value: "Module" }));
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value2) => __defProp$7(target, "name", { value: value2, configurable: true });
 var emitterLogger = createLogger("kasstamp:rpc:events");
@@ -82674,9 +82551,10 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    WASM[getWasmUrl] = function() {
+    let getWasmUrl2 = function() {
       return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
     };
+    (void 0)(getWasmUrl2);
     await KaspaSDK.init({
       network: "testnet-10",
       debug: true
