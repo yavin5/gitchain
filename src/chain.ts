@@ -54,7 +54,7 @@ import {
   type TransactionEvent,
 } from '@kasstamp/sdk';
 import * as WASM from '@kasstamp/kaspa_wasm_sdk';
-var w = WASM;
+//var w = WASM;
 //import { WalletService, walletService } from './WalletService';
 //import type { WalletServiceEvent, WalletServiceEventData } from './WalletService';
 import { UseWallet } from './UseWallet';
