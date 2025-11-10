@@ -82522,7 +82522,6 @@ function UseWallet() {
   return [finalState, actions];
 }
 initializeLoggers();
-console.log(WASM);
 const [walletState, walletActions] = UseWallet();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
