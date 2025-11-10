@@ -82551,9 +82551,6 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    undefined = function() {
-      return `https://${OWNER}.github.io/${REPO}/`;
-    };
     await KaspaSDK.init({
       network: "testnet-10",
       debug: true
