@@ -76,7 +76,7 @@ const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = '/gitchain/tx/1.0.0';
 const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
-(WASM as any).getWasmUrl = function () {
+(WASM as any).getWasmUrl ||= function () {
   return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
 };
 

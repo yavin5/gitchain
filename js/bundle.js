@@ -82536,7 +82536,7 @@ const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
 const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
-undefined = function() {
+undefined ||= function() {
   return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
 };
 let libp2p = null;
