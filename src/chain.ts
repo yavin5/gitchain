@@ -152,16 +152,16 @@ export class KaspaSignalling {
               new Promise((r) => setTimeout(r, 1000)).then(async () => {
                   const [walletState, walletActions] = UseWallet();
                   walletActions.connect('testnet-10');
-                  console.log('isConnected: ' + walletState.isConnected);
-                  await new Promise((r) => setTimeout(r, 1000));
-                  console.log('isConnected: ' + walletState.isConnected);
+                  await new Promise((r) => setTimeout(r, 1000)).then(() => {
+                      console.log('isConnected: ' + walletState.isConnected);
+                  });
               });
           }
       });
   }
 
   async generateWallet() {
-      console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
+      console.log("GenerateWallet: SDK is ready?: " + this.sdk?.isReady());
 
       try {
           const defaultWalletName = `Testnet Wallet`;

@@ -82595,15 +82595,15 @@ class KaspaSignalling {
         new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
           const [walletState, walletActions] = UseWallet();
           walletActions.connect("testnet-10");
-          console.log("isConnected: " + walletState.isConnected);
-          await new Promise((r2) => setTimeout(r2, 1e3));
-          console.log("isConnected: " + walletState.isConnected);
+          await new Promise((r2) => setTimeout(r2, 1e3)).then(() => {
+            console.log("isConnected: " + walletState.isConnected);
+          });
         });
       }
     });
   }
   async generateWallet() {
-    console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
+    console.log("GenerateWallet: SDK is ready?: " + this.sdk?.isReady());
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = void 0;
