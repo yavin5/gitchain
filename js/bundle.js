@@ -83361,5 +83361,4 @@ window.gitchain = {
   KaspaSignalling,
   WebRTCConnection
 };
-window.dispatchEvent(new Event("gitchain:init"));
 //# sourceMappingURL=bundle.js.map
