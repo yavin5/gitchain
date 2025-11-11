@@ -93,10 +93,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Expose signalling object for other parts of the app
     window.gitchain.kaspaSignallingInstance = signalling;
 
+    const walletInfoDiv = document.getElementById('walletInfo');
     console.log("walletInfoDiv: " + walletInfoDiv);
     walletInfoDiv.textContent = 'Generating…';
 
-    new Promise((r) => setTimeout(r, 2000)).then(() => {
+    new Promise((r) => setTimeout(r, 6000)).then(() => {
       try {
         console.log("signalling: " + signaling);
         const { mnemonic, address } = signaling.generateWallet();

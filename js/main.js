@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const messageInput = document.getElementById("message");
   const sendButton = document.getElementById("send");
   const generateWalletBtn = document.getElementById("generateWallet");
-  const walletInfoDiv = document.getElementById("walletInfo");
+  document.getElementById("walletInfo");
   const mnemonicDisplay = document.getElementById("mnemonic");
   const kaspaAddress = document.getElementById("kaspaAddress");
   const connectPeersBtn = document.getElementById("connectPeers");
@@ -61,9 +61,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("About to instantiate KaspaSignalling.");
     signaling = new window.gitchain.KaspaSignalling("testnet-10");
     window.gitchain.kaspaSignallingInstance = signalling;
+    const walletInfoDiv = document.getElementById("walletInfo");
     console.log("walletInfoDiv: " + walletInfoDiv);
     walletInfoDiv.textContent = "Generating…";
-    new Promise((r) => setTimeout(r, 2e3)).then(() => {
+    new Promise((r) => setTimeout(r, 6e3)).then(() => {
       try {
         console.log("signalling: " + signaling);
         const { mnemonic, address } = signaling.generateWallet();
