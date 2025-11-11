@@ -143,6 +143,9 @@ try {
     nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
     debug: true,
   });
+} finally {
+  await new Promise((r) => setTimeout(r, 2000));
+  console.log("SDK is ready?: " + sdk?.isReady());
 }
 
 // Global P2P state

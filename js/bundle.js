@@ -82579,6 +82579,9 @@ try {
     nodeUrl: "wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh",
     debug: true
   });
+} finally {
+  await new Promise((r2) => setTimeout(r2, 2e3));
+  console.log("SDK is ready?: " + sdk?.isReady());
 }
 let libp2p = null;
 let isServer = false;
