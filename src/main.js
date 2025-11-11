@@ -88,17 +88,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------------------------------------------------------------
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
-        console.log("About to instantiate KaspaSignalling.");
-        signaling = new window.gitchain.KaspaSignalling('testnet-10');
+    console.log("About to instantiate KaspaSignalling.");
+    signaling = new window.gitchain.KaspaSignalling("testnet-10");
+    // Expose signalling object for other parts of the app
+    window.gitchain.kaspaSignallingInstance = signalling;
+
+    console.log("walletInfoDiv: " + walletInfoDiv);
+    walletInfoDiv.textContent = 'Generating…';
+
+    new Promise((r) => setTimeout(r, 2000)).then(() => {
+      try {
         console.log("signalling: " + signaling);
         const { mnemonic, address } = signaling.generateWallet();
         console.log("Generated wallet: " + mnemonic + " " + address);
+        mnemonicDisplay.textContent = mnemonic;
+        kaspaAddress.textContent = address;
+        walletInfoDiv.classList.remove("hidden");
+        console.log("Kaspa wallet generated:", { mnemonic, address });
 
-        mnemonicDisplay.textContent   = mnemonic;
-        kaspaAddress.textContent      = address;
-        walletInfoDiv.classList.remove('hidden');
-
-	console.log('Kaspa wallet generated:', { mnemonic, address });
+        walletInfoDiv.innerHTML = `
+          <strong>Address:</strong> ${address}<br>
+          <strong>Mnemonic (keep secret):</strong><br>
+          <code style="word-break:break-all;">${mnemonic}</code>
+        `;
+      } catch (err) {
+        walletInfoDiv.textContent = 'Error: ' + err.message;
+      }
+    });
   });
 
   // ---------------------------------------------------------------
