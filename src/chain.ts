@@ -125,6 +125,14 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 };
 await initKaspaWasm();
 
+// Sleep for a short time before proceeding.
+await new Promise((r) => setTimeout(r, 2000));
+
+const sdk = await KaspaSDK.init({
+  network: 'testnet-10',
+  debug: true,
+});
+
 // Global P2P state
 let libp2p: any = null;
 let isServer = false;
@@ -147,11 +155,6 @@ export class KaspaSignalling {
   }
 
   async generateWallet() {
-    const sdk = await KaspaSDK.init({
-      network: 'testnet-10',
-      debug: true,
-    });
-
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = undefined;

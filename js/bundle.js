@@ -82565,6 +82565,11 @@ window.fetch = async function(input, init3) {
   return originalFetch(input, init3);
 };
 await initKaspaWasm();
+await new Promise((r2) => setTimeout(r2, 2e3));
+await KaspaSDK.init({
+  network: "testnet-10",
+  debug: true
+});
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
@@ -82580,10 +82585,6 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    await KaspaSDK.init({
-      network: "testnet-10",
-      debug: true
-    });
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = void 0;
