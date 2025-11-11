@@ -55,11 +55,6 @@ import {
 } from '@kasstamp/sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 
-//import { WalletService, walletService } from './WalletService';
-//import type { WalletServiceEvent, WalletServiceEventData } from './WalletService';
-import { UseWallet } from './UseWallet';
-const [walletState, walletActions] = UseWallet();
-
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
 const OWNER: string = hostnameParts[0];
@@ -127,7 +122,6 @@ await initKaspaWasm();
 // Sleep for a short time before proceeding.
 await new Promise((r) => setTimeout(r, 2000));
 
-
 let sdk;
 try {
   // Your kasstamp initialization code here
@@ -147,6 +141,9 @@ try {
   await new Promise((r) => setTimeout(r, 2000));
   console.log("SDK is ready?: " + sdk?.isReady());
 }
+
+import { UseWallet } from './UseWallet';
+const [walletState, walletActions] = UseWallet();
 
 // Global P2P state
 let libp2p: any = null;
@@ -190,7 +187,7 @@ export class KaspaSignalling {
 
     } catch (err) {
       console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
-      console.error('Full stack trace:', err.stack);
+      console.error('Full stack trace:', (err as Error).stack);
     }
   }
 

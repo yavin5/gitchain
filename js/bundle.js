@@ -82522,7 +82522,6 @@ function UseWallet() {
   return [finalState, actions];
 }
 initializeLoggers();
-const [walletState, walletActions] = UseWallet();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
@@ -82583,6 +82582,7 @@ try {
   await new Promise((r2) => setTimeout(r2, 2e3));
   console.log("SDK is ready?: " + sdk?.isReady());
 }
+const [walletState, walletActions] = UseWallet();
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
