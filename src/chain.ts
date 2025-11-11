@@ -73,33 +73,63 @@ if (isGithubPages) {
 // Fix for WASM path issue - must be added before importing kasstamp SDK
 const originalFetch = window.fetch;
 window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  if (typeof input === 'string' && input.endsWith('.wasm')) {
-    console.log('Intercepting WASM request:', input);
-    
-    // Get repository name from current URL path
-    const pathParts = window.location.pathname.split('/').filter(p => p);
-    let repoName = '';
-    
-    // Determine if we're in a GitHub Pages repo subdirectory
-    if (window.location.hostname.endsWith('github.io') && pathParts.length > 0) {
-      repoName = pathParts[0];
+    if (typeof input === 'string' && input.endsWith('.wasm')) {
+        console.log('Intercepting WASM request:', input);
+
+        // Get repository name from current URL path
+        const pathParts = window.location.pathname.split('/').filter(p => p);
+        let repoName = '';
+
+        // Determine if we're in a GitHub Pages repo subdirectory
+        if (window.location.hostname.endsWith('github.io') && pathParts.length > 0) {
+            repoName = pathParts[0];
+        }
+
+        // Construct the correct path
+        const filename = input.substring(input.lastIndexOf('/') + 1);
+        let correctedUrl = '';
+
+        if (repoName) {
+            correctedUrl = `/${repoName}/assets/${filename}`;
+        } else {
+            correctedUrl = `/assets/${filename}`;
+        }
+
+        console.log('Correcting WASM path to:', correctedUrl);
+        return originalFetch(correctedUrl, init);
+    } else if (typeof input === 'string') {
+        // Handle problematic Kaspa nodes with CORS issues
+        // List of nodes with known CORS issues
+        const problematicNodes = [
+            'https://jake.kaspa.green',
+            'https://paul.kaspa.red',
+            'https://sean.kaspa.stream'
+        ];
+
+        // Working fallback nodes
+        const workingNodes = [
+            'https://api-tn10.kaspa.org',
+            'https://noah.kaspa.blue',
+            'https://alex.kaspa.red'
+        ];
+
+        for (const badNode of problematicNodes) {
+            if (input.startsWith(badNode)) {
+                // Try each working node as a replacement
+                for (const goodNode of workingNodes) {
+                    const newUrl = input.replace(badNode, goodNode);
+                    try {
+                        console.log(`Redirecting request from ${badNode} to ${goodNode}`);
+                        return await originalFetch(newUrl, init);
+                    } catch (e) {
+                        console.log(`Fallback node ${goodNode} failed, trying next one...`);
+                    }
+                }
+            }
+        }
     }
-    
-    // Construct the correct path
-    const filename = input.substring(input.lastIndexOf('/') + 1);
-    let correctedUrl = '';
-    
-    if (repoName) {
-      correctedUrl = `/${repoName}/assets/${filename}`;
-    } else {
-      correctedUrl = `/assets/${filename}`;
-    }
-    
-    console.log('Correcting WASM path to:', correctedUrl);
-    return originalFetch(correctedUrl, init);
-  }
-  
-  return originalFetch(input, init);
+
+    return originalFetch(input, init);
 };
 await initKaspaWasm();
 

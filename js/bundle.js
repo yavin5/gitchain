@@ -82560,6 +82560,30 @@ window.fetch = async function(input, init3) {
     }
     console.log("Correcting WASM path to:", correctedUrl);
     return originalFetch(correctedUrl, init3);
+  } else if (typeof input === "string") {
+    const problematicNodes = [
+      "https://jake.kaspa.green",
+      "https://paul.kaspa.red",
+      "https://sean.kaspa.stream"
+    ];
+    const workingNodes = [
+      "https://api-tn10.kaspa.org",
+      "https://noah.kaspa.blue",
+      "https://alex.kaspa.red"
+    ];
+    for (const badNode of problematicNodes) {
+      if (input.startsWith(badNode)) {
+        for (const goodNode of workingNodes) {
+          const newUrl = input.replace(badNode, goodNode);
+          try {
+            console.log(`Redirecting request from ${badNode} to ${goodNode}`);
+            return await originalFetch(newUrl, init3);
+          } catch (e2) {
+            console.log(`Fallback node ${goodNode} failed, trying next one...`);
+          }
+        }
+      }
+    }
   }
   return originalFetch(input, init3);
 };
