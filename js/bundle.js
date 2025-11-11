@@ -82566,10 +82566,24 @@ window.fetch = async function(input, init3) {
 };
 await initKaspaWasm();
 await new Promise((r2) => setTimeout(r2, 2e3));
-await KaspaSDK.init({
-  network: "testnet-10",
-  debug: true
-});
+let sdk;
+try {
+  sdk = await KaspaSDK.init({
+    network: "testnet-10",
+    debug: true
+  });
+} catch (error) {
+  console.error("Failed to initialize Kaspa SDK:", error);
+  sdk = await KaspaSDK.init({
+    network: "testnet-10",
+    nodes: [
+      { url: "wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh", type: "WRPC" },
+      { url: "wss://charm-10.kaspa.blue/kaspa/testnet-10/wrpc/borsh", type: "WRPC" },
+      { url: "wss://fermion-10.kaspa.green/kaspa/testnet-10/wrpc/borsh", type: "WRPC" }
+    ],
+    debug: true
+  });
+}
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
@@ -82604,6 +82618,7 @@ class KaspaSignalling {
       return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
     } catch (err) {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
+      console.error("Full stack trace:", err.stack);
     }
   }
   async connect(networkName = "testnet-10") {

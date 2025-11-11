@@ -53,7 +53,6 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
-//import init from '@kasstamp/kaspa_wasm_sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 
 //import { WalletService, walletService } from './WalletService';
@@ -128,10 +127,27 @@ await initKaspaWasm();
 // Sleep for a short time before proceeding.
 await new Promise((r) => setTimeout(r, 2000));
 
-const sdk = await KaspaSDK.init({
-  network: 'testnet-10',
-  debug: true,
-});
+
+let sdk;
+try {
+  // Your kasstamp initialization code here
+  sdk = await KaspaSDK.init({
+    network: 'testnet-10',
+    debug: true,
+  });
+} catch (error) {
+  console.error('Failed to initialize Kaspa SDK:', error);
+  // Fallback to a working node if initialization fails
+  sdk = await KaspaSDK.init({
+    network: 'testnet-10',
+    nodes: [
+      { url: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' },
+      { url: 'wss://charm-10.kaspa.blue/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' },
+      { url: 'wss://fermion-10.kaspa.green/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' }
+    ],
+    debug: true,
+  });
+}
 
 // Global P2P state
 let libp2p: any = null;
@@ -175,6 +191,7 @@ export class KaspaSignalling {
 
     } catch (err) {
       console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
+      console.error('Full stack trace:', err.stack);
     }
   }
 
