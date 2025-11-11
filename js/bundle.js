@@ -75811,22 +75811,6 @@ async function getBalance() {
   return module2.Balance;
 }
 __name$8(getBalance, "getBalance");
-var index_default = {
-  initKaspaWasm,
-  getKaspaWasm,
-  getRpcClient,
-  getResolver,
-  getEncoding,
-  getNetworkId,
-  getInitSync,
-  getUtxoContext,
-  getUtxoProcessor,
-  getUtxoEntry,
-  getUtxoEntries,
-  getUtxoEntryReference,
-  getBalance,
-  detectPlatform
-};
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value2) => __defProp$7(target, "name", { value: value2, configurable: true });
 var emitterLogger = createLogger("kasstamp:rpc:events");
@@ -82554,15 +82538,33 @@ const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
 const hostname = window.location.hostname;
 const isGithubPages = hostname.endsWith(".github.io");
-let repo = "";
 if (isGithubPages) {
   hostname.split(".")[0];
   const pathSegments = window.location.pathname.split("/").filter((segment) => segment);
-  repo = pathSegments[0] || "";
+  pathSegments[0] || "";
 }
-const basePath = repo ? `/${repo}` : "";
-const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
-await index_default(wasmUrl);
+const originalFetch = window.fetch;
+window.fetch = async function(input, init3) {
+  if (typeof input === "string" && input.endsWith(".wasm")) {
+    console.log("Intercepting WASM request:", input);
+    const pathParts = window.location.pathname.split("/").filter((p2) => p2);
+    let repoName = "";
+    if (window.location.hostname.endsWith("github.io") && pathParts.length > 0) {
+      repoName = pathParts[0];
+    }
+    const filename = input.substring(input.lastIndexOf("/") + 1);
+    let correctedUrl = "";
+    if (repoName) {
+      correctedUrl = `/${repoName}/assets/${filename}`;
+    } else {
+      correctedUrl = `/assets/${filename}`;
+    }
+    console.log("Correcting WASM path to:", correctedUrl);
+    return originalFetch(correctedUrl, init3);
+  }
+  return originalFetch(input, init3);
+};
+await initKaspaWasm();
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
@@ -82578,7 +82580,6 @@ class KaspaSignalling {
     this.chainId = chainId;
   }
   async generateWallet() {
-    await initKaspaWasm();
     await KaspaSDK.init({
       network: "testnet-10",
       debug: true

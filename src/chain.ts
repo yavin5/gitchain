@@ -53,7 +53,7 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
-import init from '@kasstamp/kaspa_wasm_sdk';
+//import init from '@kasstamp/kaspa_wasm_sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 
 //import { WalletService, walletService } from './WalletService';
@@ -90,10 +90,40 @@ if (isGithubPages) {
 const basePath = repo ? `/${repo}` : '';
 
 // Construct full absolute WASM URL
-const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
+//const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
 
-// Pre-initialize WASM with custom URL
-await init(wasmUrl);
+// Fix for WASM path issue - must be added before importing kasstamp SDK
+const originalFetch = window.fetch;
+window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  if (typeof input === 'string' && input.endsWith('.wasm')) {
+    console.log('Intercepting WASM request:', input);
+    
+    // Get repository name from current URL path
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    let repoName = '';
+    
+    // Determine if we're in a GitHub Pages repo subdirectory
+    if (window.location.hostname.endsWith('github.io') && pathParts.length > 0) {
+      repoName = pathParts[0];
+    }
+    
+    // Construct the correct path
+    const filename = input.substring(input.lastIndexOf('/') + 1);
+    let correctedUrl = '';
+    
+    if (repoName) {
+      correctedUrl = `/${repoName}/assets/${filename}`;
+    } else {
+      correctedUrl = `/assets/${filename}`;
+    }
+    
+    console.log('Correcting WASM path to:', correctedUrl);
+    return originalFetch(correctedUrl, init);
+  }
+  
+  return originalFetch(input, init);
+};
+await initKaspaWasm();
 
 // Global P2P state
 let libp2p: any = null;
@@ -117,7 +147,6 @@ export class KaspaSignalling {
   }
 
   async generateWallet() {
-    await initKaspaWasm();
     const sdk = await KaspaSDK.init({
       network: 'testnet-10',
       debug: true,
