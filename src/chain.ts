@@ -138,13 +138,16 @@ try {
     debug: true,
   });
 } finally {
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   console.log("SDK is ready?: " + sdk?.isReady());
 }
 
 import { UseWallet } from './UseWallet';
 const [walletState, walletActions] = UseWallet();
 walletActions.connect('testnet-10');
+console.log('isConnected: ' + walletState.isConnected);
+await new Promise((r) => setTimeout(r, 1000));
+console.log('isConnected: ' + walletState.isConnected);
 
 // Global P2P state
 let libp2p: any = null;

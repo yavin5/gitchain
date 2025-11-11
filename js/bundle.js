@@ -82579,11 +82579,14 @@ try {
     debug: true
   });
 } finally {
-  await new Promise((r2) => setTimeout(r2, 2e3));
+  await new Promise((r2) => setTimeout(r2, 1e3));
   console.log("SDK is ready?: " + sdk?.isReady());
 }
 const [walletState, walletActions] = UseWallet();
 walletActions.connect("testnet-10");
+console.log("isConnected: " + walletState.isConnected);
+await new Promise((r2) => setTimeout(r2, 1e3));
+console.log("isConnected: " + walletState.isConnected);
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
