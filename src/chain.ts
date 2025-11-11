@@ -140,11 +140,7 @@ try {
   // Fallback to a working node if initialization fails
   sdk = await KaspaSDK.init({
     network: 'testnet-10',
-    nodes: [
-      { url: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' },
-      { url: 'wss://charm-10.kaspa.blue/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' },
-      { url: 'wss://fermion-10.kaspa.green/kaspa/testnet-10/wrpc/borsh', type: 'WRPC' }
-    ],
+    nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
     debug: true,
   });
 }
