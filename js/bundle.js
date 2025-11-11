@@ -82619,7 +82619,7 @@ class KaspaSignaling {
         new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
           const [walletState, walletActions] = UseWallet();
           walletActions.connect("testnet-10");
-          await new Promise((r2) => setTimeout(r2, 1e3)).then(() => {
+          await new Promise((r2) => setTimeout(r2, 9e3)).then(() => {
             console.log("isConnected: " + walletState.isConnected);
           });
         });
