@@ -82583,6 +82583,7 @@ try {
   console.log("SDK is ready?: " + sdk?.isReady());
 }
 const [walletState, walletActions] = UseWallet();
+walletActions.connect("testnet-10");
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];

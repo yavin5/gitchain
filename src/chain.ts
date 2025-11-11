@@ -144,6 +144,7 @@ try {
 
 import { UseWallet } from './UseWallet';
 const [walletState, walletActions] = UseWallet();
+walletActions.connect('testnet-10');
 
 // Global P2P state
 let libp2p: any = null;
