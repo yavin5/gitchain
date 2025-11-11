@@ -182,7 +182,7 @@ export class KaspaSignaling {
               new Promise((r) => setTimeout(r, 1000)).then(async () => {
                   const [walletState, walletActions] = UseWallet();
                   walletActions.connect('testnet-10');
-                  await new Promise((r) => setTimeout(r, 9000)).then(() => {
+                  await new Promise((r) => setTimeout(r, 14000)).then(() => {
                       console.log('isConnected: ' + walletState.isConnected);
                   });
               });
