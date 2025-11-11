@@ -82564,29 +82564,6 @@ window.fetch = async function(input, init3) {
   return originalFetch(input, init3);
 };
 await initKaspaWasm();
-await new Promise((r2) => setTimeout(r2, 2e3));
-let sdk;
-try {
-  sdk = await KaspaSDK.init({
-    network: "testnet-10",
-    debug: true
-  });
-} catch (error) {
-  console.error("Failed to initialize Kaspa SDK:", error);
-  sdk = await KaspaSDK.init({
-    network: "testnet-10",
-    nodeUrl: "wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh",
-    debug: true
-  });
-} finally {
-  await new Promise((r2) => setTimeout(r2, 1e3));
-  console.log("SDK is ready?: " + sdk?.isReady());
-}
-const [walletState, walletActions] = UseWallet();
-walletActions.connect("testnet-10");
-console.log("isConnected: " + walletState.isConnected);
-await new Promise((r2) => setTimeout(r2, 1e3));
-console.log("isConnected: " + walletState.isConnected);
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
@@ -82598,20 +82575,45 @@ class KaspaSignalling {
   address = null;
   listeners = [];
   pollingInterval = null;
+  sdk;
+  walletState;
+  walletActions;
   constructor(chainId = "testnet-10") {
     this.chainId = chainId;
+    new Promise((r2) => setTimeout(r2, 1e3)).then(() => {
+      try {
+        async () => {
+          this.sdk = await KaspaSDK.init({
+            network: "testnet-10",
+            debug: true
+          });
+        };
+      } catch (error) {
+        console.error("Failed to initialize Kaspa SDK:", error);
+      } finally {
+        console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
+        new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
+          const [walletState, walletActions] = UseWallet();
+          walletActions.connect("testnet-10");
+          console.log("isConnected: " + walletState.isConnected);
+          await new Promise((r2) => setTimeout(r2, 1e3));
+          console.log("isConnected: " + walletState.isConnected);
+        });
+      }
+    });
   }
   async generateWallet() {
+    console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = void 0;
-      const result = await walletActions.createWallet({
+      const result = await this.walletActions?.createWallet({
         walletName: defaultWalletName,
         walletSecret: "",
         words: seedWords,
         passphrase: void 0
       });
-      if (!result.mnemonic)
+      if (!result?.mnemonic)
         throw new Error("Mnemonic not generated");
       alert("Seed words: " + result.mnemonic);
       if (!result.wallet.accounts[0])

@@ -38,22 +38,9 @@ import { keccak256 as keccak256Buffer } from 'js-sha3';
 import { concat as uint8Concat } from 'uint8arrays';
 
 // KaspaSDK from kasstamp
-import {
-  type BalanceMonitoringService,
-  type ITransactionRecord,
-  KaspaSDK,
-  type KaspaSDKConfig,
-  KaspaWalletFactory,
-  type Network,
-  type SimpleWallet,
-  type TransactionMonitoringService,
-  type WalletDescriptor,
-  walletStorage,
-  type IAccountDescriptor,
-  type BalanceEvent,
-  type TransactionEvent,
-} from '@kasstamp/sdk';
+import { KaspaSDK } from '@kasstamp/sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
+import { UseWallet, type WalletState, type WalletActions } from './UseWallet';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -81,10 +68,7 @@ if (isGithubPages) {
   const pathSegments = window.location.pathname.split('/').filter(segment => segment);
   repo = pathSegments[0] || ''; // e.g., 'gitchain'
 }
-const basePath = repo ? `/${repo}` : '';
-
-// Construct full absolute WASM URL
-//const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
+//const basePath = repo ? `/${repo}` : '';
 
 // Fix for WASM path issue - must be added before importing kasstamp SDK
 const originalFetch = window.fetch;
@@ -119,36 +103,6 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 };
 await initKaspaWasm();
 
-// Sleep for a short time before proceeding.
-await new Promise((r) => setTimeout(r, 2000));
-
-let sdk;
-try {
-  // Your kasstamp initialization code here
-  sdk = await KaspaSDK.init({
-    network: 'testnet-10',
-    debug: true,
-  });
-} catch (error) {
-  console.error('Failed to initialize Kaspa SDK:', error);
-  // Fallback to a working node if initialization fails
-  sdk = await KaspaSDK.init({
-    network: 'testnet-10',
-    nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
-    debug: true,
-  });
-} finally {
-  await new Promise((r) => setTimeout(r, 1000));
-  console.log("SDK is ready?: " + sdk?.isReady());
-}
-
-import { UseWallet } from './UseWallet';
-const [walletState, walletActions] = UseWallet();
-walletActions.connect('testnet-10');
-console.log('isConnected: ' + walletState.isConnected);
-await new Promise((r) => setTimeout(r, 1000));
-console.log('isConnected: ' + walletState.isConnected);
-
 // Global P2P state
 let libp2p: any = null;
 let isServer = false;
@@ -165,34 +119,72 @@ export class KaspaSignalling {
   address: string | null = null;
   listeners: ((msg: any) => void)[] = [];
   pollingInterval: any = null;
+  sdk: KaspaSDK | undefined;
+  walletState: WalletState | undefined;
+  walletActions: WalletActions | undefined;
 
   constructor(chainId = 'testnet-10') {
-    this.chainId = chainId;
+      this.chainId = chainId;
+
+      // Sleep for a short time before proceeding.
+      new Promise((r) => setTimeout(r, 1000)).then(() => {
+          try {
+              // kasstamp Kaspa SDK initialization.
+              async () => {
+                  this.sdk = await KaspaSDK.init({
+                      network: 'testnet-10',
+                      debug: true,
+                  });
+              };
+          } catch (error) {
+              console.error('Failed to initialize Kaspa SDK:', error);
+              // Fallback to a working node if initialization fails
+              async () => {
+                  this.sdk = await KaspaSDK.init({
+                      network: 'testnet-10',
+                      nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
+                      debug: true,
+                  });
+              }
+          } finally {
+              console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
+
+              new Promise((r) => setTimeout(r, 1000)).then(async () => {
+                  const [walletState, walletActions] = UseWallet();
+                  walletActions.connect('testnet-10');
+                  console.log('isConnected: ' + walletState.isConnected);
+                  await new Promise((r) => setTimeout(r, 1000));
+                  console.log('isConnected: ' + walletState.isConnected);
+              });
+          }
+      });
   }
 
   async generateWallet() {
-    try {
-      const defaultWalletName = `Testnet Wallet`;
-      const seedWords = undefined;
+      console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
 
-      const result = await walletActions.createWallet({
-        walletName: defaultWalletName,
-        walletSecret: '',
-        words: seedWords,
-        passphrase: undefined,
-      });
+      try {
+          const defaultWalletName = `Testnet Wallet`;
+          const seedWords = undefined;
 
-      if (!result.mnemonic) throw new Error('Mnemonic not generated');
-      alert("Seed words: " + result.mnemonic);
-      if (!result.wallet.accounts[0]) alert ("result doesn't have an address.");
-      else alert("address: " + result.wallet.accounts[0]);
+          const result = await this.walletActions?.createWallet({
+              walletName: defaultWalletName,
+              walletSecret: '',
+              words: seedWords,
+              passphrase: undefined,
+          });
 
-      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
+          if (!result?.mnemonic) throw new Error('Mnemonic not generated');
+          alert("Seed words: " + result.mnemonic);
+          if (!result.wallet.accounts[0]) alert("result doesn't have an address.");
+          else alert("address: " + result.wallet.accounts[0]);
 
-    } catch (err) {
-      console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
-      console.error('Full stack trace:', (err as Error).stack);
-    }
+          return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
+
+      } catch (err) {
+          console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
+          console.error('Full stack trace:', (err as Error).stack);
+      }
   }
 
   async connect(networkName = 'testnet-10') {
