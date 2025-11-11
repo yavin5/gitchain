@@ -82615,11 +82615,11 @@ class KaspaSignaling {
       } catch (error) {
         console.error("Failed to initialize Kaspa SDK:", error);
       } finally {
-        console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
         new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
           const [walletState, walletActions] = UseWallet();
           walletActions.connect("testnet-10");
-          await new Promise((r2) => setTimeout(r2, 14e3)).then(() => {
+          await new Promise((r2) => setTimeout(r2, 2e4)).then(() => {
+            console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
             console.log("isConnected: " + walletState.isConnected);
           });
         });

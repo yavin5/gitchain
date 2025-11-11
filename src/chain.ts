@@ -177,12 +177,11 @@ export class KaspaSignaling {
                   });
               }
           } finally {
-              console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
-
               new Promise((r) => setTimeout(r, 1000)).then(async () => {
                   const [walletState, walletActions] = UseWallet();
                   walletActions.connect('testnet-10');
-                  await new Promise((r) => setTimeout(r, 14000)).then(() => {
+                  await new Promise((r) => setTimeout(r, 20000)).then(() => {
+                      console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
                       console.log('isConnected: ' + walletState.isConnected);
                   });
               });

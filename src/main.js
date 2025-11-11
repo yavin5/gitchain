@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("walletInfoDiv: " + walletInfoDiv);
     walletInfoDiv.textContent = 'Generating…';
 
-    new Promise((r) => setTimeout(r, 15000)).then(() => {
+    new Promise((r) => setTimeout(r, 23000)).then(() => {
       try {
         console.log("signaling: " + signaling);
         const { mnemonic, address } = signaling.generateWallet();
