@@ -82567,7 +82567,7 @@ await initKaspaWasm();
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
-class KaspaSignalling {
+class KaspaSignaling {
   chainId;
   provider;
   wallet;
@@ -83358,7 +83358,7 @@ window.gitchain = {
   processTxns,
   fetchState,
   connectAndSendTx,
-  KaspaSignalling,
+  KaspaSignaling,
   WebRTCConnection
 };
 //# sourceMappingURL=bundle.js.map

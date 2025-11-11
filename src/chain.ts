@@ -11,7 +11,7 @@ interface Gitchain {
     processTxns: () => Promise<void>;
     fetchState: () => Promise<{ content: State; sha: string } | null>;
     connectAndSendTx: (tx: Transaction) => Promise<void>;
-    KaspaSignalling: typeof KaspaSignalling;
+    KaspaSignaling: typeof KaspaSignaling;
     WebRTCConnection: typeof WebRTCConnection;
 }
 declare global {
@@ -109,9 +109,9 @@ let isServer = false;
 let serverPeers: string[] = [];
 
 // ---------------------------------------------------------------------------
-// KaspaSignalling – signalling layer over Kaspa
+// KaspaSignaling – signaling layer over Kaspa
 // ---------------------------------------------------------------------------
-export class KaspaSignalling {
+export class KaspaSignaling {
   chainId: string;
   provider: any;
   wallet: any;
@@ -242,13 +242,13 @@ export class KaspaSignalling {
 // WebRTCConnection – uses KaspaSignalling for SDP/ICE
 // ---------------------------------------------------------------------------
 export class WebRTCConnection {
-  signaling: KaspaSignalling;
+  signaling: KaspaSignaling;
   localPeerId: string;
   remotePeerId: string;
   pc: RTCPeerConnection;
   dc: RTCDataChannel | null = null;
 
-  constructor(signaling: KaspaSignalling, localPeerId: string, remotePeerId: string) {
+  constructor(signaling: KaspaSignaling, localPeerId: string, remotePeerId: string) {
     this.signaling = signaling;
     this.localPeerId = localPeerId;
     this.remotePeerId = remotePeerId;
@@ -1036,7 +1036,7 @@ window.gitchain = {
     processTxns,
     fetchState,
     connectAndSendTx,
-    KaspaSignalling,
+    KaspaSignaling,
     WebRTCConnection
 };
 
