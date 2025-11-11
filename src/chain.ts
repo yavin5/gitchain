@@ -53,6 +53,7 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
+import init from '@kasstamp/kaspa_wasm_sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 
 //import { WalletService, walletService } from './WalletService';
@@ -76,9 +77,23 @@ const ISSUES_URL: string = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = '/gitchain/tx/1.0.0';
 const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
-//(WASM as any).getWasmUrl ||= function () {
-//  return `https://${OWNER}.github.io/${REPO}/assets/kaspa_bg-DfnGiCXH.wasm`;
-//};
+// Detect deployment environment for base path
+const hostname = window.location.hostname;
+const isGithubPages = hostname.endsWith('.github.io');
+let owner = '';
+let repo = '';
+if (isGithubPages) {
+  owner = hostname.split('.')[0]; // e.g., 'yavin5'
+  const pathSegments = window.location.pathname.split('/').filter(segment => segment);
+  repo = pathSegments[0] || ''; // e.g., 'gitchain'
+}
+const basePath = repo ? `/${repo}` : '';
+
+// Construct full absolute WASM URL
+const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
+
+// Pre-initialize WASM with custom URL
+await init(wasmUrl);
 
 // Global P2P state
 let libp2p: any = null;

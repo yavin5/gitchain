@@ -18387,12 +18387,12 @@ class DNSAddrResolver {
     return ma.getComponents().some(({ name: name2 }) => name2 === "dnsaddr");
   }
   async resolve(ma, options) {
-    const hostname = ma.getComponents().find((component) => component.name === "dnsaddr")?.value;
-    if (hostname == null) {
+    const hostname2 = ma.getComponents().find((component) => component.name === "dnsaddr")?.value;
+    if (hostname2 == null) {
       return [ma];
     }
     const resolver = this.getDNS(options);
-    const result = await resolver.query(`_dnsaddr.${hostname}`, {
+    const result = await resolver.query(`_dnsaddr.${hostname2}`, {
       signal: options?.signal,
       types: [
         RecordType.TXT
@@ -75811,6 +75811,22 @@ async function getBalance() {
   return module2.Balance;
 }
 __name$8(getBalance, "getBalance");
+var index_default = {
+  initKaspaWasm,
+  getKaspaWasm,
+  getRpcClient,
+  getResolver,
+  getEncoding,
+  getNetworkId,
+  getInitSync,
+  getUtxoContext,
+  getUtxoProcessor,
+  getUtxoEntry,
+  getUtxoEntries,
+  getUtxoEntryReference,
+  getBalance,
+  detectPlatform
+};
 var __defProp$7 = Object.defineProperty;
 var __name$7 = (target, value2) => __defProp$7(target, "name", { value: value2, configurable: true });
 var emitterLogger = createLogger("kasstamp:rpc:events");
@@ -82536,6 +82552,17 @@ const GITHUB_ACCESS_TOKEN_KEY = "gitchain_github_access_token";
 const ISSUES_URL = `https://api.github.com/repos/${FQ_REPO}/issues`;
 const PROTOCOL = "/gitchain/tx/1.0.0";
 const UPDATE_INTERVAL = 2 * 60 * 1e3;
+const hostname = window.location.hostname;
+const isGithubPages = hostname.endsWith(".github.io");
+let repo = "";
+if (isGithubPages) {
+  hostname.split(".")[0];
+  const pathSegments = window.location.pathname.split("/").filter((segment) => segment);
+  repo = pathSegments[0] || "";
+}
+const basePath = repo ? `/${repo}` : "";
+const wasmUrl = `${window.location.origin}${basePath}/assets/kaspa_bg-DfnGiCXH.wasm`;
+await index_default(wasmUrl);
 let libp2p = null;
 let isServer = false;
 let serverPeers = [];
