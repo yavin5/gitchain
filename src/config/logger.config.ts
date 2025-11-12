@@ -1,6 +1,6 @@
 import { LogLevel, setGlobalLogLevel } from '@kasstamp/utils';
 // Uncomment the following line if you need per-namespace configuration:
-// import { setNamespaceLogLevel } from '@kasstamp/utils';
+import { setNamespaceLogLevel } from '@kasstamp/utils';
 
 /**
  * Logger configuration based on environment
@@ -17,10 +17,10 @@ export function initializeLoggers(): void {
 
     // You can selectively enable DEBUG/INFO logs for specific packages if needed:
     // Example: Debug wallet issues in production
-    // setNamespaceLogLevel('kasstamp:wallet:*', LogLevel.DEBUG);
+    setNamespaceLogLevel('kasstamp:wallet:*', LogLevel.DEBUG);
 
     // Example: Show info logs for stamping operations
-    // setNamespaceLogLevel('kasstamp:stamping:*', LogLevel.INFO);
+    setNamespaceLogLevel('kasstamp:stamping:*', LogLevel.INFO);
   } else {
     // ============================================================================
     // DEVELOPMENT CONFIGURATION
@@ -30,9 +30,9 @@ export function initializeLoggers(): void {
 
     // You can selectively reduce noise from specific packages:
     // Example: Reduce RPC connection logs
-    // setNamespaceLogLevel('kasstamp:rpc:connection', LogLevel.WARN);
+    setNamespaceLogLevel('kasstamp:rpc:connection', LogLevel.WARN);
 
     // Example: Silence WASM SDK logs
-    // setNamespaceLogLevel('kasstamp:sdk:wasm', LogLevel.ERROR);
+    setNamespaceLogLevel('kasstamp:sdk:wasm', LogLevel.ERROR);
   }
 }

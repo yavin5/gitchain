@@ -341,6 +341,8 @@ __name$9(resetLogger, "resetLogger");
 function initializeLoggers() {
   {
     setGlobalLogLevel(LogLevel.WARN);
+    setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:stamping:*", LogLevel.INFO);
   }
 }
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
