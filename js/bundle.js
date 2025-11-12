@@ -340,9 +340,12 @@ function resetLogger() {
 __name$9(resetLogger, "resetLogger");
 function initializeLoggers() {
   {
-    setGlobalLogLevel(LogLevel.WARN);
+    setGlobalLogLevel(LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:sdk", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:rpc:connection", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:stamping:*", LogLevel.INFO);
+    setNamespaceLogLevel("kasstamp:sdk:wasm", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:stamping:*", LogLevel.DEBUG);
   }
 }
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
