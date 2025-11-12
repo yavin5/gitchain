@@ -1054,4 +1054,4 @@ window.gitchain = {
 // ---------------------------------------------------------------------------
 // Dispatch event
 // ---------------------------------------------------------------------------
-//window.dispatchEvent(new Event('gitchain:init'));
+window.dispatchEvent(new Event('gitchain:init'));
