@@ -1,12 +1,10 @@
 // IMPORTANT: Initialize logger configuration FIRST, before any other imports
-import { createLogger } from '@kasstamp/utils';
-
-// Main application logger
-export const appLogger = createLogger('gitchain:web:app');
-
 import { initializeLoggers } from './config/logger.config';
 initializeLoggers();
 
+import { createLogger } from '@kasstamp/utils';
+// Main application logger
+export const appLogger = createLogger('gitchain:web:app');
 
 import { ADMIN_ADDRESS } from './admin-address.js';
 
