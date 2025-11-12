@@ -9,6 +9,7 @@ import type {
   IAccountDescriptor,
   SimpleWallet,
 } from '@kasstamp/sdk';
+import { KaspaSDK } from '@kasstamp/sdk';
 import { hookLogger } from './logger';
 
 export interface WalletState {
@@ -27,7 +28,7 @@ export interface WalletState {
 }
 
 export interface WalletActions {
-  connect: (network?: string) => Promise<void>;
+  connect: (network?: string) => Promise<KaspaSDK>;
   disconnect: () => Promise<void>;
   createWallet: (params: {
     walletName: string;
@@ -92,6 +93,7 @@ export function UseWallet(): [WalletState, WalletActions] {
 
   let actions: WalletActions = {
       connect: async (network?: string) => {
+        let kaspaSDK: KaspaSDK | undefined;
         try {
           setIsConnecting = () => ( false );
           setState = (prevState: WalletState) => ({
@@ -99,7 +101,7 @@ export function UseWallet(): [WalletState, WalletActions] {
             isConnecting: true,
             error: null,
           });
-          await walletService.connect(network);
+          kaspaSDK = await walletService.connect(network);
         } catch (error) {
           setIsConnecting = () => ( false );
           setState = (prevState: WalletState) => ({
@@ -109,6 +111,7 @@ export function UseWallet(): [WalletState, WalletActions] {
           });
           throw error;
         }
+        return kaspaSDK;
       },
 
       disconnect: async () => {

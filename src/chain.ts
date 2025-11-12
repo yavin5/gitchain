@@ -136,6 +136,7 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 
     return originalFetch(input, init);
 };
+// Load the Kaspa client WASM bundle from the web server.
 await initKaspaWasm();
 
 // Global P2P state
@@ -154,48 +155,29 @@ export class KaspaSignaling {
   address: string | null = null;
   listeners: ((msg: any) => void)[] = [];
   pollingInterval: any = null;
-  sdk: KaspaSDK | undefined;
+  kaspaSDK: KaspaSDK | undefined;
   walletState: WalletState | undefined;
   walletActions: WalletActions | undefined;
 
   constructor(chainId = 'testnet-10') {
       this.chainId = chainId;
-
-      // Sleep for a short time before proceeding.
-      new Promise((r) => setTimeout(r, 1000)).then(() => {
-          try {
-              // kasstamp Kaspa SDK initialization.
-              async () => {
-                  this.sdk = await KaspaSDK.init({
-                      network: 'testnet-10',
-                      debug: true,
-                  });
-              };
-          } catch (error) {
-              console.error('Failed to initialize Kaspa SDK:', error);
-              // Fallback to a working node if initialization fails
-              async () => {
-                  this.sdk = await KaspaSDK.init({
-                      network: 'testnet-10',
-                      nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
-                      debug: true,
-                  });
-              }
-          } finally {
-              new Promise((r) => setTimeout(r, 1000)).then(async () => {
-                  const [walletState, walletActions] = UseWallet();
-                  walletActions.connect('testnet-10');
-                  await new Promise((r) => setTimeout(r, 20000)).then(() => {
-                      console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
-                      console.log('isConnected: ' + walletState.isConnected);
-                  });
-              });
-          }
+      (async () => {
+          this.kaspaSDK = await this.connect(chainId);
       });
   }
 
+  async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {
+    //console.log("Connecting to network: " + networkName);
+    //await KaspaSDK.rpcClient.connect(networkName);
+    const [walletState, walletActions] = UseWallet();
+    let kaspaSDK = walletActions.connect('testnet-10');
+    // TODO: Get a reference to the KaspaSDK instance for use here.
+    this.startPolling();
+    return kaspaSDK;
+  }
+
   async generateWallet() {
-      console.log("GenerateWallet: SDK is ready?: " + this.sdk?.isReady());
+      console.log("GenerateWallet: SDK is ready?: " + this.kaspaSDK?.isReady());
 
       try {
           const defaultWalletName = `Testnet Wallet`;
@@ -219,12 +201,6 @@ export class KaspaSignaling {
           console.error(err instanceof Error ? err.message : 'Failed to create wallet: ' + err);
           console.error('Full stack trace:', (err as Error).stack);
       }
-  }
-
-  async connect(networkName = 'testnet-10') {
-    console.log("Connecting to network: " + networkName);
-    //await KaspaSDK.rpcClient.connect(networkName);
-    //this.startPolling();
   }
 
   async sendMessage(to: string, type: 'offer' | 'answer' | 'candidate', data: any) {

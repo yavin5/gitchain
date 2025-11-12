@@ -342,6 +342,7 @@ function initializeLoggers() {
   {
     setGlobalLogLevel(LogLevel.DEBUG);
     setNamespaceLogLevel("gitchain:web:app", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:web:wallet", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:sdk", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:rpc:connection", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
@@ -81921,6 +81922,7 @@ class WalletService {
   /**
    * Connect to Kaspa network using unified SDK
    * @param network - Network to connect to (required: 'mainnet' or 'testnet-10')
+   * @returns kaspaSDK - The KaspaSDK instance.
    */
   async connect(network) {
     const targetNetwork = network || APP_CONFIG.defaultNetwork;
@@ -81944,6 +81946,7 @@ class WalletService {
       });
       throw error;
     }
+    return this.kaspaSDK;
   }
   /**
    * List all available wallets using WASM SDK storage
@@ -82370,6 +82373,7 @@ function UseWallet() {
   };
   let actions = {
     connect: async (network) => {
+      let kaspaSDK;
       try {
         setIsConnecting = () => false;
         setState = (prevState) => ({
@@ -82377,7 +82381,7 @@ function UseWallet() {
           isConnecting: true,
           error: null
         });
-        await walletService.connect(network);
+        kaspaSDK = await walletService.connect(network);
       } catch (error) {
         setIsConnecting = () => false;
         setState = (prevState) => ({
@@ -82387,6 +82391,7 @@ function UseWallet() {
         });
         throw error;
       }
+      return kaspaSDK;
     },
     disconnect: async () => {
       try {
@@ -82605,35 +82610,20 @@ class KaspaSignaling {
   address = null;
   listeners = [];
   pollingInterval = null;
-  sdk;
+  kaspaSDK;
   walletState;
   walletActions;
   constructor(chainId = "testnet-10") {
     this.chainId = chainId;
-    new Promise((r2) => setTimeout(r2, 1e3)).then(() => {
-      try {
-        async () => {
-          this.sdk = await KaspaSDK.init({
-            network: "testnet-10",
-            debug: true
-          });
-        };
-      } catch (error) {
-        console.error("Failed to initialize Kaspa SDK:", error);
-      } finally {
-        new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
-          const [walletState, walletActions] = UseWallet();
-          walletActions.connect("testnet-10");
-          await new Promise((r2) => setTimeout(r2, 2e4)).then(() => {
-            console.log("Constructor: SDK is ready?: " + this.sdk?.isReady());
-            console.log("isConnected: " + walletState.isConnected);
-          });
-        });
-      }
-    });
+  }
+  async connect(networkName = "testnet-10") {
+    const [walletState, walletActions] = UseWallet();
+    let kaspaSDK = walletActions.connect("testnet-10");
+    this.startPolling();
+    return kaspaSDK;
   }
   async generateWallet() {
-    console.log("GenerateWallet: SDK is ready?: " + this.sdk?.isReady());
+    console.log("GenerateWallet: SDK is ready?: " + this.kaspaSDK?.isReady());
     try {
       const defaultWalletName = `Testnet Wallet`;
       const seedWords = void 0;
@@ -82655,9 +82645,6 @@ class KaspaSignaling {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
       console.error("Full stack trace:", err.stack);
     }
-  }
-  async connect(networkName = "testnet-10") {
-    console.log("Connecting to network: " + networkName);
   }
   async sendMessage(to, type, data) {
     if (!this.wallet)

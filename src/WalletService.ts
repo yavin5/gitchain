@@ -124,8 +124,9 @@ export class WalletService {
   /**
    * Connect to Kaspa network using unified SDK
    * @param network - Network to connect to (required: 'mainnet' or 'testnet-10')
+   * @returns kaspaSDK - The KaspaSDK instance.
    */
-  async connect(network?: string): Promise<void> {
+  async connect(network?: string): Promise<KaspaSDK> {
     // Use configured network if not provided
     const targetNetwork = network || APP_CONFIG.defaultNetwork;
 
@@ -164,6 +165,7 @@ export class WalletService {
       });
       throw error;
     }
+    return this.kaspaSDK;
   }
 
   /**
