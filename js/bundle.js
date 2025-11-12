@@ -341,6 +341,7 @@ __name$9(resetLogger, "resetLogger");
 function initializeLoggers() {
   {
     setGlobalLogLevel(LogLevel.DEBUG);
+    setNamespaceLogLevel("gitchain:web:app", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:sdk", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:rpc:connection", LogLevel.DEBUG);
     setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
