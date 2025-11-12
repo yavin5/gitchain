@@ -36,4 +36,4 @@ window.viewChain = async () => {
 // ---------------------------------------------------------------
 // 6. Dispatch the custom init event that chain.ts waits for
 // ---------------------------------------------------------------
-window.dispatchEvent(new Event('gitchain:init'));
+//window.dispatchEvent(new Event('gitchain:init'));
