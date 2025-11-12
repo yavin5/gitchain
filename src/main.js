@@ -2,7 +2,7 @@
 // Wait for the custom init event that bundle.js dispatches
 // ---------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
-  // Wait a tick for bundle.js to run and set window.gitchain
+  // Wait a tick for bundle.js to run.
   await new Promise(r => setTimeout(r, 300));
 
   // ---- DOM elements -------------------------------------------------

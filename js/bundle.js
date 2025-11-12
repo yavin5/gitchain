@@ -82617,10 +82617,10 @@ class KaspaSignaling {
     this.chainId = chainId;
   }
   async connect(networkName = "testnet-10") {
-    const [walletState, walletActions] = UseWallet();
-    let kaspaSDK = await walletActions.connect("testnet-10");
+    [this.walletState, this.walletActions] = UseWallet();
+    this.kaspaSDK = await this.walletActions.connect(networkName);
     this.startPolling();
-    return kaspaSDK;
+    return this.kaspaSDK;
   }
   async generateWallet() {
     console.log("GenerateWallet: SDK is ready?: " + this.kaspaSDK?.isReady());
