@@ -82618,7 +82618,7 @@ class KaspaSignaling {
   }
   async connect(networkName = "testnet-10") {
     const [walletState, walletActions] = UseWallet();
-    let kaspaSDK = walletActions.connect("testnet-10");
+    let kaspaSDK = await walletActions.connect("testnet-10");
     this.startPolling();
     return kaspaSDK;
   }

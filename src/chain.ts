@@ -170,7 +170,7 @@ export class KaspaSignaling {
     //console.log("Connecting to network: " + networkName);
     //await KaspaSDK.rpcClient.connect(networkName);
     const [walletState, walletActions] = UseWallet();
-    let kaspaSDK = walletActions.connect('testnet-10');
+    let kaspaSDK = await walletActions.connect('testnet-10');
     // TODO: Get a reference to the KaspaSDK instance for use here.
     this.startPolling();
     return kaspaSDK;
