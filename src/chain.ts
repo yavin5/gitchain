@@ -99,14 +99,16 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
         const problematicNodes = [
             'https://jake.kaspa.green',
             'https://paul.kaspa.red',
-            'https://sean.kaspa.stream'
+            'https://sean.kaspa.stream',
+            'https://mike.kaspa.red,'
         ];
 
         // Working fallback nodes
         const workingNodes = [
             'https://api-tn10.kaspa.org',
             'https://noah.kaspa.blue',
-            'https://alex.kaspa.red'
+            'https://alex.kaspa.red',
+            'https://adam.kaspa.green'
         ];
 
         for (const badNode of problematicNodes) {

@@ -82575,12 +82575,14 @@ window.fetch = async function(input, init3) {
     const problematicNodes = [
       "https://jake.kaspa.green",
       "https://paul.kaspa.red",
-      "https://sean.kaspa.stream"
+      "https://sean.kaspa.stream",
+      "https://mike.kaspa.red,"
     ];
     const workingNodes = [
       "https://api-tn10.kaspa.org",
       "https://noah.kaspa.blue",
-      "https://alex.kaspa.red"
+      "https://alex.kaspa.red",
+      "https://adam.kaspa.green"
     ];
     for (const badNode of problematicNodes) {
       if (input.startsWith(badNode)) {
