@@ -34,7 +34,7 @@ import { keccak256 as keccak256Buffer } from 'js-sha3';
 import { concat as uint8Concat } from 'uint8arrays';
 
 // KaspaSDK from kasstamp
-import { KaspaSDK } from '@kasstamp/sdk';
+import { KaspaSDK, type Network } from '@kasstamp/sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 import { UseWallet, type WalletState, type WalletActions } from './UseWallet';
 
@@ -139,7 +139,7 @@ let serverPeers: string[] = [];
 // KaspaSignaling – signaling layer over Kaspa
 // ---------------------------------------------------------------------------
 export class KaspaSignaling {
-  chainId: string;
+  chainId: string | undefined;
   provider: any;
   wallet: any;
   mnemonic: string | null = null;
@@ -150,11 +150,33 @@ export class KaspaSignaling {
   walletState: WalletState | undefined;
   walletActions: WalletActions | undefined;
 
-  constructor(chainId = 'testnet-10') {
-      this.chainId = chainId;
-      (async () => {
-          this.kaspaSDK = await this.connect(chainId);
-      });
+  constructor(network: Network = 'testnet-10') {
+      try {
+          // kasstamp Kaspa SDK initialization.
+          async () => {
+              this.kaspaSDK = await KaspaSDK.init({
+                  network: network,
+                  debug: true,
+              });
+          };
+      } catch (error) {
+          console.error('Failed to initialize Kaspa SDK:', error);
+          // Fallback to a working node if initialization fails
+          async () => {
+              this.kaspaSDK = await KaspaSDK.init({
+                  network: network,
+                  nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
+                  debug: true,
+              });
+          }
+      } finally {
+          new Promise((r) => setTimeout(r, 1000)).then(async () => {
+              this.chainId = network;
+              (async () => {
+                  this.kaspaSDK = await this.connect(network);
+              });
+          });
+      }
   }
 
   async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {

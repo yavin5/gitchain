@@ -82613,8 +82613,21 @@ class KaspaSignaling {
   kaspaSDK;
   walletState;
   walletActions;
-  constructor(chainId = "testnet-10") {
-    this.chainId = chainId;
+  constructor(network = "testnet-10") {
+    try {
+      async () => {
+        this.kaspaSDK = await KaspaSDK.init({
+          network,
+          debug: true
+        });
+      };
+    } catch (error) {
+      console.error("Failed to initialize Kaspa SDK:", error);
+    } finally {
+      new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
+        this.chainId = network;
+      });
+    }
   }
   async connect(networkName = "testnet-10") {
     [this.walletState, this.walletActions] = UseWallet();
