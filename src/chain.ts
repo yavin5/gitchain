@@ -182,8 +182,7 @@ export class KaspaSignaling {
   async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {
     [this.walletState, this.walletActions] = UseWallet();
     this.kaspaSDK = await this.walletActions.connect(networkName);
-    // TODO: Get a reference to the KaspaSDK instance for use here.
-    this.startPolling();
+    //this.startPolling();
     return this.kaspaSDK;
   }
 
