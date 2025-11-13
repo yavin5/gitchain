@@ -82631,7 +82631,7 @@ class KaspaSignaling {
       const seedWords = void 0;
       const result = await this.walletActions?.createWallet({
         walletName: defaultWalletName,
-        walletSecret: "",
+        walletSecret: "gitchain",
         words: seedWords,
         passphrase: void 0
       });

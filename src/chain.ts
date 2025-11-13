@@ -151,30 +151,10 @@ export class KaspaSignaling {
   walletActions: WalletActions | undefined;
 
   constructor(network: Network = 'testnet-10') {
-      /*try {
-          // kasstamp Kaspa SDK initialization.
-          async () => {
-              this.kaspaSDK = await KaspaSDK.init({
-                  network: network,
-                  debug: true,
-              });
-          };
-      } catch (error) {
-          console.error('Failed to initialize Kaspa SDK:', error);
-          // Fallback to a working node if initialization fails
-          async () => {
-              this.kaspaSDK = await KaspaSDK.init({
-                  network: network,
-                  nodeUrl: 'wss://baryon-10.kaspa.green/kaspa/testnet-10/wrpc/borsh',
-                  debug: true,
-              });
-          }
-      } finally {*/
-          new Promise((r) => setTimeout(r, 1000)).then(async () => {
-              this.chainId = network;
-              this.kaspaSDK = await this.connect(network);
-          });
-      /*}*/
+      new Promise((r) => setTimeout(r, 1000)).then(async () => {
+          this.chainId = network;
+          this.kaspaSDK = await this.connect(network);
+      });
   }
 
   async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {
@@ -193,7 +173,7 @@ export class KaspaSignaling {
 
           const result = await this.walletActions?.createWallet({
               walletName: defaultWalletName,
-              walletSecret: '',
+              walletSecret: 'gitchain',
               words: seedWords,
               passphrase: undefined,
           });
