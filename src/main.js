@@ -89,32 +89,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    signaling = new window.gitchain.KaspaSignaling("testnet-10");
-    // Expose signaling object for other parts of the app
-    window.gitchain.kaspaSignalingInstance = signaling;
 
-    const walletInfoDiv = document.getElementById('walletInfo');
-    console.log("walletInfoDiv: " + walletInfoDiv);
-    walletInfoDiv.textContent = 'Generating…';
+    // Sleep some ticks to let chain.ts run.
+    new Promise((r) => setTimeout(r, 1000)).then(() => {
 
-    new Promise((r) => setTimeout(r, 23000)).then(() => {
-      try {
-        console.log("signaling: " + signaling);
-        const { mnemonic, address } = signaling.generateWallet();
-        console.log("Generated wallet: " + mnemonic + " " + address);
-        mnemonicDisplay.textContent = mnemonic;
-        kaspaAddress.textContent = address;
-        walletInfoDiv.classList.remove("hidden");
-        console.log("Kaspa wallet generated:", { mnemonic, address });
+      signaling = new window.gitchain.KaspaSignaling("testnet-10");
+      // Expose signaling object for other parts of the app
+      window.gitchain.kaspaSignalingInstance = signaling;
 
-        walletInfoDiv.innerHTML = `
+      const walletInfoDiv = document.getElementById('walletInfo');
+      console.log("walletInfoDiv: " + walletInfoDiv);
+      walletInfoDiv.textContent = 'Generating…';
+
+      new Promise((r) => setTimeout(r, 23000)).then(() => {
+        try {
+          console.log("signaling: " + signaling);
+          const { mnemonic, address } = signaling.generateWallet();
+          console.log("Generated wallet: " + mnemonic + " " + address);
+          mnemonicDisplay.textContent = mnemonic;
+          kaspaAddress.textContent = address;
+          walletInfoDiv.classList.remove("hidden");
+          console.log("Kaspa wallet generated:", { mnemonic, address });
+
+          walletInfoDiv.innerHTML = `
           <strong>Address:</strong> ${address}<br>
           <strong>Mnemonic (keep secret):</strong><br>
           <code style="word-break:break-all;">${mnemonic}</code>
         `;
-      } catch (err) {
-        walletInfoDiv.textContent = 'Error: ' + err.message;
-      }
+        } catch (err) {
+          walletInfoDiv.textContent = 'Error: ' + err.message;
+        }
+      });
     });
   });
 
