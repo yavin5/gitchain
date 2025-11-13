@@ -1,3 +1,17 @@
+// IMPORTANT: Initialize logger configuration FIRST, before any other imports
+import { initializeLoggers } from './config/logger.config';
+initializeLoggers();
+
+import { createLogger } from '@kasstamp/utils';
+
+// Main application logger
+export const appLogger = createLogger('gitchain:web:app');
+
+// Service loggers
+export const walletLogger = createLogger('kasstamp:web:wallet');
+export const stampingLogger = createLogger('kasstamp:web:stamping');
+export const sdkLogger = createLogger('kasstamp:web:sdk');
+
 import {
   type BalanceMonitoringService,
   type ITransactionRecord,
@@ -13,7 +27,7 @@ import {
   type BalanceEvent,
   type TransactionEvent,
 } from '@kasstamp/sdk';
-import { walletLogger } from './logger';
+
 import { APP_CONFIG } from './constants';
 
 // Event types for type safety

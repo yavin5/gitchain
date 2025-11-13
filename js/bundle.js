@@ -1,355 +1,3 @@
-var __defProp$9 = Object.defineProperty;
-var __name$9 = (target, value2) => __defProp$9(target, "name", { value: value2, configurable: true });
-var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
-  LogLevel2[LogLevel2["DEBUG"] = 0] = "DEBUG";
-  LogLevel2[LogLevel2["INFO"] = 1] = "INFO";
-  LogLevel2[LogLevel2["WARN"] = 2] = "WARN";
-  LogLevel2[LogLevel2["ERROR"] = 3] = "ERROR";
-  LogLevel2[LogLevel2["SILENT"] = 4] = "SILENT";
-  return LogLevel2;
-})(LogLevel || {});
-var COLORS = {
-  reset: "\x1B[0m",
-  red: "\x1B[31m",
-  yellow: "\x1B[33m",
-  blue: "\x1B[34m",
-  magenta: "\x1B[35m",
-  gray: "\x1B[90m"
-};
-var BROWSER_COLORS = {
-  DEBUG: "color: #6B7280; font-weight: normal",
-  INFO: "color: #3B82F6; font-weight: normal",
-  WARN: "color: #F59E0B; font-weight: bold",
-  ERROR: "color: #EF4444; font-weight: bold",
-  namespace: "color: #8B5CF6; font-weight: bold",
-  timestamp: "color: #9CA3AF; font-weight: normal"
-};
-var LoggerManager = class {
-  static {
-    __name$9(this, "LoggerManager");
-  }
-  config;
-  namespacePatterns = /* @__PURE__ */ new Map();
-  isBrowser;
-  constructor() {
-    this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
-    this.config = {
-      level: 3,
-      // Silent by default - only errors (nothing is logged without explicit config)
-      namespaces: {},
-      colors: true,
-      timestamps: true,
-      formatter: this.defaultFormatter.bind(this)
-    };
-  }
-  /**
-   * Set global log level
-   */
-  setGlobalLogLevel(level) {
-    this.config.level = level;
-  }
-  /**
-   * Set log level for a specific namespace or pattern
-   * Supports wildcards: 'kasstamp:*' or 'kasstamp:sdk:*'
-   */
-  setNamespaceLogLevel(namespace, level) {
-    this.config.namespaces[namespace] = level;
-    this.namespacePatterns.set(namespace, level);
-  }
-  /**
-   * Configure logger
-   */
-  configure(config) {
-    this.config = {
-      ...this.config,
-      ...config
-    };
-    if (config.namespaces) {
-      Object.entries(config.namespaces).forEach(([namespace, level]) => {
-        this.namespacePatterns.set(namespace, level);
-      });
-    }
-  }
-  /**
-   * Reset logger configuration to silent (ERROR only)
-   */
-  reset() {
-    this.config = {
-      level: 3,
-      // Silent by default
-      namespaces: {},
-      colors: true,
-      timestamps: true,
-      formatter: this.defaultFormatter.bind(this)
-    };
-    this.namespacePatterns.clear();
-  }
-  /**
-   * Get effective log level for a namespace
-   */
-  getEffectiveLevel(namespace) {
-    if (this.config.namespaces[namespace] !== void 0) {
-      return this.config.namespaces[namespace];
-    }
-    const parts = namespace.split(":");
-    for (let i2 = parts.length; i2 > 0; i2--) {
-      const pattern = parts.slice(0, i2).join(":");
-      if (this.config.namespaces[pattern] !== void 0) {
-        return this.config.namespaces[pattern];
-      }
-      const wildcardPattern = `${pattern}:*`;
-      if (this.config.namespaces[wildcardPattern] !== void 0) {
-        return this.config.namespaces[wildcardPattern];
-      }
-    }
-    return this.config.level;
-  }
-  /**
-   * Default formatter for log messages
-   */
-  defaultFormatter(level, namespace, message2, timestamp) {
-    const time = this.config.timestamps ? timestamp.toISOString() : "";
-    if (this.isBrowser && this.config.colors) {
-      return time ? `%c${time}%c [%c${level}%c] %c[${namespace}]%c ${message2}` : `[%c${level}%c] %c[${namespace}]%c ${message2}`;
-    } else if (this.config.colors) {
-      const levelColor = this.getLevelColor(level);
-      const timeStr = time ? `${COLORS.gray}${time}${COLORS.reset} ` : "";
-      return `${timeStr}${levelColor}[${level}]${COLORS.reset} ${COLORS.magenta}[${namespace}]${COLORS.reset} ${message2}`;
-    } else {
-      return time ? `${time} [${level}] [${namespace}] ${message2}` : `[${level}] [${namespace}] ${message2}`;
-    }
-  }
-  getLevelColor(level) {
-    switch (level) {
-      case "DEBUG":
-        return COLORS.gray;
-      case "INFO":
-        return COLORS.blue;
-      case "WARN":
-        return COLORS.yellow;
-      case "ERROR":
-        return COLORS.red;
-      default:
-        return COLORS.reset;
-    }
-  }
-  /**
-   * Get browser color arguments for console styling
-   */
-  getBrowserColorArgs(level) {
-    if (!this.config.timestamps) {
-      return [
-        BROWSER_COLORS[level] || "",
-        "",
-        BROWSER_COLORS.namespace,
-        ""
-      ];
-    }
-    return [
-      BROWSER_COLORS.timestamp,
-      "",
-      BROWSER_COLORS[level] || "",
-      "",
-      BROWSER_COLORS.namespace,
-      ""
-    ];
-  }
-  getConfig() {
-    return this.config;
-  }
-  isBrowserEnvironment() {
-    return this.isBrowser;
-  }
-};
-var loggerManager = new LoggerManager();
-var Logger = class _Logger {
-  static {
-    __name$9(this, "Logger");
-  }
-  namespace;
-  constructor(namespace) {
-    this.namespace = namespace;
-  }
-  /**
-   * Check if a log level is enabled for this logger
-   * Checks dynamically so configuration changes take effect immediately
-   */
-  isLevelEnabled(level) {
-    const effectiveLevel = loggerManager.getEffectiveLevel(this.namespace);
-    return effectiveLevel <= level;
-  }
-  /**
-   * Log a debug message
-   * Calls console directly to preserve call site in browser DevTools
-   */
-  debug(message2, context) {
-    if (!this.isLevelEnabled(
-      0
-      /* DEBUG */
-    )) return;
-    const config = loggerManager.getConfig();
-    const timestamp = /* @__PURE__ */ new Date();
-    const formattedMessage = config.formatter("DEBUG", this.namespace, message2, timestamp);
-    if (loggerManager.isBrowserEnvironment() && config.colors) {
-      const colorArgs = loggerManager.getBrowserColorArgs("DEBUG");
-      if (context && Object.keys(context).length > 0) {
-        console.debug(formattedMessage, ...colorArgs, context);
-      } else {
-        console.debug(formattedMessage, ...colorArgs);
-      }
-    } else {
-      if (context && Object.keys(context).length > 0) {
-        console.debug(formattedMessage, context);
-      } else {
-        console.debug(formattedMessage);
-      }
-    }
-  }
-  /**
-   * Log an info message
-   * Calls console directly to preserve call site in browser DevTools
-   */
-  info(message2, context) {
-    if (!this.isLevelEnabled(
-      1
-      /* INFO */
-    )) return;
-    const config = loggerManager.getConfig();
-    const timestamp = /* @__PURE__ */ new Date();
-    const formattedMessage = config.formatter("INFO", this.namespace, message2, timestamp);
-    if (loggerManager.isBrowserEnvironment() && config.colors) {
-      const colorArgs = loggerManager.getBrowserColorArgs("INFO");
-      if (context && Object.keys(context).length > 0) {
-        console.info(formattedMessage, ...colorArgs, context);
-      } else {
-        console.info(formattedMessage, ...colorArgs);
-      }
-    } else {
-      if (context && Object.keys(context).length > 0) {
-        console.info(formattedMessage, context);
-      } else {
-        console.info(formattedMessage);
-      }
-    }
-  }
-  /**
-   * Log a warning message
-   * Calls console directly to preserve call site in browser DevTools
-   */
-  warn(message2, context) {
-    if (!this.isLevelEnabled(
-      2
-      /* WARN */
-    )) return;
-    const config = loggerManager.getConfig();
-    const timestamp = /* @__PURE__ */ new Date();
-    const formattedMessage = config.formatter("WARN", this.namespace, message2, timestamp);
-    if (loggerManager.isBrowserEnvironment() && config.colors) {
-      const colorArgs = loggerManager.getBrowserColorArgs("WARN");
-      if (context && Object.keys(context).length > 0) {
-        console.warn(formattedMessage, ...colorArgs, context);
-      } else {
-        console.warn(formattedMessage, ...colorArgs);
-      }
-    } else {
-      if (context && Object.keys(context).length > 0) {
-        console.warn(formattedMessage, context);
-      } else {
-        console.warn(formattedMessage);
-      }
-    }
-  }
-  /**
-   * Log an error message
-   * Calls console directly to preserve call site in browser DevTools
-   */
-  error(message2, error, context) {
-    if (!this.isLevelEnabled(
-      3
-      /* ERROR */
-    )) return;
-    let actualError;
-    let actualContext;
-    if (error instanceof Error) {
-      actualError = error;
-      actualContext = context;
-    } else {
-      actualContext = error;
-    }
-    const config = loggerManager.getConfig();
-    const timestamp = /* @__PURE__ */ new Date();
-    const formattedMessage = config.formatter("ERROR", this.namespace, message2, timestamp);
-    if (loggerManager.isBrowserEnvironment() && config.colors) {
-      const colorArgs = loggerManager.getBrowserColorArgs("ERROR");
-      if (actualContext && Object.keys(actualContext).length > 0) {
-        console.error(formattedMessage, ...colorArgs, actualContext);
-      } else {
-        console.error(formattedMessage, ...colorArgs);
-      }
-    } else {
-      if (actualContext && Object.keys(actualContext).length > 0) {
-        console.error(formattedMessage, actualContext);
-      } else {
-        console.error(formattedMessage);
-      }
-    }
-    if (actualError && actualError.stack) {
-      console.error(actualError.stack);
-    }
-  }
-  /**
-   * Create a child logger with additional namespace
-   */
-  child(subNamespace) {
-    return new _Logger(`${this.namespace}:${subNamespace}`);
-  }
-};
-function createLogger(namespace) {
-  return new Logger(namespace);
-}
-__name$9(createLogger, "createLogger");
-function setGlobalLogLevel(level) {
-  loggerManager.setGlobalLogLevel(level);
-}
-__name$9(setGlobalLogLevel, "setGlobalLogLevel");
-function setNamespaceLogLevel(namespace, level) {
-  loggerManager.setNamespaceLogLevel(namespace, level);
-}
-__name$9(setNamespaceLogLevel, "setNamespaceLogLevel");
-function configureLogger(config) {
-  loggerManager.configure(config);
-}
-__name$9(configureLogger, "configureLogger");
-function disableLogging() {
-  loggerManager.setGlobalLogLevel(
-    4
-    /* SILENT */
-  );
-}
-__name$9(disableLogging, "disableLogging");
-function enableDebugLogging() {
-  loggerManager.setGlobalLogLevel(
-    0
-    /* DEBUG */
-  );
-}
-__name$9(enableDebugLogging, "enableDebugLogging");
-function resetLogger() {
-  loggerManager.reset();
-}
-__name$9(resetLogger, "resetLogger");
-function initializeLoggers() {
-  {
-    setGlobalLogLevel(LogLevel.DEBUG);
-    setNamespaceLogLevel("gitchain:web:app", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:web:wallet", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:sdk", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:rpc:connection", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:sdk:wasm", LogLevel.DEBUG);
-    setNamespaceLogLevel("kasstamp:stamping:*", LogLevel.DEBUG);
-  }
-}
 const ADMIN_ADDRESS = "0x097efb2a92bc5205e1615db52338a118f1619f3f";
 const connectionSymbol = Symbol.for("@libp2p/connection");
 const contentRoutingSymbol = Symbol.for("@libp2p/content-routing");
@@ -47949,6 +47597,346 @@ var sha3 = { exports: {} };
   })();
 })(sha3);
 var sha3Exports = sha3.exports;
+var __defProp$9 = Object.defineProperty;
+var __name$9 = (target, value2) => __defProp$9(target, "name", { value: value2, configurable: true });
+var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
+  LogLevel2[LogLevel2["DEBUG"] = 0] = "DEBUG";
+  LogLevel2[LogLevel2["INFO"] = 1] = "INFO";
+  LogLevel2[LogLevel2["WARN"] = 2] = "WARN";
+  LogLevel2[LogLevel2["ERROR"] = 3] = "ERROR";
+  LogLevel2[LogLevel2["SILENT"] = 4] = "SILENT";
+  return LogLevel2;
+})(LogLevel || {});
+var COLORS = {
+  reset: "\x1B[0m",
+  red: "\x1B[31m",
+  yellow: "\x1B[33m",
+  blue: "\x1B[34m",
+  magenta: "\x1B[35m",
+  gray: "\x1B[90m"
+};
+var BROWSER_COLORS = {
+  DEBUG: "color: #6B7280; font-weight: normal",
+  INFO: "color: #3B82F6; font-weight: normal",
+  WARN: "color: #F59E0B; font-weight: bold",
+  ERROR: "color: #EF4444; font-weight: bold",
+  namespace: "color: #8B5CF6; font-weight: bold",
+  timestamp: "color: #9CA3AF; font-weight: normal"
+};
+var LoggerManager = class {
+  static {
+    __name$9(this, "LoggerManager");
+  }
+  config;
+  namespacePatterns = /* @__PURE__ */ new Map();
+  isBrowser;
+  constructor() {
+    this.isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined";
+    this.config = {
+      level: 3,
+      // Silent by default - only errors (nothing is logged without explicit config)
+      namespaces: {},
+      colors: true,
+      timestamps: true,
+      formatter: this.defaultFormatter.bind(this)
+    };
+  }
+  /**
+   * Set global log level
+   */
+  setGlobalLogLevel(level) {
+    this.config.level = level;
+  }
+  /**
+   * Set log level for a specific namespace or pattern
+   * Supports wildcards: 'kasstamp:*' or 'kasstamp:sdk:*'
+   */
+  setNamespaceLogLevel(namespace, level) {
+    this.config.namespaces[namespace] = level;
+    this.namespacePatterns.set(namespace, level);
+  }
+  /**
+   * Configure logger
+   */
+  configure(config) {
+    this.config = {
+      ...this.config,
+      ...config
+    };
+    if (config.namespaces) {
+      Object.entries(config.namespaces).forEach(([namespace, level]) => {
+        this.namespacePatterns.set(namespace, level);
+      });
+    }
+  }
+  /**
+   * Reset logger configuration to silent (ERROR only)
+   */
+  reset() {
+    this.config = {
+      level: 3,
+      // Silent by default
+      namespaces: {},
+      colors: true,
+      timestamps: true,
+      formatter: this.defaultFormatter.bind(this)
+    };
+    this.namespacePatterns.clear();
+  }
+  /**
+   * Get effective log level for a namespace
+   */
+  getEffectiveLevel(namespace) {
+    if (this.config.namespaces[namespace] !== void 0) {
+      return this.config.namespaces[namespace];
+    }
+    const parts = namespace.split(":");
+    for (let i2 = parts.length; i2 > 0; i2--) {
+      const pattern = parts.slice(0, i2).join(":");
+      if (this.config.namespaces[pattern] !== void 0) {
+        return this.config.namespaces[pattern];
+      }
+      const wildcardPattern = `${pattern}:*`;
+      if (this.config.namespaces[wildcardPattern] !== void 0) {
+        return this.config.namespaces[wildcardPattern];
+      }
+    }
+    return this.config.level;
+  }
+  /**
+   * Default formatter for log messages
+   */
+  defaultFormatter(level, namespace, message2, timestamp) {
+    const time = this.config.timestamps ? timestamp.toISOString() : "";
+    if (this.isBrowser && this.config.colors) {
+      return time ? `%c${time}%c [%c${level}%c] %c[${namespace}]%c ${message2}` : `[%c${level}%c] %c[${namespace}]%c ${message2}`;
+    } else if (this.config.colors) {
+      const levelColor = this.getLevelColor(level);
+      const timeStr = time ? `${COLORS.gray}${time}${COLORS.reset} ` : "";
+      return `${timeStr}${levelColor}[${level}]${COLORS.reset} ${COLORS.magenta}[${namespace}]${COLORS.reset} ${message2}`;
+    } else {
+      return time ? `${time} [${level}] [${namespace}] ${message2}` : `[${level}] [${namespace}] ${message2}`;
+    }
+  }
+  getLevelColor(level) {
+    switch (level) {
+      case "DEBUG":
+        return COLORS.gray;
+      case "INFO":
+        return COLORS.blue;
+      case "WARN":
+        return COLORS.yellow;
+      case "ERROR":
+        return COLORS.red;
+      default:
+        return COLORS.reset;
+    }
+  }
+  /**
+   * Get browser color arguments for console styling
+   */
+  getBrowserColorArgs(level) {
+    if (!this.config.timestamps) {
+      return [
+        BROWSER_COLORS[level] || "",
+        "",
+        BROWSER_COLORS.namespace,
+        ""
+      ];
+    }
+    return [
+      BROWSER_COLORS.timestamp,
+      "",
+      BROWSER_COLORS[level] || "",
+      "",
+      BROWSER_COLORS.namespace,
+      ""
+    ];
+  }
+  getConfig() {
+    return this.config;
+  }
+  isBrowserEnvironment() {
+    return this.isBrowser;
+  }
+};
+var loggerManager = new LoggerManager();
+var Logger = class _Logger {
+  static {
+    __name$9(this, "Logger");
+  }
+  namespace;
+  constructor(namespace) {
+    this.namespace = namespace;
+  }
+  /**
+   * Check if a log level is enabled for this logger
+   * Checks dynamically so configuration changes take effect immediately
+   */
+  isLevelEnabled(level) {
+    const effectiveLevel = loggerManager.getEffectiveLevel(this.namespace);
+    return effectiveLevel <= level;
+  }
+  /**
+   * Log a debug message
+   * Calls console directly to preserve call site in browser DevTools
+   */
+  debug(message2, context) {
+    if (!this.isLevelEnabled(
+      0
+      /* DEBUG */
+    )) return;
+    const config = loggerManager.getConfig();
+    const timestamp = /* @__PURE__ */ new Date();
+    const formattedMessage = config.formatter("DEBUG", this.namespace, message2, timestamp);
+    if (loggerManager.isBrowserEnvironment() && config.colors) {
+      const colorArgs = loggerManager.getBrowserColorArgs("DEBUG");
+      if (context && Object.keys(context).length > 0) {
+        console.debug(formattedMessage, ...colorArgs, context);
+      } else {
+        console.debug(formattedMessage, ...colorArgs);
+      }
+    } else {
+      if (context && Object.keys(context).length > 0) {
+        console.debug(formattedMessage, context);
+      } else {
+        console.debug(formattedMessage);
+      }
+    }
+  }
+  /**
+   * Log an info message
+   * Calls console directly to preserve call site in browser DevTools
+   */
+  info(message2, context) {
+    if (!this.isLevelEnabled(
+      1
+      /* INFO */
+    )) return;
+    const config = loggerManager.getConfig();
+    const timestamp = /* @__PURE__ */ new Date();
+    const formattedMessage = config.formatter("INFO", this.namespace, message2, timestamp);
+    if (loggerManager.isBrowserEnvironment() && config.colors) {
+      const colorArgs = loggerManager.getBrowserColorArgs("INFO");
+      if (context && Object.keys(context).length > 0) {
+        console.info(formattedMessage, ...colorArgs, context);
+      } else {
+        console.info(formattedMessage, ...colorArgs);
+      }
+    } else {
+      if (context && Object.keys(context).length > 0) {
+        console.info(formattedMessage, context);
+      } else {
+        console.info(formattedMessage);
+      }
+    }
+  }
+  /**
+   * Log a warning message
+   * Calls console directly to preserve call site in browser DevTools
+   */
+  warn(message2, context) {
+    if (!this.isLevelEnabled(
+      2
+      /* WARN */
+    )) return;
+    const config = loggerManager.getConfig();
+    const timestamp = /* @__PURE__ */ new Date();
+    const formattedMessage = config.formatter("WARN", this.namespace, message2, timestamp);
+    if (loggerManager.isBrowserEnvironment() && config.colors) {
+      const colorArgs = loggerManager.getBrowserColorArgs("WARN");
+      if (context && Object.keys(context).length > 0) {
+        console.warn(formattedMessage, ...colorArgs, context);
+      } else {
+        console.warn(formattedMessage, ...colorArgs);
+      }
+    } else {
+      if (context && Object.keys(context).length > 0) {
+        console.warn(formattedMessage, context);
+      } else {
+        console.warn(formattedMessage);
+      }
+    }
+  }
+  /**
+   * Log an error message
+   * Calls console directly to preserve call site in browser DevTools
+   */
+  error(message2, error, context) {
+    if (!this.isLevelEnabled(
+      3
+      /* ERROR */
+    )) return;
+    let actualError;
+    let actualContext;
+    if (error instanceof Error) {
+      actualError = error;
+      actualContext = context;
+    } else {
+      actualContext = error;
+    }
+    const config = loggerManager.getConfig();
+    const timestamp = /* @__PURE__ */ new Date();
+    const formattedMessage = config.formatter("ERROR", this.namespace, message2, timestamp);
+    if (loggerManager.isBrowserEnvironment() && config.colors) {
+      const colorArgs = loggerManager.getBrowserColorArgs("ERROR");
+      if (actualContext && Object.keys(actualContext).length > 0) {
+        console.error(formattedMessage, ...colorArgs, actualContext);
+      } else {
+        console.error(formattedMessage, ...colorArgs);
+      }
+    } else {
+      if (actualContext && Object.keys(actualContext).length > 0) {
+        console.error(formattedMessage, actualContext);
+      } else {
+        console.error(formattedMessage);
+      }
+    }
+    if (actualError && actualError.stack) {
+      console.error(actualError.stack);
+    }
+  }
+  /**
+   * Create a child logger with additional namespace
+   */
+  child(subNamespace) {
+    return new _Logger(`${this.namespace}:${subNamespace}`);
+  }
+};
+function createLogger(namespace) {
+  return new Logger(namespace);
+}
+__name$9(createLogger, "createLogger");
+function setGlobalLogLevel(level) {
+  loggerManager.setGlobalLogLevel(level);
+}
+__name$9(setGlobalLogLevel, "setGlobalLogLevel");
+function setNamespaceLogLevel(namespace, level) {
+  loggerManager.setNamespaceLogLevel(namespace, level);
+}
+__name$9(setNamespaceLogLevel, "setNamespaceLogLevel");
+function configureLogger(config) {
+  loggerManager.configure(config);
+}
+__name$9(configureLogger, "configureLogger");
+function disableLogging() {
+  loggerManager.setGlobalLogLevel(
+    4
+    /* SILENT */
+  );
+}
+__name$9(disableLogging, "disableLogging");
+function enableDebugLogging() {
+  loggerManager.setGlobalLogLevel(
+    0
+    /* DEBUG */
+  );
+}
+__name$9(enableDebugLogging, "enableDebugLogging");
+function resetLogger() {
+  loggerManager.reset();
+}
+__name$9(resetLogger, "resetLogger");
 var __defProp$8 = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __name$8 = (target, value2) => __defProp$8(target, "name", { value: value2, configurable: true });
@@ -81827,8 +81815,18 @@ var KaspaSDK = class _KaspaSDK {
     _KaspaSDK.instance = null;
   }
 };
-const walletLogger = createLogger("kasstamp:web:wallet");
-const hookLogger = createLogger("kasstamp:web:hooks");
+function initializeLoggers() {
+  {
+    setGlobalLogLevel(LogLevel.DEBUG);
+    setNamespaceLogLevel("gitchain:web:app", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:web:wallet", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:sdk", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:rpc:connection", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:wallet:*", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:sdk:wasm", LogLevel.DEBUG);
+    setNamespaceLogLevel("kasstamp:stamping:*", LogLevel.DEBUG);
+  }
+}
 const __vite_import_meta_env__ = { "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "SSR": false, "VITE_AUTO_CONNECT": "true", "VITE_AUTO_REFRESH_INTERVAL": "30000", "VITE_CONNECTION_TIMEOUT": "15000", "VITE_DEBUG": "true", "VITE_DEFAULT_NETWORK": "testnet-10", "VITE_HEALTH_CHECK_INTERVAL": "30000", "VITE_HEARTBEAT_INTERVAL": "300000", "VITE_PRIORITY_FEE": "1000", "VITE_REQUEST_TIMEOUT": "10000" };
 const getEnv = (key2, defaultValue) => {
   if (typeof window !== "undefined") {
@@ -81858,6 +81856,8 @@ const APP_CONFIG = {
   showDebugLogs: getEnv("VITE_DEBUG", "true").toLowerCase() === "true",
   enableAutoConnect: getEnv("VITE_AUTO_CONNECT", "true").toLowerCase() === "true"
 };
+initializeLoggers();
+const walletLogger = createLogger("kasstamp:web:wallet");
 class WalletService {
   kaspaSDK = null;
   currentWallet = null;
@@ -82338,6 +82338,7 @@ class WalletService {
   }
 }
 const walletService = new WalletService();
+const hookLogger = createLogger("kasstamp:web:hooks");
 const initialState = {
   isConnected: false,
   isInitialized: false,
@@ -82532,7 +82533,6 @@ function UseWallet() {
   };
   return [finalState, actions];
 }
-initializeLoggers();
 const hostnameParts = location.hostname.split(".");
 const OWNER = hostnameParts[0];
 const REPO = location.pathname === "/" || location.pathname === "" ? `${OWNER}.github.io` : location.pathname.split("/")[1];
