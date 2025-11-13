@@ -82626,6 +82626,7 @@ class KaspaSignaling {
     } finally {
       new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
         this.chainId = network;
+        this.kaspaSDK = await this.connect(network);
       });
     }
   }

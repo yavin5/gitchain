@@ -172,9 +172,7 @@ export class KaspaSignaling {
       } finally {
           new Promise((r) => setTimeout(r, 1000)).then(async () => {
               this.chainId = network;
-              (async () => {
-                  this.kaspaSDK = await this.connect(network);
-              });
+              this.kaspaSDK = await this.connect(network);
           });
       }
   }
