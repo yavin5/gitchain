@@ -175,7 +175,7 @@ export class KaspaSignaling {
               walletName: defaultWalletName,
               walletSecret: 'gitchain',
               words: seedWords,
-              passphrase: undefined,
+              passphrase: 'gitchain',
           });
 
           if (!result?.mnemonic) throw new Error('Mnemonic not generated');

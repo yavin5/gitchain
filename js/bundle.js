@@ -82633,7 +82633,7 @@ class KaspaSignaling {
         walletName: defaultWalletName,
         walletSecret: "gitchain",
         words: seedWords,
-        passphrase: void 0
+        passphrase: "gitchain"
       });
       if (!result?.mnemonic)
         throw new Error("Mnemonic not generated");
