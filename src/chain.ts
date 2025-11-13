@@ -151,7 +151,7 @@ export class KaspaSignaling {
   walletActions: WalletActions | undefined;
 
   constructor(network: Network = 'testnet-10') {
-      try {
+      /*try {
           // kasstamp Kaspa SDK initialization.
           async () => {
               this.kaspaSDK = await KaspaSDK.init({
@@ -169,12 +169,12 @@ export class KaspaSignaling {
                   debug: true,
               });
           }
-      } finally {
+      } finally {*/
           new Promise((r) => setTimeout(r, 1000)).then(async () => {
               this.chainId = network;
               this.kaspaSDK = await this.connect(network);
           });
-      }
+      /*}*/
   }
 
   async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {
