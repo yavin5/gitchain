@@ -100,7 +100,8 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
             'https://jake.kaspa.green',
             'https://paul.kaspa.red',
             'https://sean.kaspa.stream',
-            'https://mike.kaspa.red,'
+            'https://mike.kaspa.red,',
+            'https://mark.kaspa.green'
         ];
 
         // Working fallback nodes
@@ -108,7 +109,8 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
             'https://api-tn10.kaspa.org',
             'https://noah.kaspa.blue',
             'https://alex.kaspa.red',
-            'https://adam.kaspa.green'
+            'https://adam.kaspa.green',
+            'https://troy.kaspa.stream'
         ];
 
         for (const badNode of problematicNodes) {
