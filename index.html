@@ -21,6 +21,28 @@
     .kaspa-section { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; }
     .mnemonic { font-family: monospace; background: #f5f5f5; padding: 0.5rem; word-break: break-all; }
     .warning { color: red; font-size: 0.8rem; }
+      .blinking {
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+      .error {
+        color: red;
+      }
+      .seed-columns {
+        display: flex;
+        justify-content: space-between;
+      }
+      .seed-column {
+        width: 48%;
+      }
+      .seed-column ol li {
+        margin-bottom: 5px;
+      }
+      .seed-column input {
+        width: 150px;
+      }
   </style>
 </head>
 <body>
@@ -37,9 +59,68 @@
   <div id="blockHeight" class="spacer"></div>
   <div id="peerId" class="spacer"></div>
 
-  <!-- New Kaspa Signaling Section -->
   <div class="kaspa-section">
     <h2>Kaspa Relay</h2>
+
+    <details id="wallet-controls">
+      <summary>Wallet Controls</summary>
+      <div>
+        <p>Status: <span id="wallet-status">No wallet yet: Create or Activate one</span></p>
+        <button id="generate-wallet">Generate New Wallet</button>
+        <div id="walletInfo" class="hidden">
+          <p><strong>Warning: Save these seed words ONLY on paper, not share!</strong> <span class="warning">Loss means lost funds in your wallet.</span></p>
+          <p class="mnemonic" id="mnemonic"></p>
+          <p><strong>Address:</strong> <span id="kaspaAddress"></span></p>
+          <a href="https://faucet-tn10.kaspanet.io" target="_blank">Get tKAS from Faucet (paste address, claim once)</a><br>
+          <button id="connectPeers">Funded? Connect to Peers</button>
+        </div>
+        <div>
+          <label>Enter your 24 seed words:</label>
+          <div class="seed-columns">
+            <div class="seed-column">
+              <ol start="1">
+                <li><input type="text" id="word1" placeholder="Word 1"></li>
+                <li><input type="text" id="word2" placeholder="Word 2"></li>
+                <li><input type="text" id="word3" placeholder="Word 3"></li>
+                <li><input type="text" id="word4" placeholder="Word 4"></li>
+                <li><input type="text" id="word5" placeholder="Word 5"></li>
+                <li><input type="text" id="word6" placeholder="Word 6"></li>
+                <li><input type="text" id="word7" placeholder="Word 7"></li>
+                <li><input type="text" id="word8" placeholder="Word 8"></li>
+                <li><input type="text" id="word9" placeholder="Word 9"></li>
+                <li><input type="text" id="word10" placeholder="Word 10"></li>
+                <li><input type="text" id="word11" placeholder="Word 11"></li>
+                <li><input type="text" id="word12" placeholder="Word 12"></li>
+              </ol>
+            </div>
+            <div class="seed-column">
+              <ol start="13">
+                <li><input type="text" id="word13" placeholder="Word 13"></li>
+                <li><input type="text" id="word14" placeholder="Word 14"></li>
+                <li><input type="text" id="word15" placeholder="Word 15"></li>
+                <li><input type="text" id="word16" placeholder="Word 16"></li>
+                <li><input type="text" id="word17" placeholder="Word 17"></li>
+                <li><input type="text" id="word18" placeholder="Word 18"></li>
+                <li><input type="text" id="word19" placeholder="Word 19"></li>
+                <li><input type="text" id="word20" placeholder="Word 20"></li>
+                <li><input type="text" id="word21" placeholder="Word 21"></li>
+                <li><input type="text" id="word22" placeholder="Word 22"></li>
+                <li><input type="text" id="word23" placeholder="Word 23"></li>
+                <li><input type="text" id="word24" placeholder="Word 24"></li>
+              </ol>
+            </div>
+          </div>
+          <button id="restore-wallet">Restore Existing Wallet</button>
+        </div>
+        <div id="wallet-address" style="display: none;">
+          Wallet Address: <span id="address-text"></span><br>
+          Balance: <span id="balance-text" style="font-weight: bold; font-family: monospace;"></span>
+        </div>
+        <div id="faucet-message" style="display: none;">
+          You need to add KAS to your wallet, for free, by requesting it at the faucet page here: <a href="https://faucet-t11.kaspanet.io" target="_blank">Kaspa Testnet 11 Faucet</a>
+        </div>
+      </div>
+    </details>
     <button id="generateWallet">Generate New Wallet</button>
     <div id="walletInfo" class="hidden">
       <p><strong>Warning: Save these seed words ONLY on paper, not share!</strong> <span class="warning">Loss means lost funds in your wallet.</span></p>

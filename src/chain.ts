@@ -131,6 +131,7 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 
     return originalFetch(input, init);
 };
+
 // Load the Kaspa client WASM bundle from the web server.
 await initKaspaWasm();
 
@@ -138,6 +139,128 @@ await initKaspaWasm();
 let libp2p: any = null;
 let isServer = false;
 let serverPeers: string[] = [];
+
+// Global wallet variables
+let currentWallet: any = null;
+let currentWalletState: WalletState | null = null;
+let currentWalletActions: WalletActions | null = null;
+
+// ---------------------------------------------------------------------------
+// Wallet UI Helpers
+// ---------------------------------------------------------------------------
+function updateWalletStatus(message: string, blinking = false, error = false) {
+    const statusElem = document.getElementById('wallet-status');
+    if (statusElem) {
+        statusElem.textContent = message;
+        statusElem.classList.toggle('blinking', blinking);
+        statusElem.classList.toggle('error', error);
+    }
+}
+
+function showWalletInfo(address: string, balance: number) {
+    const addrDiv = document.getElementById('wallet-address');
+    const addrText = document.getElementById('address-text');
+    const balanceText = document.getElementById('balance-text');
+    const faucetDiv = document.getElementById('faucet-message');
+    if (addrDiv && addrText && balanceText && faucetDiv) {
+        addrText.textContent = address;
+        balanceText.textContent = `${balance} KAS`;
+        addrDiv.style.display = 'block';
+        faucetDiv.style.display = balance === 0 ? 'block' : 'none';
+    }
+}
+
+async function loadOrRestoreWallet() {
+    const storedPhrase = localStorage.getItem('kaspa_phrase');
+    if (storedPhrase) {
+        updateWalletStatus('Activating wallet.. please wait..', true);
+        try {
+            [currentWalletState, currentWalletActions] = UseWallet();
+            const result = await currentWalletActions.restoreWallet({
+                walletSecret: 'gitchain',
+                mnemonic: storedPhrase,
+                passphrase: 'gitchain'
+            });
+            currentWallet = result.wallet;
+            const address = result.wallet.accounts[0].address;
+            const balance = await currentWalletActions.getBalance(address);
+            updateWalletStatus('Active');
+            showWalletInfo(address, balance);
+        } catch (err) {
+            updateWalletStatus('Error loading wallet', false, true);
+            localStorage.removeItem('kaspa_phrase');
+        }
+    } else {
+        updateWalletStatus('No wallet yet: Create or Activate one');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadOrRestoreWallet();
+
+    document.getElementById('generate-wallet')?.addEventListener('click', async () => {
+        updateWalletStatus('Activating wallet.. please wait..', true);
+        try {
+            [currentWalletState, currentWalletActions] = UseWallet();
+            const result = await currentWalletActions.createWallet({
+                walletName: 'Gitchain Wallet',
+                walletSecret: 'gitchain',
+                words: undefined,
+                passphrase: 'gitchain'
+            });
+            if (!result?.mnemonic) throw new Error('Failed to generate mnemonic');
+            currentWallet = result.wallet;
+            const address = result.wallet.accounts[0].address;
+            const balance = await currentWalletActions.getBalance(address);
+            localStorage.setItem('kaspa_phrase', result.mnemonic);
+            updateWalletStatus('Active');
+            showWalletInfo(address, balance);
+            alert(`Wallet generated! Backup your seed words:\n\n${result.mnemonic.replace(/ /g, '\n')}`);
+        } catch (err) {
+            updateWalletStatus('Error generating wallet', false, true);
+            console.error(err);
+        }
+    });
+
+    document.getElementById('restore-wallet')?.addEventListener('click', async () => {
+        const words: string[] = [];
+        let allFilled = true;
+        for (let i = 1; i <= 24; i++) {
+            const input = document.getElementById(`word${i}`) as HTMLInputElement;
+            const word = input.value.trim();
+            if (!word) allFilled = false;
+            words.push(word);
+        }
+        if (!allFilled) {
+            updateWalletStatus('You must type all 24 seed words to restore your wallet.', false, true);
+            return;
+        }
+        const phrase = words.join(' ');
+        updateWalletStatus('Activating wallet.. please wait..', true);
+        try {
+            [currentWalletState, currentWalletActions] = UseWallet();
+            const result = await currentWalletActions.restoreWallet({
+                walletSecret: 'gitchain',
+                mnemonic: phrase,
+                passphrase: 'gitchain'
+            });
+            currentWallet = result.wallet;
+            const address = result.wallet.accounts[0].address;
+            const balance = await currentWalletActions.getBalance(address);
+            localStorage.setItem('kaspa_phrase', phrase);
+            updateWalletStatus('Active');
+            showWalletInfo(address, balance);
+            // Clear inputs only after success
+            for (let i = 1; i <= 24; i++) {
+                (document.getElementById(`word${i}`) as HTMLInputElement).value = '';
+            }
+        } catch (err) {
+            updateWalletStatus('Invalid seed phrase or restore failed', false, true);
+            console.error(err);
+        }
+    });
+});
+
 
 // ---------------------------------------------------------------------------
 // KaspaSignaling – signaling layer over Kaspa
