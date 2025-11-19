@@ -66,7 +66,6 @@
       <summary>Wallet Controls</summary>
       <div>
         <p>Status: <span id="wallet-status">No wallet yet: Create or Activate one</span></p>
-        <button id="generate-wallet">Generate New Wallet</button>
         <div id="walletInfo" class="hidden">
           <p><strong>Warning: Save these seed words ONLY on paper, not share!</strong> <span class="warning">Loss means lost funds in your wallet.</span></p>
           <p class="mnemonic" id="mnemonic"></p>
@@ -74,8 +73,9 @@
           <a href="https://faucet-tn10.kaspanet.io" target="_blank">Get tKAS from Faucet (paste address, claim once)</a><br>
           <button id="connectPeers">Funded? Connect to Peers</button>
         </div>
+        <p><span>Click here to generate a new wallet: <button id="generate-wallet">Generate New Wallet</button></span></p>
         <div>
-          <label>Enter your 24 seed words:</label>
+          <label>Or enter your 24 seed words to restore your existing wallet:</label>
           <div class="seed-columns">
             <div class="seed-column">
               <ol start="1">
