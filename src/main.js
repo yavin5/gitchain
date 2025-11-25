@@ -112,10 +112,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.log("Kaspa wallet generated:", { mnemonic, address });
 
           walletInfoDiv.innerHTML = `
-          <strong>Address:</strong> ${address}<br>
-          <strong>Mnemonic (keep secret):</strong><br>
-          <code style="word-break:break-all;">${mnemonic}</code>
-        `;
+            <strong>Address:</strong> ${address}<br>
+            <strong>Mnemonic (keep secret):</strong><br>
+            <code style="word-break:break-all;">${mnemonic}</code>
+          `;
         } catch (err) {
           walletInfoDiv.textContent = 'Error: ' + err.message;
         }

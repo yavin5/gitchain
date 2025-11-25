@@ -73,7 +73,10 @@
           <a href="https://faucet-tn10.kaspanet.io" target="_blank">Get tKAS from Faucet (paste address, claim once)</a><br>
           <button id="connectPeers">Funded? Connect to Peers</button>
         </div>
-        <p><span>Click here to generate a new wallet: <button id="generate-wallet">Generate New Wallet</button></span></p>
+        <div>
+          <p><span>To generate a new wallet:</span></p>
+          <p><span>  New password to use: <input type="text" id="kas-wallet-generate-secret"> <button id="generate-wallet">Generate New Wallet</button></span></p>
+        </div>
         <div>
           <label>Or enter your 24 seed words to restore your existing wallet:</label>
           <div class="seed-columns">
@@ -110,7 +113,7 @@
               </ol>
             </div>
           </div>
-          <button id="restore-wallet">Restore Existing Wallet</button>
+          New password to use: <input type="text" id="kas-wallet-restore-secret"> <button id="restore-wallet">Restore Existing Wallet</button>
         </div>
         <div id="wallet-address-restored" style="display: none;">
           Wallet Address: <span id="address-text"></span><br>
@@ -138,12 +141,12 @@
   <div id="chat"></div>
   <div id="output" class="hidden"></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script defer="true" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script type="module">
     import { ec } from 'https://esm.sh/elliptic@6.6.1';
     window.ec = ec;
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
+  <script defer="true" src="https://cdn.jsdelivr.net/npm/js-sha3@0.8.0/src/sha3.min.js"></script>
 
   <!-- Our code – **bundle.js is the Vite output** -->
   <script type="module" src="./js/bundle.js"></script>

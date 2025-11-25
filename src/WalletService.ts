@@ -323,7 +323,7 @@ export class WalletService {
   }
 
   /**
-   * Import wallet from mnemonic
+   * Import wallet from mnemonic and passphrase.
    */
   async importWallet(
     mnemonic: string,
@@ -404,7 +404,7 @@ export class WalletService {
   }
 
   /**
-   * Open existing wallet
+   * Open existing wallet from the Kaspa WASM SDK. Wallets are locked using name & password.
    */
   async openExistingWallet(walletName: string, walletSecret: string): Promise<void> {
     if (!this.kaspaSDK) {

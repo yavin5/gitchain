@@ -37,6 +37,7 @@ import { concat as uint8Concat } from 'uint8arrays';
 import { KaspaSDK, type Network } from '@kasstamp/sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 import { UseWallet, type WalletState, type WalletActions } from './UseWallet';
+import { getNetworkParams } from '../../../../../Volumes/share/git/kasstamp/js/packages/kasstamp_kaspa_wasm_sdk/web/kaspa.js';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -176,18 +177,13 @@ async function loadOrRestoreWallet() {
         updateWalletStatus('Activating wallet.. please wait..', true);
         try {
             [currentWalletState, currentWalletActions] = UseWallet();
-            const result = await currentWalletActions.restoreWallet({
-                walletSecret: 'gitchain',
-                mnemonic: storedPhrase,
-                passphrase: 'gitchain'
-            });
-            currentWallet = result.wallet;
-            const address = result.wallet.accounts[0].address;
-            const balance = await currentWalletActions.getBalance(address);
+            await currentWalletActions.openExistingWallet('Gitchain Wallet', storedPhrase);
+            const address = currentWalletState.accounts[0].address;
+            const balance = currentWalletState.balance == null ? "0" : currentWalletState.balance;
             updateWalletStatus('Active');
-            showWalletInfo(address, balance);
+            showWalletInfo(address, +balance);
         } catch (err) {
-            updateWalletStatus('Error loading wallet', false, true);
+            updateWalletStatus(`Error loading wallet: ${err}`, false, true);
             localStorage.removeItem('kaspa_phrase');
         }
     } else {
@@ -202,20 +198,23 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWalletStatus('Activating wallet.. please wait..', true);
         try {
             [currentWalletState, currentWalletActions] = UseWallet();
+            const input = document.getElementById('kas-wallet-generate-secret') as HTMLInputElement;
+            const walletSecret = input.value;
             const result = await currentWalletActions.createWallet({
                 walletName: 'Gitchain Wallet',
-                walletSecret: 'gitchain',
+                walletSecret: walletSecret,
                 words: undefined,
                 passphrase: 'gitchain'
             });
             if (!result?.mnemonic) throw new Error('Failed to generate mnemonic');
             currentWallet = result.wallet;
             const address = result.wallet.accounts[0].address;
-            const balance = await currentWalletActions.getBalance(address);
+            const balance = await currentWalletActions.getBalance();
             localStorage.setItem('kaspa_phrase', result.mnemonic);
             updateWalletStatus('Active');
-            showWalletInfo(address, balance);
+            showWalletInfo(address, +balance);
             alert(`Wallet generated! Backup your seed words:\n\n${result.mnemonic.replace(/ /g, '\n')}`);
+            input.value = '';
         } catch (err) {
             updateWalletStatus('Error generating wallet', false, true);
             console.error(err);
@@ -235,25 +234,29 @@ document.addEventListener('DOMContentLoaded', () => {
             updateWalletStatus('You must type all 24 seed words to restore your wallet.', false, true);
             return;
         }
-        const phrase = words.join(' ');
+        const wordsSpaceSeparated = words.join(' ');
         updateWalletStatus('Activating wallet.. please wait..', true);
         try {
             [currentWalletState, currentWalletActions] = UseWallet();
-            const result = await currentWalletActions.restoreWallet({
-                walletSecret: 'gitchain',
-                mnemonic: phrase,
-                passphrase: 'gitchain'
+            const input = document.getElementById('kas-wallet-restore-secret') as HTMLInputElement;
+            const walletSecret = input.value;
+            await currentWalletActions.importWallet({
+                mnemonic: wordsSpaceSeparated,
+                walletName: 'Gitchain Wallet',
+                walletSecret: walletSecret,
+                passphrase: 'gitchain',
+                network: currentWalletState.currentNetwork
             });
-            currentWallet = result.wallet;
-            const address = result.wallet.accounts[0].address;
-            const balance = await currentWalletActions.getBalance(address);
-            localStorage.setItem('kaspa_phrase', phrase);
+            const address = currentWalletState.accounts[0].address;
+            const balance = currentWalletState.balance == null ? "0" : currentWalletState.balance;
+            localStorage.setItem('kaspa_phrase', 'gitchain');
             updateWalletStatus('Active');
-            showWalletInfo(address, balance);
+            showWalletInfo(address, +balance);
             // Clear inputs only after success
             for (let i = 1; i <= 24; i++) {
                 (document.getElementById(`word${i}`) as HTMLInputElement).value = '';
             }
+            input.value = '';
         } catch (err) {
             updateWalletStatus('Invalid seed phrase or restore failed', false, true);
             console.error(err);
