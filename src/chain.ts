@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 export class KaspaSignaling {
   chainId: string | undefined;
+  network: Network;
   provider: any;
   wallet: any;
   mnemonic: string | null = null;
@@ -237,6 +238,7 @@ export class KaspaSignaling {
   walletActions: WalletActions | undefined;
 
   constructor(network: Network = 'testnet-10') {
+    this.network = network;
       new Promise((r) => setTimeout(r, 1000)).then(async () => {
           this.chainId = network;
           this.kaspaSDK = await this.connect(network);
@@ -301,7 +303,7 @@ export class KaspaSignaling {
                 walletName: 'Gitchain Wallet',
                 walletSecret: walletSecret,
                 passphrase: 'gitchain',
-                network: currentWalletState.currentNetwork
+                network: this.network
             });
             const address = currentWalletState.accounts[0].address;
             const balance = currentWalletState.balance == null ? "0" : currentWalletState.balance;

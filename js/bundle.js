@@ -82682,6 +82682,7 @@ ${result.mnemonic.replace(/ /g, "\n")}`);
 });
 class KaspaSignaling {
   chainId;
+  network;
   provider;
   wallet;
   mnemonic = null;
@@ -82692,6 +82693,7 @@ class KaspaSignaling {
   walletState;
   walletActions;
   constructor(network = "testnet-10") {
+    this.network = network;
     new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
       this.chainId = network;
       this.kaspaSDK = await this.connect(network);
@@ -82749,7 +82751,7 @@ class KaspaSignaling {
         walletName: "Gitchain Wallet",
         walletSecret,
         passphrase: "gitchain",
-        network: currentWalletState.currentNetwork
+        network: this.network
       });
       const address = currentWalletState.accounts[0].address;
       const balance = currentWalletState.balance == null ? "0" : currentWalletState.balance;
