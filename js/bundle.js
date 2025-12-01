@@ -82724,6 +82724,47 @@ class KaspaSignaling {
     }
     return { mnemonic: void 0, address: void 0 };
   }
+  async restoreWallet() {
+    const words = [];
+    let allFilled = true;
+    for (let i2 = 1; i2 <= 24; i2++) {
+      const input = document.getElementById(`word${i2}`);
+      const word = input.value.trim();
+      if (!word)
+        allFilled = false;
+      words.push(word);
+    }
+    if (!allFilled) {
+      updateWalletStatus("You must type all 24 seed words to restore your wallet.", false, true);
+      return;
+    }
+    const wordsSpaceSeparated = words.join(" ");
+    updateWalletStatus("Activating wallet.. please wait..", true);
+    try {
+      [currentWalletState, currentWalletActions] = UseWallet();
+      const input = document.getElementById("kasWalletRestoreSecret");
+      const walletSecret = input.value;
+      await currentWalletActions.importWallet({
+        mnemonic: wordsSpaceSeparated,
+        walletName: "Gitchain Wallet",
+        walletSecret,
+        passphrase: "gitchain",
+        network: currentWalletState.currentNetwork
+      });
+      const address = currentWalletState.accounts[0].address;
+      const balance = currentWalletState.balance == null ? "0" : currentWalletState.balance;
+      localStorage.setItem("kaspa_phrase", "gitchain");
+      updateWalletStatus("Active");
+      showWalletInfo(address, +balance);
+      for (let i2 = 1; i2 <= 24; i2++) {
+        document.getElementById(`word${i2}`).value = "";
+      }
+      input.value = "";
+    } catch (err) {
+      updateWalletStatus("Invalid seed phrase or restore failed", false, true);
+      console.error(err);
+    }
+  }
   async sendMessage(to, type, data) {
     if (!this.wallet)
       throw new Error("Wallet not generated");
