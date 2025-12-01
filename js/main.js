@@ -89,9 +89,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     new Promise((r) => setTimeout(r, 1e3)).then(async () => {
       signaling = new window.gitchain.KaspaSignaling("testnet-10");
       window.gitchain.kaspaSignalingInstance = signaling;
-      const walletAddressRestoredDiv = document.getElementById("walletAddressRestored");
-      console.log("walletAddressRestoredDiv: " + walletAddressRestoredDiv);
-      walletAddressRestoredDiv.addressText.textContent = "Generating…";
+      const walletAddressRestoreDiv = document.getElementById("walletAddressRestored");
+      console.log("walletAddressRestoredDiv: " + walletAddressRestoreDiv);
+      walletAddressRestoreDiv.classList.remove("hidden");
+      walletAddressRestoreDiv.addressText.textContent = "Generating…";
       try {
         console.log("signaling: " + signaling);
         await signaling.restoreWallet();

@@ -121,9 +121,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Expose signaling object for other parts of the app
       window.gitchain.kaspaSignalingInstance = signaling;
 
-      const walletAddressRestoredDiv = document.getElementById('walletAddressRestored');
-      console.log("walletAddressRestoredDiv: " + walletAddressRestoredDiv);
-      walletAddressRestoredDiv.addressText.textContent = 'Generating…';
+      const walletAddressRestoreDiv = document.getElementById('walletAddressRestored');
+      console.log("walletAddressRestoredDiv: " + walletAddressRestoreDiv);
+      walletAddressRestoreDiv.classList.remove("hidden");
+      walletAddressRestoreDiv.addressText.textContent = 'Generating…';
 
       try {
         console.log("signaling: " + signaling);
