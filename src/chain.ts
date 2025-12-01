@@ -149,7 +149,7 @@ let currentWalletActions: WalletActions | null = null;
  * Wallet UI Helpers
  */
 function updateWalletStatus(message: string, blinking = false, error = false) {
-    const statusElem = document.getElementById('wallet-status');
+    const statusElem = document.getElementById('walletStatus');
     if (statusElem) {
         statusElem.textContent = message;
         statusElem.classList.toggle('blinking', blinking);
@@ -158,10 +158,10 @@ function updateWalletStatus(message: string, blinking = false, error = false) {
 }
 
 function showWalletInfo(address: string, balance: number) {
-    const addrDiv = document.getElementById('wallet-address');
-    const addrText = document.getElementById('address-text');
-    const balanceText = document.getElementById('balance-text');
-    const faucetDiv = document.getElementById('faucet-message');
+    const addrDiv = document.getElementById('walletAddress');
+    const addrText = document.getElementById('addressText');
+    const balanceText = document.getElementById('balanceText');
+    const faucetDiv = document.getElementById('faucetMessage');
     if (addrDiv && addrText && balanceText && faucetDiv) {
         addrText.textContent = address;
         balanceText.textContent = `${balance} KAS`;
@@ -193,11 +193,11 @@ async function loadOrRestoreWallet() {
 document.addEventListener('DOMContentLoaded', () => {
     loadOrRestoreWallet();
 
-    document.getElementById('generate-wallet')?.addEventListener('click', async () => {
+    document.getElementById('generateWallet')?.addEventListener('click', async () => {
         updateWalletStatus('Activating wallet.. please wait..', true);
         try {
             [currentWalletState, currentWalletActions] = UseWallet();
-            const input = document.getElementById('kas-wallet-generate-secret') as HTMLInputElement;
+            const input = document.getElementById('kasWalletGenerateSecret') as HTMLInputElement;
             const walletSecret = input.value;
             const result = await currentWalletActions.createWallet({
                 walletName: 'Gitchain Wallet',
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('restore-wallet')?.addEventListener('click', async () => {
+    document.getElementById('restoreWallet')?.addEventListener('click', async () => {
         const words: string[] = [];
         let allFilled = true;
         for (let i = 1; i <= 24; i++) {

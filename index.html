@@ -18,7 +18,7 @@
     .hidden { display: none; }
     #message { width: 80%; height: 50px; }
     #chat { border: 1px solid #ccc; height: 200px; overflow-y: auto; margin-top: 1rem; }
-    .kaspa-section { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; }
+    .kaspaSection { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; }
     .mnemonic { font-family: monospace; background: #f5f5f5; padding: 0.5rem; word-break: break-all; }
     .warning { color: red; font-size: 0.8rem; }
       .blinking {
@@ -30,17 +30,17 @@
       .error {
         color: red;
       }
-      .seed-columns {
+      .seedColumns {
         display: flex;
         justify-content: space-between;
       }
-      .seed-column {
+      .seedColumn {
         width: 48%;
       }
-      .seed-column ol li {
+      .seedColumn ol li {
         margin-bottom: 5px;
       }
-      .seed-column input {
+      .seedColumn input {
         width: 150px;
       }
   </style>
@@ -59,13 +59,13 @@
   <div id="blockHeight" class="spacer"></div>
   <div id="peerId" class="spacer"></div>
 
-  <div class="kaspa-section">
-    <h2>Kaspa Relay</h2>
+  <div class="kaspaSection">
+    <h2>Kaspa Communications</h2>
 
-    <details id="wallet-controls">
+    <details id="walletControls">
       <summary>Wallet Controls</summary>
       <div>
-        <p>Status: <span id="wallet-status">No wallet yet: Create or Activate one</span></p>
+        <p>Status: <span id="walletStatus">No wallet yet: Create or Activate one</span></p>
         <div id="walletInfo" class="hidden">
           <p><strong>Warning: Save these seed words ONLY on paper, not share!</strong> <span class="warning">Loss means lost funds in your wallet.</span></p>
           <p class="mnemonic" id="mnemonic"></p>
@@ -75,7 +75,7 @@
         </div>
         <div>
           <p><span>To generate a new wallet:</span></p>
-          <p><span>  New password to use: <input type="text" id="kas-wallet-generate-secret"> <button id="generate-wallet">Generate New Wallet</button></span></p>
+          <p><span>  New password to use: <input type="text" id="kasWalletGenerateSecret"> <button id="generateWallet">Generate New Wallet</button></span></p>
         </div>
         <div>
           <label>Or enter your 24 seed words to restore your existing wallet:</label>
@@ -96,7 +96,7 @@
                 <li><input type="text" id="word12" placeholder="Word 12"></li>
               </ol>
             </div>
-            <div class="seed-column">
+            <div class="seedColumn">
               <ol start="13">
                 <li><input type="text" id="word13" placeholder="Word 13"></li>
                 <li><input type="text" id="word14" placeholder="Word 14"></li>
@@ -113,13 +113,13 @@
               </ol>
             </div>
           </div>
-          New password to use: <input type="text" id="kas-wallet-restore-secret"> <button id="restore-wallet">Restore Existing Wallet</button>
+          New password to use: <input type="text" id="kasWalletRestoreSecret"> <button id="restoreWallet">Restore Existing Wallet</button>
         </div>
-        <div id="wallet-address-restored" style="display: none;">
-          Wallet Address: <span id="address-text"></span><br>
-          Balance: <span id="balance-text" style="font-weight: bold; font-family: monospace;"></span>
+        <div id="walletAddressRestored" style="display: none;">
+          Wallet Address: <span id="addressText"></span><br>
+          Balance: <span id="balanceText" style="font-weight: bold; font-family: monospace;"></span>
         </div>
-        <div id="faucet-message" style="display: none;">
+        <div id="faucetMessage" style="display: none;">
           You need to add KAS to your wallet, for free, by requesting it at the faucet page here: <a href="https://faucet-t11.kaspanet.io" target="_blank">Kaspa Testnet 11 Faucet</a>
         </div>
       </div>

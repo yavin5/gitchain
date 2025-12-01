@@ -82610,7 +82610,7 @@ let currentWallet = null;
 let currentWalletState = null;
 let currentWalletActions = null;
 function updateWalletStatus(message2, blinking = false, error = false) {
-  const statusElem = document.getElementById("wallet-status");
+  const statusElem = document.getElementById("walletStatus");
   if (statusElem) {
     statusElem.textContent = message2;
     statusElem.classList.toggle("blinking", blinking);
@@ -82618,10 +82618,10 @@ function updateWalletStatus(message2, blinking = false, error = false) {
   }
 }
 function showWalletInfo(address, balance) {
-  const addrDiv = document.getElementById("wallet-address");
-  const addrText = document.getElementById("address-text");
-  const balanceText = document.getElementById("balance-text");
-  const faucetDiv = document.getElementById("faucet-message");
+  const addrDiv = document.getElementById("walletAddress");
+  const addrText = document.getElementById("addressText");
+  const balanceText = document.getElementById("balanceText");
+  const faucetDiv = document.getElementById("faucetMessage");
   if (addrDiv && addrText && balanceText && faucetDiv) {
     addrText.textContent = address;
     balanceText.textContent = `${balance} KAS`;
@@ -82650,11 +82650,11 @@ async function loadOrRestoreWallet() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   loadOrRestoreWallet();
-  document.getElementById("generate-wallet")?.addEventListener("click", async () => {
+  document.getElementById("generateWallet")?.addEventListener("click", async () => {
     updateWalletStatus("Activating wallet.. please wait..", true);
     try {
       [currentWalletState, currentWalletActions] = UseWallet();
-      const input = document.getElementById("kas-wallet-generate-secret");
+      const input = document.getElementById("kasWalletGenerateSecret");
       const walletSecret = input.value;
       const result = await currentWalletActions.createWallet({
         walletName: "Gitchain Wallet",
@@ -82679,7 +82679,7 @@ ${result.mnemonic.replace(/ /g, "\n")}`);
       console.error(err);
     }
   });
-  document.getElementById("restore-wallet")?.addEventListener("click", async () => {
+  document.getElementById("restoreWallet")?.addEventListener("click", async () => {
     const words = [];
     let allFilled = true;
     for (let i2 = 1; i2 <= 24; i2++) {
@@ -82697,7 +82697,7 @@ ${result.mnemonic.replace(/ /g, "\n")}`);
     updateWalletStatus("Activating wallet.. please wait..", true);
     try {
       [currentWalletState, currentWalletActions] = UseWallet();
-      const input = document.getElementById("kas-wallet-restore-secret");
+      const input = document.getElementById("kasWalletRestoreSecret");
       const walletSecret = input.value;
       await currentWalletActions.importWallet({
         mnemonic: wordsSpaceSeparated,
