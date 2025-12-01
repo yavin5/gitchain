@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("signaling: " + signaling);
         await signaling.restoreWallet();
       } catch (err) {
-        walletAddressRestoredDiv.addressText.textContent = 'Error: ' + err.message;
+        addressText.textContent = 'Error: ' + err.message;
       }
     });
   });
