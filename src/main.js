@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sendButton        = document.getElementById('send');
 
   const generateWalletBtn = document.getElementById('generateWallet');
+  const restoreWalletBtn  = document.getElementById('restoreWallet');
   const walletInfoDiv     = document.getElementById('walletInfo');
   const mnemonicDisplay   = document.getElementById('mnemonic');
   const kaspaAddress      = document.getElementById('kaspaAddress');
