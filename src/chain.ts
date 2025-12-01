@@ -37,7 +37,6 @@ import { concat as uint8Concat } from 'uint8arrays';
 import { KaspaSDK, type Network } from '@kasstamp/sdk';
 import { initKaspaWasm } from '@kasstamp/kaspa_wasm_sdk';
 import { UseWallet, type WalletState, type WalletActions } from './UseWallet';
-import { getNetworkParams } from '../../../../../Volumes/share/git/kasstamp/js/packages/kasstamp_kaspa_wasm_sdk/web/kaspa.js';
 
 // Dynamic OWNER and REPO from URL
 const hostnameParts = location.hostname.split('.');
@@ -146,9 +145,9 @@ let currentWallet: any = null;
 let currentWalletState: WalletState | null = null;
 let currentWalletActions: WalletActions | null = null;
 
-// ---------------------------------------------------------------------------
-// Wallet UI Helpers
-// ---------------------------------------------------------------------------
+/**
+ * Wallet UI Helpers
+ */
 function updateWalletStatus(message: string, blinking = false, error = false) {
     const statusElem = document.getElementById('wallet-status');
     if (statusElem) {
@@ -238,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWalletStatus('Activating wallet.. please wait..', true);
         try {
             [currentWalletState, currentWalletActions] = UseWallet();
-            const input = document.getElementById('kas-wallet-restore-secret') as HTMLInputElement;
+            const input = document.getElementById('kasWalletRestoreSecret') as HTMLInputElement;
             const walletSecret = input.value;
             await currentWalletActions.importWallet({
                 mnemonic: wordsSpaceSeparated,
@@ -264,10 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-// ---------------------------------------------------------------------------
-// KaspaSignaling – signaling layer over Kaspa
-// ---------------------------------------------------------------------------
+/**
+ * KaspaSignaling – signaling layer over Kaspa
+ */
 export class KaspaSignaling {
   chainId: string | undefined;
   provider: any;
@@ -366,9 +364,9 @@ export class KaspaSignaling {
   }
 }
 
-// ---------------------------------------------------------------------------
-// WebRTCConnection – uses KaspaSignalling for SDP/ICE
-// ---------------------------------------------------------------------------
+/**
+ * WebRTCConnection – uses KaspaSignaling for SDP/ICE
+ */
 export class WebRTCConnection {
   signaling: KaspaSignaling;
   localPeerId: string;
@@ -442,9 +440,9 @@ export class WebRTCConnection {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Interfaces
-// ---------------------------------------------------------------------------
+/**
+ * Interfaces
+ */
 interface Transaction {
     from: string;
     to: string;
@@ -467,17 +465,11 @@ interface State {
     lastProcessedDate: string;
 }
 
-// ---------------------------------------------------------------------------
-// Calculate hash
-// ---------------------------------------------------------------------------
 function calculateHash(index: number, previousHash: string, timestamp: string, transactions: Transaction[]): string {
     const value = `${index}${previousHash}${timestamp}${JSON.stringify(transactions)}`;
     return CryptoJS.SHA256(value).toString();
 }
 
-// ---------------------------------------------------------------------------
-// Create genesis block
-// ---------------------------------------------------------------------------
 function createOriginalBlock(): Block {
     const timestamp = new Date().toISOString();
     return {
@@ -489,9 +481,6 @@ function createOriginalBlock(): Block {
     };
 }
 
-// ---------------------------------------------------------------------------
-// Serialize txn for signing/hash
-// ---------------------------------------------------------------------------
 function serializeTxn(txn: Omit<Transaction, 'signature'>): string {
     return JSON.stringify(txn, Object.keys(txn).sort());
 }
@@ -500,9 +489,6 @@ function keccak256Bytes(input: Uint8Array): Uint8Array {
     return Uint8Array.from(keccak256Buffer.array(input));
 }
 
-// ---------------------------------------------------------------------------
-// Hex to bytes
-// ---------------------------------------------------------------------------
 function hexToBytes(hex: string): Uint8Array {
     const bytes = new Uint8Array(hex.length / 2);
     for (let i = 0; i < hex.length; i += 2) {
@@ -511,16 +497,10 @@ function hexToBytes(hex: string): Uint8Array {
     return bytes;
 }
 
-// ---------------------------------------------------------------------------
-// Bytes to hex
-// ---------------------------------------------------------------------------
 function bytesToHex(bytes: Uint8Array): string {
     return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-// ---------------------------------------------------------------------------
-// Verify signature using elliptic
-// ---------------------------------------------------------------------------
 function verifyTxn(txn: Transaction): boolean {
     try {
 	const msgHash = keccak256Bytes(uint8FromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce })));
@@ -543,9 +523,9 @@ function verifyTxn(txn: Transaction): boolean {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Process a single txn (mint if from admin)
-// ---------------------------------------------------------------------------
+/**
+ * Process a single txn (mint if from admin)
+ */
 async function processTxn(txn: Transaction, state: State): Promise<{ valid: boolean; txid: string }> {
     const txid = bytesToHex(keccak256Bytes(uint8FromString(serializeTxn({ from: txn.from, to: txn.to, amount: txn.amount, nonce: txn.nonce }))));
     
@@ -557,9 +537,6 @@ async function processTxn(txn: Transaction, state: State): Promise<{ valid: bool
     return { valid: true, txid };
 }
 
-// ---------------------------------------------------------------------------
-// Create block
-// ---------------------------------------------------------------------------
 async function createBlock(state: State): Promise<number | null> {
     if (state.pending.length === 0) return null;
     const validTxns: Transaction[] = [];
@@ -591,9 +568,6 @@ async function createBlock(state: State): Promise<number | null> {
     return nextIndex;
 }
 
-// ---------------------------------------------------------------------------
-// Get GitHub access token
-// ---------------------------------------------------------------------------
 function getGithubAccessToken(): string | null {
     let githubAccessToken = localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY);
     if (!githubAccessToken) {
@@ -609,9 +583,9 @@ function getGithubAccessToken(): string | null {
     return githubAccessToken;
 }
 
-// ---------------------------------------------------------------------------
-// Initialize libp2p / WebRTC server
-// ---------------------------------------------------------------------------
+/**
+ * Initialize libp2p / WebRTC server
+ */
 export async function initP2P(host: boolean): Promise<void> {
     console.log('Entering initP2P, host:', host);
     isServer = host;
@@ -720,9 +694,9 @@ export async function initP2P(host: boolean): Promise<void> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Update server-peer.json
-// ---------------------------------------------------------------------------
+/**
+ * Update server-peer.json
+ */
 async function updateServerPeers(): Promise<string[]> {
     console.debug("Entering updateServerPeers() with serverPeers: " + JSON.stringify(serverPeers));
     const githubAccessToken = getGithubAccessToken();
@@ -785,9 +759,9 @@ async function updateServerPeers(): Promise<string[]> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Remove host peer ID on unload
-// ---------------------------------------------------------------------------
+/**
+ * Remove host peer ID on unload
+ */
 async function removeHostPeerId(): Promise<void> {
     if (!isServer || !libp2p) return;
     const peerId = libp2p.peerId.toString();
@@ -795,9 +769,9 @@ async function removeHostPeerId(): Promise<void> {
     await updateServerPeers();
 }
 
-// ---------------------------------------------------------------------------
-// Client-side: Connect and Send TX
-// ---------------------------------------------------------------------------
+/** 
+ * Client-side: Connect and send a transaction.
+ */
 export async function connectAndSendTx(tx: Transaction) {
     if (isServer) {
         const issueBody = JSON.stringify({
@@ -867,9 +841,6 @@ export async function connectAndSendTx(tx: Transaction) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Save GitHub access token
-// ---------------------------------------------------------------------------
 export function saveGithubAccessToken(): void {
     console.log('Entering saveGithubAccessToken');
     const githubAccessToken = (document.getElementById('patInput') as HTMLInputElement)?.value;
@@ -883,9 +854,6 @@ export function saveGithubAccessToken(): void {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Fetch state
-// ---------------------------------------------------------------------------
 export async function fetchState(): Promise<{ content: State; sha: string } | null> {
     console.log('Entering fetchState');
     const githubAccessToken = getGithubAccessToken();
@@ -919,9 +887,9 @@ export async function fetchState(): Promise<{ content: State; sha: string } | nu
     }
 }
 
-// ---------------------------------------------------------------------------
-// Update state with retries
-// ---------------------------------------------------------------------------
+/**
+ * Update state with retries
+ */
 async function updateState(newContent: State, oldSha: string | null, message: string, retries = 3): Promise<boolean> {
     console.log('Entering updateState, message:', message);
     const githubAccessToken = getGithubAccessToken();
@@ -961,9 +929,6 @@ async function updateState(newContent: State, oldSha: string | null, message: st
     }
 }
 
-// ---------------------------------------------------------------------------
-// Close issue with comment
-// ---------------------------------------------------------------------------
 async function closeIssueWithComment(issueNumber: number, blockIndex: number | null, valid: boolean): Promise<void> {
     console.log('Entering closeIssueWithComment, issue:', issueNumber);
     const githubAccessToken = getGithubAccessToken();
@@ -997,9 +962,9 @@ async function closeIssueWithComment(issueNumber: number, blockIndex: number | n
     });
 }
 
-// ---------------------------------------------------------------------------
-// Process txns via open issues
-// ---------------------------------------------------------------------------
+/**
+ * Process txns via open issues
+ */
 export async function processTxns(): Promise<void> {
     console.log('Entering processTxns');
     const output = document.getElementById('output') as HTMLDivElement;
@@ -1089,9 +1054,6 @@ export async function processTxns(): Promise<void> {
     processingMessage.classList.remove('visible');
 }
 
-// ---------------------------------------------------------------------------
-// View chain
-// ---------------------------------------------------------------------------
 export async function viewChain(): Promise<void> {
     console.log('Entering viewChain');
     const output = document.getElementById('output') as HTMLDivElement;
@@ -1120,19 +1082,17 @@ export async function viewChain(): Promise<void> {
     console.log('viewChain completed, chain length:', chain.length);
 }
 
-// ---------------------------------------------------------------------------
-// Expose libp2p and server peers
-// ---------------------------------------------------------------------------
 export function getLibp2p() {
     return libp2p;
 }
+
 export function getServerPeers() {
     return serverPeers;
 }
 
-// ---------------------------------------------------------------------------
-// Auto-process and initialize
-// ---------------------------------------------------------------------------
+/**
+ * Auto-process and initialize
+ */
 window.addEventListener('load', () => {
     console.log('Window loaded, checking for PAT');
     if (!localStorage.getItem(GITHUB_ACCESS_TOKEN_KEY)) {
@@ -1148,16 +1108,13 @@ window.addEventListener('load', () => {
     }, UPDATE_INTERVAL);
 });
 
-// ---------------------------------------------------------------------------
-// Unload event for removing peer ID
-// ---------------------------------------------------------------------------
+/**
+ * Unload event for removing peer ID
+ */
 window.addEventListener('unload', async () => {
     await removeHostPeerId();
 });
 
-// ---------------------------------------------------------------------------
-// Expose to window.gitchain
-// ---------------------------------------------------------------------------
 window.gitchain = {
     saveGithubAccessToken,
     viewChain,
@@ -1168,7 +1125,5 @@ window.gitchain = {
     WebRTCConnection
 };
 
-// ---------------------------------------------------------------------------
-// Dispatch event
-// ---------------------------------------------------------------------------
+// Dispatch the gitchain:init event now that this entire source file is processed.
 window.dispatchEvent(new Event('gitchain:init'));
