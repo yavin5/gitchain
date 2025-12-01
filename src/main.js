@@ -1,11 +1,9 @@
-// ---------------------------------------------------------------
 // Wait for the custom init event that bundle.js dispatches
-// ---------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
   // Wait a tick for bundle.js to run.
   await new Promise(r => setTimeout(r, 300));
 
-  // ---- DOM elements -------------------------------------------------
+  // DOM elements
   const patInput          = document.getElementById('patInput');
   const savePatButton     = document.getElementById('savePat');
   const processTxnsButton = document.getElementById('processTxns');
@@ -27,9 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let localPeerId = '';
   const connections = new Map();
 
-  // ---------------------------------------------------------------
-  // 1. P2P init – shows Peer ID
-  // ---------------------------------------------------------------
+  // P2P init – shows Peer ID
   if (window.gitchain && window.gitchain.initP2P) {
     window.gitchain.initP2P().then(peerId => {
       localPeerId = peerId;
@@ -37,9 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ---------------------------------------------------------------
-  // 2. Show current block height
-  // ---------------------------------------------------------------
+  // Show current block height
   if (window.gitchain && window.gitchain.fetchState) {
     window.gitchain.fetchState().then(state => {
       if (state && state.content && state.content.chain) {
@@ -50,9 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ---------------------------------------------------------------
-  // 3. PAT handling
-  // ---------------------------------------------------------------
+  // PAT handling
   if (localStorage.getItem('gitchain_github_access_token')) {
     tokenMessage.textContent = 'GitHub Personal Access Token saved.';
     processTxnsButton.classList.remove('hidden');
@@ -72,9 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ---------------------------------------------------------------
-  // 4. Process / View chain
-  // ---------------------------------------------------------------
+  // Process / View chain
   processTxnsButton.addEventListener('click', () => {
     if (window.gitchain && window.gitchain.processTxns) window.gitchain.processTxns();
   });
@@ -83,15 +73,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.gitchain && window.gitchain.viewChain) window.gitchain.viewChain();
   });
 
-  // ---------------------------------------------------------------
-  // 5. Generate Kaspa wallet
-  // ---------------------------------------------------------------
+  // Generate Kaspa wallet
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
 
     // Sleep some ticks to let chain.ts run.
-    new Promise((r) => setTimeout(r, 1000)).then(() => {
+    new Promise((r) => setTimeout(r, 1000)).then(async () => {
 
       signaling = new window.gitchain.KaspaSignaling("testnet-10");
       // Expose signaling object for other parts of the app
@@ -101,30 +89,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.log("walletInfoDiv: " + walletInfoDiv);
       walletInfoDiv.textContent = 'Generating…';
 
-      new Promise((r) => setTimeout(r, 10000)).then(() => {
-        try {
-          console.log("signaling: " + signaling);
-          const { mnemonic, address } = signaling.generateWallet();
-          console.log("Generated wallet: " + mnemonic + " " + address);
-          mnemonicDisplay.textContent = mnemonic;
-          kaspaAddress.textContent = address;
-          walletInfoDiv.classList.remove("hidden");
+      try {
+        console.log("signaling: " + signaling);
+        const { mnemonic, address } = await signaling.generateWallet();
+        console.log("Generated wallet: " + mnemonic + " " + address);
+        mnemonicDisplay.textContent = mnemonic;
+        kaspaAddress.textContent = address;
+        walletInfoDiv.classList.remove("hidden");
 
-          walletInfoDiv.innerHTML = `
+        walletInfoDiv.innerHTML = `
             <strong>Address:</strong> ${address}<br>
             <strong>Mnemonic (keep secret):</strong><br>
             <code style="word-break:break-all;">${mnemonic}</code>
           `;
-        } catch (err) {
-          walletInfoDiv.textContent = 'Error: ' + err.message;
-        }
-      });
+      } catch (err) {
+        walletInfoDiv.textContent = 'Error: ' + err.message;
+      }
     });
   });
 
-  // ---------------------------------------------------------------
-  // 6. Connect to peers (after funding)
-  // ---------------------------------------------------------------
+  // Generate Kaspa wallet
+  restoreWalletBtn.addEventListener('click', () => {
+    console.log("Clicked restore wallet button.");
+    console.log("About to instantiate KaspaSignaling.");
+
+    // Sleep some ticks to let chain.ts run.
+    new Promise((r) => setTimeout(r, 1000)).then(async () => {
+
+      signaling = new window.gitchain.KaspaSignaling("testnet-10");
+      // Expose signaling object for other parts of the app
+      window.gitchain.kaspaSignalingInstance = signaling;
+
+      const walletAddressRestoredDiv = document.getElementById('walletAddressRestored');
+      console.log("walletAddressRestoredDiv: " + walletAddressRestoredDiv);
+      walletAddressRestoredDiv.addressText.textContent = 'Generating…';
+
+      try {
+        console.log("signaling: " + signaling);
+        await signaling.restoreWallet();
+      } catch (err) {
+        walletAddressRestoredDiv.addressText.textContent = 'Error: ' + err.message;
+      }
+    });
+  });
+
+  // Connect to peers (after funding)
   connectPeersBtn.addEventListener('click', async () => {
     if (!signaling) return alert('Generate a wallet first.');
 
@@ -138,9 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // ---------------------------------------------------------------
-  // 7. Chat send
-  // ---------------------------------------------------------------
+  // Chat send
   sendButton.addEventListener('click', () => {
     const msg = messageInput.value.trim();
     if (!msg) return;
