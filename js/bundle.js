@@ -82757,15 +82757,13 @@ class KaspaSignaling {
       if (!result?.mnemonic)
         throw new Error("Mnemonic not generated");
       alert("Seed words: " + result.mnemonic);
-      if (!result.wallet.accounts[0])
-        alert("result doesn't have an address.");
-      else
-        alert("address: " + result.wallet.accounts[0]);
-      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address | 0 };
+      alert("address: " + JSON.stringify(result.wallet.accounts[0].address.receiveAddress));
+      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address.receiveAddress | 0 };
     } catch (err) {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
       console.error("Full stack trace:", err.stack);
     }
+    return { mnemonic: void 0, address: void 0 };
   }
   async sendMessage(to, type, data) {
     if (!this.wallet)

@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           mnemonicDisplay.textContent = mnemonic;
           kaspaAddress.textContent = address;
           walletInfoDiv.classList.remove("hidden");
-          console.log("Kaspa wallet generated:", { mnemonic, address });
           walletInfoDiv.innerHTML = `
             <strong>Address:</strong> ${address}<br>
             <strong>Mnemonic (keep secret):</strong><br>
