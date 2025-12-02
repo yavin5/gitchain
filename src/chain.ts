@@ -237,18 +237,19 @@ export class KaspaSignaling {
   walletState: WalletState | undefined;
   walletActions: WalletActions | undefined;
 
-  constructor(network: Network = 'testnet-10') {
+  constructor(network: Network = 'testnet-10', connectedCallback: Function = () => {}) {
     this.network = network;
       new Promise((r) => setTimeout(r, 1000)).then(async () => {
           this.chainId = network;
-          this.kaspaSDK = await this.connect(network);
+          this.kaspaSDK = await this.connect(network, connectedCallback);
       });
   }
 
-  async connect(networkName = 'testnet-10'): Promise<KaspaSDK> {
+  async connect(networkName = 'testnet-10', connectedCallback: Function = () => {}): Promise<KaspaSDK> {
     [this.walletState, this.walletActions] = UseWallet();
     this.kaspaSDK = await this.walletActions.connect(networkName);
     //this.startPolling();
+    connectedCallback();
     return this.kaspaSDK;
   }
 

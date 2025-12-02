@@ -82692,16 +82692,19 @@ class KaspaSignaling {
   kaspaSDK;
   walletState;
   walletActions;
-  constructor(network = "testnet-10") {
+  constructor(network = "testnet-10", connectedCallback = () => {
+  }) {
     this.network = network;
     new Promise((r2) => setTimeout(r2, 1e3)).then(async () => {
       this.chainId = network;
-      this.kaspaSDK = await this.connect(network);
+      this.kaspaSDK = await this.connect(network, connectedCallback);
     });
   }
-  async connect(networkName = "testnet-10") {
+  async connect(networkName = "testnet-10", connectedCallback = () => {
+  }) {
     [this.walletState, this.walletActions] = UseWallet();
     this.kaspaSDK = await this.walletActions.connect(networkName);
+    connectedCallback();
     return this.kaspaSDK;
   }
   async generateWallet() {
