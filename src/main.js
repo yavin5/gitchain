@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    walletStatusSpan.innerHTML = `<blink>Please wait, connecting..</blink>`;
+    walletStatusSpan.innerHTML = `<p style="blinking">Please wait, connecting..</p>`;
 
     // Sleep some ticks to let chain.ts run.
     new Promise((r) => setTimeout(r, 1000)).then(async () => {
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <strong>Mnemonic (keep secret):</strong><br>
             <code style="word-break:break-all;">${mnemonic}</code>
           `;
-          walletStatusSpan.innerHTML = `New wallet generated.`;
+          walletStatusSpan.innerHTML = `New wallet generated!`;
         } catch (err) {
           walletInfoDiv.textContent = 'Error: ' + err.message;
         }
@@ -115,11 +115,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   restoreWalletBtn.addEventListener('click', () => {
     console.log("Clicked restore wallet button.");
     console.log("About to instantiate KaspaSignaling.");
+    walletStatusSpan.innerHTML = `<p style="blinking">Please wait, connecting..</p>`;
 
     // Sleep some ticks to let chain.ts run.
     new Promise((r) => setTimeout(r, 1000)).then(async () => {
 
       signaling = new window.gitchain.KaspaSignaling("testnet-10", async () => {
+        walletStatusSpan.innerHTML = `Restoring wallet..`;
         const walletAddressRestoredDiv = document.getElementById('walletAddressRestored');
         console.log("walletAddressRestoredDiv: " + walletAddressRestoredDiv);
         walletAddressRestoredDiv.classList.remove("hidden");
@@ -129,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           console.log("signaling: " + signaling);
           await signaling.restoreWallet();
+          walletStatusSpan.innerHTML = `Wallet restored!`;
         } catch (err) {
           addressText.textContent = 'Error: ' + err.message;
         }
