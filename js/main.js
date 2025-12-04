@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const generateWalletBtn = document.getElementById("generateWallet");
   const restoreWalletBtn = document.getElementById("restoreWallet");
   document.getElementById("walletInfo");
+  const walletStatusSpan = document.getElementById("walletStatus");
   const mnemonicDisplay = document.getElementById("mnemonic");
   const kaspaAddress = document.getElementById("kaspaAddress");
   const connectPeersBtn = document.getElementById("connectPeers");
@@ -60,11 +61,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   generateWalletBtn.addEventListener("click", () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
+    walletStatusSpan.innerHTML = `<blink>Please wait, connecting..</blink>`;
     new Promise((r) => setTimeout(r, 1e3)).then(async () => {
       signaling = new window.gitchain.KaspaSignaling("testnet-10", async () => {
         const walletInfoDiv = document.getElementById("walletInfo");
         console.log("walletInfoDiv: " + walletInfoDiv);
-        walletInfoDiv.textContent = "Generating…";
+        walletStatusSpan.innerHTML = `Generating new wallet..`;
         try {
           const { mnemonic, address } = await signaling.generateWallet();
           console.log("Generated wallet: " + mnemonic + " " + address);
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <strong>Mnemonic (keep secret):</strong><br>
             <code style="word-break:break-all;">${mnemonic}</code>
           `;
+          walletStatusSpan.innerHTML = `New wallet generated.`;
         } catch (err) {
           walletInfoDiv.textContent = "Error: " + err.message;
         }

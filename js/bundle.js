@@ -82721,8 +82721,8 @@ class KaspaSignaling {
       if (!result?.mnemonic)
         throw new Error("Mnemonic not generated");
       alert("Seed words: " + result.mnemonic);
-      alert("address: " + JSON.stringify(result.wallet.accounts[0].address.receiveAddress));
-      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].address.receiveAddress | 0 };
+      alert("address: " + JSON.stringify(result.wallet.accounts[0].receiveAddress));
+      return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].receiveAddress };
     } catch (err) {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);
       console.error("Full stack trace:", err.stack);
