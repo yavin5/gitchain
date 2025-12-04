@@ -152,8 +152,8 @@ function updateWalletStatus(message: string, blinking = false, error = false) {
     const statusElem = document.getElementById('walletStatus');
     if (statusElem) {
         statusElem.textContent = message;
-        statusElem.classList.toggle('blinking', blinking);
-        statusElem.classList.toggle('error', error);
+        if (blinking) statusElem.classList.toggle('blinking', blinking);
+        if (error)    statusElem.classList.toggle('error', error);
     }
 }
 
@@ -186,7 +186,7 @@ async function loadOrRestoreWallet() {
             localStorage.removeItem('kaspa_phrase');
         }
     } else {
-        updateWalletStatus('No wallet yet: Create or Activate one');
+        updateWalletStatus('No wallet yet: Generate or Restore one.');
     }
 }
 
@@ -268,8 +268,8 @@ export class KaspaSignaling {
           });
 
           if (!result?.mnemonic) throw new Error('Mnemonic not generated');
-          alert("Seed words: " + result.mnemonic);
-          alert("address: " + JSON.stringify(result.wallet.accounts[0].receiveAddress));
+          //alert("Seed words: " + result.mnemonic);
+          //alert("address: " + result.wallet.accounts[0].receiveAddress);
 
           return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].receiveAddress };
 

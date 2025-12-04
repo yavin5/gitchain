@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   generateWalletBtn.addEventListener("click", () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    walletStatusSpan.innerHTML = `<p class="blinking">Please wait, connecting..</p>`;
+    walletStatusSpan.innerHTML = `<span class="blinking">Please wait, connecting..</span>`;
     new Promise((r) => setTimeout(r, 1e3)).then(async () => {
       signaling = new window.gitchain.KaspaSignaling("testnet-10", async () => {
         const walletInfoDiv = document.getElementById("walletInfo");
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   restoreWalletBtn.addEventListener("click", () => {
     console.log("Clicked restore wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    walletStatusSpan.innerHTML = `<p class="blinking">Please wait, connecting..</p>`;
+    walletStatusSpan.innerHTML = `<span class="blinking">Please wait, connecting..</span>`;
     new Promise((r) => setTimeout(r, 1e3)).then(async () => {
       signaling = new window.gitchain.KaspaSignaling("testnet-10", async () => {
         walletStatusSpan.innerHTML = `Restoring wallet..`;

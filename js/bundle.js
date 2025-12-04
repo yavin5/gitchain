@@ -82613,8 +82613,10 @@ function updateWalletStatus(message2, blinking = false, error = false) {
   const statusElem = document.getElementById("walletStatus");
   if (statusElem) {
     statusElem.textContent = message2;
-    statusElem.classList.toggle("blinking", blinking);
-    statusElem.classList.toggle("error", error);
+    if (blinking)
+      statusElem.classList.toggle("blinking", blinking);
+    if (error)
+      statusElem.classList.toggle("error", error);
   }
 }
 function showWalletInfo(address, balance) {
@@ -82645,7 +82647,7 @@ async function loadOrRestoreWallet() {
       localStorage.removeItem("kaspa_phrase");
     }
   } else {
-    updateWalletStatus("No wallet yet: Create or Activate one");
+    updateWalletStatus("No wallet yet: Generate or Restore one.");
   }
 }
 document.addEventListener("DOMContentLoaded", () => {
@@ -82720,8 +82722,6 @@ class KaspaSignaling {
       });
       if (!result?.mnemonic)
         throw new Error("Mnemonic not generated");
-      alert("Seed words: " + result.mnemonic);
-      alert("address: " + JSON.stringify(result.wallet.accounts[0].receiveAddress));
       return { mnemonic: result.mnemonic, address: result.wallet.accounts[0].receiveAddress };
     } catch (err) {
       console.error(err instanceof Error ? err.message : "Failed to create wallet: " + err);

@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   generateWalletBtn.addEventListener('click', () => {
     console.log("Clicked generate wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    walletStatusSpan.innerHTML = `<p class="blinking">Please wait, connecting..</p>`;
+    walletStatusSpan.innerHTML = `<span class="blinking">Please wait, connecting..</span>`;
 
     // Sleep some ticks to let chain.ts run.
     new Promise((r) => setTimeout(r, 1000)).then(async () => {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   restoreWalletBtn.addEventListener('click', () => {
     console.log("Clicked restore wallet button.");
     console.log("About to instantiate KaspaSignaling.");
-    walletStatusSpan.innerHTML = `<p class="blinking">Please wait, connecting..</p>`;
+    walletStatusSpan.innerHTML = `<span class="blinking">Please wait, connecting..</span>`;
 
     // Sleep some ticks to let chain.ts run.
     new Promise((r) => setTimeout(r, 1000)).then(async () => {
